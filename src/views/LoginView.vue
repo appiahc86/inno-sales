@@ -1,0 +1,110 @@
+<template>
+
+  <div class="">
+    <!-- Button trigger modal -->
+    <button type="button" ref="loginModal" class="d-none" data-bs-toggle="modal" data-bs-target="#loginModal">
+    </button>
+
+    <!-- Modal -->
+    <div class="modal" id="loginModal" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+      <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="container">
+              <div class="row justify-content-center">
+
+                <div class="col-5">
+                  <div class="card shadow p-4 login-form-container">
+                      <h3 class="text-center text-info">{{ companyName }}</h3>
+                      <form @submit.prevent="login">
+                        <table class="myTable">
+                          <tr>
+                            <th>Username</th>
+                            <td><input type="text" v-model.trim="username" class="form-control-dark py-1"></td>
+                          </tr>
+                          <tr>
+                            <th>Password</th>
+                            <td><input :type="showPass ? 'text' : 'password'" v-model="password" class="form-control-dark py-1"></td>
+                          </tr>
+                          <tr>
+                            <th></th>
+                            <td><label><input type="checkbox" class="p-checkbox" v-model="showPass"> Show password</label></td>
+                          </tr>
+                        </table>
+                        <button type="submit" class="btn btn-secondary btn-sm loginBtn">
+                          <span class="pi pi-lock"></span>
+                          Login
+                        </button>
+                        <button type="button" class="d-none" data-bs-dismiss="modal" name="closeModal"></button>
+                      </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</template>
+
+<script setup>
+
+import {computed, onMounted, ref} from "vue";
+import {useStore} from "vuex";
+import {useRouter} from "vue-router";
+
+const router = useRouter();
+const username = ref('');
+const password = ref('');
+const loginModal = ref(null);
+const showPass = ref(false);
+const store = useStore();
+const companyName = ref('');
+const settings = computed(() => store.getters.setting);
+
+onMounted(() => {
+  loginModal.value.click();
+  companyName.value = settings.value.companyName;
+})
+
+const login = async (e) => {
+  console.log('logged in')
+    e.target.closeModal.click();
+    router.push({name: 'sales'});
+}
+
+</script>
+
+<style scoped>
+
+.login-form-container{
+  top: 50%;
+  box-sizing: border-box;
+}
+.myTable th{
+  padding: 15px;
+  font-size: 1.3em;
+  width: 25%;
+}
+.myTable td{
+  width: 70%
+}
+
+.form-control-dark{
+  width: 100%
+}
+.loginBtn{
+  margin-top: 10px;
+  width: 23%;
+  margin-left: 35%;
+}
+.modal-body{
+  background-image: url("../assets/bg.jpg");
+}
+
+
+</style>

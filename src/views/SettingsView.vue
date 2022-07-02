@@ -1,7 +1,7 @@
 <template>
 <div class="container-fluid mt-5">
   <form @submit.prevent="save">
-  <div class="row shadow-sm p-3">
+  <div class="row shadow shadow-lg p-3">
 
     <div class="col-5" style="border: 0.5px solid #ccc;">
       <h4 class="w-100 p-1 text-center text-dark" >Company Settings</h4>
@@ -92,6 +92,9 @@ const save = async () => {
 
 <style scoped>
 .myTable th{
-  padding: 10px;
+  padding: 20px;
+}
+.form-control-dark{
+  padding: 6px;
 }
 </style>

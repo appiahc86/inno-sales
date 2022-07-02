@@ -28,7 +28,7 @@
           >
             <template #header>
               <div class="d-flex justify-content-center align-items-center" style="height: 15px">
-                <h5 class="px-3">Categories</h5>
+                <h6 class="px-3">Categories</h6>
                 <span class="p-input-icon-left">
                         <i class="pi pi-search" />
                         <InputText v-model="filters['global'].value" placeholder="Search Category" style="height: 30px;"/>
@@ -38,17 +38,17 @@
             <template #empty>
               No Category found.
             </template>
-            <Column field="name" header="Name" sortable>
+            <Column field="name" header="Name" sortable style="font-size: 0.85em;">
               <template #body="{data}">
                 <td style="font-size: 0.8em;">{{ data.name.toUpperCase() }}</td>
               </template>
             </Column>
-            <template #body="{data}">
+            <template #body="{data}" style="font-size: 0.85em;">
               <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span> &nbsp;
               <span type="button" title="Delete" @click="confirmDelete(data.id)">&#10060;</span>
             </template>
 
-            <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible">
+            <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" style="font-size: 0.85em;">
               <template #body="{data}">
                 <span style="font-size: 0.8em;" type="button" title="Edit" @click="showModal(data.id, data.name)">&#128221;</span> &nbsp;
                 <span style="font-size: 0.8em;" type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>

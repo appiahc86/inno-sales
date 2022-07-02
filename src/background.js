@@ -152,6 +152,8 @@ ipcMain.on('confirm', async (event, {id, type}) => {
       break;
       case 'customer': event.sender.send('deleteCustomer', id);
       break;
+      case 'vendor': event.sender.send('deleteVendor', id);
+      break;
       default:
         console.clear();
             break;

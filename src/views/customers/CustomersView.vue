@@ -61,7 +61,7 @@
         >
           <template #header>
             <div class="d-flex justify-content-center align-items-center" style="height: 15px">
-              <h5 class="px-3">Customers</h5>
+              <h6 class="px-3">Customers</h6>
               <span class="p-input-icon-left">
                         <i class="pi pi-search" />
                         <InputText v-model="filters['global'].value" placeholder="Keyword Search" style="height: 30px"/>
@@ -75,14 +75,14 @@
             <h4 class="text-white"> Loading Customers data. Please wait.</h4>
           </template>
 
-          <Column selection-mode="multiple"></Column>
+          <Column selection-mode="multiple"  style="font-size: 0.85em;"></Column>
 
-          <Column field="name" header="Name" sortable></Column>
-          <Column field="company" header="Company" sortable></Column>
-          <Column field="phone" header="Contact" sortable></Column>
-          <Column field="address" header="Address" sortable></Column>
+          <Column field="name" header="Name" sortable  style="font-size: 0.85em;"></Column>
+          <Column field="company" header="Company" sortable  style="font-size: 0.85em;"></Column>
+          <Column field="phone" header="Contact" sortable  style="font-size: 0.85em;"></Column>
+          <Column field="address" header="Address" sortable  style="font-size: 0.85em;"></Column>
 
-          <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible">
+          <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.85em;">
             <template #body="{data}">
               <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span> &nbsp;
               <span type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
@@ -172,6 +172,7 @@ const getCustomers = async () => {
   try {
     loading.value = true;
     customers.value = await db.select().from('customers');
+
   }catch (e) {
     ipcRenderer.send("errorMessage", e.message)
   }finally {
@@ -283,7 +284,10 @@ ipcRenderer.on('deleteCustomer', async (event, args) => {
   padding: 1em;
 }
 .form-control-dark{
-  padding: 7px;
+  padding: 5px;
+}
+#formTable input{
+  max-width: 250px;
 }
 
 </style>

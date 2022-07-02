@@ -2,14 +2,14 @@
   <nav id="productsNav">
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
       <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-product" type="button" role="tab" aria-controls="nav-add-product" aria-selected="false">Add Product</button>
-      <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-products" type="button" role="tab" aria-controls="nav-home" aria-selected="true">All Products</button>
+      <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-products" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Products List</button>
     </div>
   </nav>
   <div class="tab-content" id="nav-tabContent">
 
     <!--  product Form  -->
       <div class="tab-pane mt-5 show active" id="add-product" role="tabpanel" aria-labelledby="nav-add-product-tab">
-        <div class="card shadow pb-4 pt-4">
+        <div class="card pb-4 pt-4">
           <div class="container">
             <div class="row justify-content-center">
               <div class="col-md-9">
@@ -50,7 +50,9 @@
                       <th>Description</th>
                       <td><textarea class="form-control-dark w-75" cols="10" rows="3" v-model.trim="productData.description"></textarea></td>
                       <th></th>
-                      <td><button name="addProductBtn" class="btn-secondary p-1" type="submit">Add Product</button></td>
+                      <td><button name="addProductBtn" class="btn-secondary p-1" type="submit">
+                       <span class="pi pi-save"></span>  Add Product
+                      </button></td>
                     </tr>
 
                   </table>
@@ -77,10 +79,11 @@
          >
            <template #header>
              <div class="d-flex justify-content-center align-items-center" style="height: 15px">
-               <h5 class="px-3">Products</h5>
+               <h6 class="px-3">Products</h6>
                <span class="p-input-icon-left">
                         <i class="pi pi-search" />
-                        <InputText v-model="filters['global'].value" placeholder="Keyword Search" style="height: 30px"/>
+                        <InputText v-model="filters['global'].value"
+                             placeholder="Keyword Search" style="height: 30px;"/>
                     </span>
              </div>
            </template>
@@ -91,17 +94,21 @@
              <h4 class="text-white"> Loading data. Please wait.</h4>
            </template>
 
-             <Column selection-mode="multiple"></Column>
+             <Column selection-mode="multiple" style="font-size: 0.85em;"></Column>
 
-           <Column field="productName" header="Product" sortable></Column>
-           <Column field="category" header="Category" sortable></Column>
-           <Column field="buyingPrice" header="Buy. Price" sortable></Column>
-           <Column field="sellingPrice" header="Sel. Price" sortable></Column>
-           <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;"></Column>
-           <Column field="tax" header="Tax" sortable></Column>
-           <Column field="description" header="Desc" sortable></Column>
+           <Column field="productName" header="Product" sortable style="font-size: 0.85em;">
+             <template #body="{data}">
+               <td :style="{color: data.quantity < 5 ? 'red' : '' }">{{ data.productName }}</td>
+             </template>
+           </Column>
+           <Column field="category" header="Category" sortable style="font-size: 0.85em;"></Column>
+           <Column field="buyingPrice" header="Buy. Price" sortable style="font-size: 0.85em;"></Column>
+           <Column field="sellingPrice" header="Sel. Price" sortable style="font-size: 0.85em;"></Column>
+           <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" style="font-size: 0.85em;"></Column>
+           <Column field="tax" header="Tax" sortable style="font-size: 0.85em;"></Column>
+           <Column field="description" header="Desc" sortable style="font-size: 0.85em;"></Column>
 
-           <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible">
+           <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" style="font-size: 0.85em;">
              <template #body="{data}">
                <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span> &nbsp;
                <span type="button" title="Delete" @click="confirmDelete(data.id)">&#10060;</span>
@@ -238,6 +245,7 @@ import { formatNumber } from "@/functions";
 
         loading.value = true;
 
+
           products.value = await db('products')
               .leftJoin('categories', 'products.category', '=','categories.id')
               .select('products.id',
@@ -295,7 +303,7 @@ import { formatNumber } from "@/functions";
 
           await db('products').insert(productData);
           resetProductData();
-          getAllProducts();
+          getAllProducts(); //TODO update in front end
 
         }else ipcRenderer.send('errorMessage', `${Object.values(validation.errors.all())[0]}`)
 
@@ -306,7 +314,6 @@ import { formatNumber } from "@/functions";
       }
 
     } // ./Add product
-
 
 
     //Edit Product
@@ -410,6 +417,7 @@ import { formatNumber } from "@/functions";
 }
 .form-control-dark{
   width: 70%;
+  padding: 5px;
 }
 
 .formTable td, .formTable th{
@@ -420,6 +428,9 @@ import { formatNumber } from "@/functions";
 }
 .w-40{
   width: 40%;
+}
+.formTable input, .formTable textarea, .formTable select {
+  max-width: 300px;
 }
 
 </style>

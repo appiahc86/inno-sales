@@ -10,10 +10,10 @@
 
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link" aria-current="page">
+              <router-link :to="{ name: 'home' }" class="nav-link">
                 <span data-feather="home" class="pi pi-home"></span>
-                Dashboard
-              </a>
+               Home
+              </router-link>
             </li>
             <li class="nav-item">
               <router-link :to="{name: 'sales'}" class="nav-link">
@@ -59,12 +59,6 @@
                   <li><a class="dropdown-item" href="#">Held Vouchers</a></li>
                 </ul>
               </div>
-            </li>
-            <li class="nav-item">
-              <router-link :to="{ name: 'home' }" class="nav-link">
-                <span data-feather="bar-chart-2">&#127513;</span>
-                Home
-              </router-link>
             </li>
           </ul>
 

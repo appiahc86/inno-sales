@@ -5,12 +5,12 @@ const Vendor = async () => {
 
         await db.schema.createTable('vendors', table => {
             table.bigIncrements('id').primary();
-            table.string('firstName', 40);
-            table.string('lastName', 40);
-            table.string('email', 40);
-            table.string('address');
-            table.string('contact', 40);
-            table.string('accountNumber', 40);
+            table.string('company', 150);
+            table.string('address', 100);
+            table.string('contactPerson', 50);
+            table.string('phone', 50);
+            table.string('accountNumber', 50);
+            table.string('notes');
         })
     }
 }

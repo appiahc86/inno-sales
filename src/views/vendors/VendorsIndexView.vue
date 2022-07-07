@@ -105,7 +105,7 @@
         </DataTable>
       </div>
       <br>
-      <button class="btn-secondary" @click="confirm(selectedVendors)">
+      <button class="btn-secondary" v-if="selectedVendors.length" @click="confirm(selectedVendors)">
         <span class="pi pi-trash"></span>
         Delete Selection
       </button>

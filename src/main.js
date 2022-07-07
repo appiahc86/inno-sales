@@ -9,10 +9,7 @@ import InputText from "primevue/inputtext";
 import vSelect from "vue-select"
 const app = createApp(App)
 
-
-// import 'primevue/resources/themes/nova-accent/theme.css'
 import 'primevue/resources/themes/rhea/theme.css'
-
 import 'primevue/resources/primevue.min.css'
 import 'primeicons/primeicons.css'
 

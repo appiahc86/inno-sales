@@ -36,7 +36,8 @@
                           <span class="pi pi-lock"></span>
                           Login
                         </button>
-                        <button type="button" class="d-none" data-bs-dismiss="modal" name="closeModal"></button>
+                        <!-- this button is used to close the modal   -->
+                        <button type="button" class="d-none" data-bs-dismiss="modal" ref="closeModal"></button>
                       </form>
                   </div>
                 </div>
@@ -47,6 +48,9 @@
         </div>
       </div>
     </div>
+
+
+
   </div>
 
 </template>
@@ -55,7 +59,7 @@
 
 import {computed, onMounted, ref} from "vue";
 import {useStore} from "vuex";
-import {useRouter} from "vue-router";
+import {onBeforeRouteLeave, useRouter} from "vue-router";
 
 const router = useRouter();
 const username = ref('');
@@ -63,6 +67,7 @@ const password = ref('');
 const loginModal = ref(null);
 const showPass = ref(false);
 const store = useStore();
+const closeModal = ref(null);
 const companyName = ref('');
 const settings = computed(() => store.getters.setting);
 
@@ -73,9 +78,14 @@ onMounted(() => {
 
 const login = async (e) => {
   console.log('logged in')
-    e.target.closeModal.click();
     router.push({name: 'sales'});
 }
+
+//Close modal before leaving this page
+onBeforeRouteLeave( (to, from, next) =>{
+   closeModal.value.click();
+  next();
+})
 
 </script>
 
@@ -104,6 +114,9 @@ const login = async (e) => {
 }
 .modal-body{
   background-image: url("../assets/bg.jpg");
+}
+.login-form-container{
+  max-width: 530px;
 }
 
 

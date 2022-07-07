@@ -3,7 +3,7 @@
   <form @submit.prevent="save">
   <div class="row shadow shadow-lg p-3">
 
-    <div class="col-5" style="border: 0.5px solid #ccc;">
+    <div class="col-6" style="border: 0.5px solid #ccc;">
       <h4 class="w-100 p-1 text-center text-dark" >Company Settings</h4>
 
         <table class="myTable w-100">
@@ -27,7 +27,7 @@
 
     </div>
 
-    <div class="col-4" style="border: 0.5px solid #ccc;">
+    <div class="col-3" style="border: 0.5px solid #ccc;">
       <h4 class="w-100 p-1 text-center text-dark">Tax Settings</h4>
       <table class="">
         <tr>
@@ -93,6 +93,11 @@ const save = async () => {
 <style scoped>
 .myTable th{
   padding: 20px;
+}
+.myTable td{
+  /*width: 65%;*/
+  max-width: 300px;
+  min-width: 300px;
 }
 .form-control-dark{
   padding: 6px;

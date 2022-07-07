@@ -65,6 +65,17 @@
          <h5><span class="text-danger fw-bold">Amount Due: </span>GHS {{ formatNumber(total) }}</h5>
        </div>
 
+       <div class="container" v-if="cart.length">
+         <div class="row">
+           <div class="col">
+             <button class="btn-info text-white" @click="putOnHold"><b>Put On Hold</b></button>
+           </div>
+           <div class="col">
+             <button class="btn-warning" @click="clearCart"><b>Clear Cart</b></button>
+           </div>
+         </div>
+       </div>
+
      </div>
    </div>
 
@@ -74,14 +85,14 @@
        <v-select :options="customers" label="display" v-model="selectedCustomer"
                  placeholder="--select customer--" class="v-select">
        </v-select>
-         <h5 class="text-center fw-bold blink text-danger" v-if="tendered < total">Awaiting Payment</h5>
-         <h5 class="text-center fw-bold" v-else>Checkout</h5>
+         <h5 class="text-center fw-bold blink text-danger mt-1" v-if="tendered < total">Awaiting Payment</h5>
+         <h5 class="mt-1 invisible" v-else>.</h5>
 
        <div class="card-body">
          <form @submit.prevent="checkout">
            <div class="d-flex">
-             <h5 class="w-50">Cash</h5>
-             <h5 class="w-50">MoMo</h5>
+             <h6 class="w-50">Cash</h6>
+             <h6 class="w-50">MoMo</h6>
            </div>
            <div class="d-flex">
              <input type="number" class="form-control-dark w-50" step="0.01" v-model="cash" min="0" ref="cashRef"> &nbsp;
@@ -238,20 +249,21 @@
 </template>
 
 <script setup>
+//TODO Put on hold
 import {ref, watch, computed, reactive, onMounted} from "vue";
 import db from "@/dbConfig/db";
 import 'vue-select/dist/vue-select.css'
 import { useStore } from "vuex";
 import { formatNumber } from "@/functions";
 
-const store = useStore()
+const store = useStore();
 const selectedProduct = ref(null);
 const selectedCustomer = ref(null);
 const products = ref([]);
 const customers = ref([]);
 const dialog = ref(null);
 const barcode = ref(1); //For barcode
-const loading = ref(false)
+const loading = ref(false);
 const companySettings = computed(() => store.getters.setting); //get company settings
 
 
@@ -346,6 +358,10 @@ const totalTax = computed(() => store.getters["cartModule/totalTax"]); //get tot
 const total = computed(() => store.getters["cartModule/total"]); //get cart total
 const totalDiscount = computed(() => store.getters["cartModule/totalDiscount"]); //get total discount
 
+const clearCart = () => store.dispatch('cartModule/clearCart'); //Clear cart
+
+//Put on hold
+const putOnHold = () => store.dispatch("cartModule/putOnHold", '');
 
 
          //............................EDITING DISCOUNT AND PRICE....................................
@@ -524,7 +540,7 @@ const checkout = async (e) => {
        })
 
     //Clear cart and reset payment form
-    store.dispatch('cartModule/clearCart');
+    clearCart();
     resetPayment();
 
      // Initialize barcode

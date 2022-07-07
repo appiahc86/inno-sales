@@ -2,9 +2,16 @@ import {dialog, BrowserWindow} from "electron";
 import * as path from "path";
 const fse = require('fs-extra');
 
+//Send report event
+const sendReportEvent = (routeName) => {
+    const win = BrowserWindow.getAllWindows()[0];
+    win.webContents.send('report', routeName)
+}
+
+// Copy database
 const copyDatabaseFile = async (filePath) => {
     try {
-        const win = BrowserWindow.getAllWindows()[0]
+        const win = BrowserWindow.getAllWindows()[0];
         win.webContents.send('backing-up', '')
 
         await fse.copy('./bk/sales.db', filePath);
@@ -70,17 +77,57 @@ const adminMenu = [
                 }
             },
 
+        ]
+    },
+
+                //..........................Reports.........................
+    {
+        label: 'Reports',
+        submenu: [
+            {label: 'Reports Center'},
+            {label: 'Dashboard'},
+            {type: 'separator'},
+
+            //Sales
             {
-                label: 'Reports',
+                label: 'Sales',
                 submenu: [
-                    {
-                        label: 'Daily Sales Report',
-                        click(){dialog.showErrorBox('Sorry', 'No Report found', )}
-                    }
+                    {label: 'Daily Sales', click(){sendReportEvent('report-dailySales')}},
+                    {label: 'Sales Over Time'}
                 ]
-            }
+            },// ./Sales
+
+            //Payments
+            {
+                label: 'Payments',
+                submenu: [
+                    {label: 'Payment Summary'}
+                ]
+            }, // ./Payments
+
+            //Customers
+            {
+                label: 'Customers',
+                submenu: [
+                    {label: 'Customer List'}
+                ]
+            }, // ./Customers
+
+            //Products
+            {
+                label: 'Products',
+                submenu: [
+                    {label: 'Summary'},
+                    {label: 'Products List'},
+                ]
+            }, // ./products
         ]
     }
+                    //  .........................../Reports.............................
+
+
+
+
 
 ]
 

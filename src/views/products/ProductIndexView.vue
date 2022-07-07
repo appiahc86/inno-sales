@@ -12,15 +12,15 @@
         <div class="card pb-4 pt-4">
           <div class="container">
             <div class="row justify-content-center">
-              <div class="col-md-9">
+              <div class="col-md-10">
                 <form @submit.prevent="addProduct">
                   <table class="formTable">
                     <tr>
                       <th class="w-10">Category</th>
                       <td class="w-40">
-                        <select class="form-control-dark w-75" v-model="productData.category">
-                          <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name.toUpperCase() }}</option>
-                        </select>
+                        <v-select :options="categories" label="name" v-model="productData.category"
+                                  placeholder="" class="form-control-dark w-75">
+                        </v-select>
                       </td>
                       <th class="w-10">Product Name</th>
                       <td class="w-40"><input type="text" class="form-control-dark w-75" v-model.trim="productData.productName"></td>
@@ -126,7 +126,7 @@
   </div>
 
 <!--  Edit Dialog-->
-  <dialog ref="editProductDialog">
+  <dialog ref="editProductDialog" name="dialog">
     <h4>Edit product</h4>
     <div class="container-fluid">
       <div class="row justify-content-center">
@@ -139,6 +139,9 @@
                   <select class="form-control-dark w-100" v-model="editProductData.category">
                     <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name.toUpperCase() }}</option>
                   </select>
+<!--                  <v-select :options="categories" label="name" v-model="editProductData.category"-->
+<!--                            placeholder="" class="form-control-dark w-100">-->
+<!--                  </v-select>-->
                 </td>
                 <th class="w-10">Product Name</th>
                 <td class="w-40"><input type="text" class="form-control-dark w-100" v-model.trim="editProductData.productName"></td>
@@ -150,7 +153,6 @@
                 <th class="w-10">Selling Price</th>
                 <td class="w-40"><input type="number" step="0.01" min="0" class="form-control-dark w-100" v-model.number="editProductData.sellingPrice"></td>
               </tr>
-
 
               <tr>
                 <th class="w-10">Quantity</th>
@@ -170,9 +172,8 @@
                 <th class="w-10"></th>
                 <td class="w-40">
                 <button name="addProductBtn" class="btn-secondary p-1 w-50" type="submit">Save</button>&nbsp;
-                  <button name="addProductBtn" class="btn-outline-dark p-1 w-40" type="button" @click="editProductDialog.close()">cancel</button>
+                <button name="addProductBtn" class="btn-outline-dark p-1 w-40" type="button" @click="editProductDialog.close()">cancel</button>
                 </td>
-
               </tr>
 
             </table>
@@ -209,7 +210,7 @@ import { formatNumber } from "@/functions";
       description: '',
       buyingPrice: '',
       sellingPrice: '',
-      category: '',
+      category: null,
       tax: 'tax'
     })
 
@@ -276,7 +277,7 @@ import { formatNumber } from "@/functions";
     //Reset Product from data
     const resetProductData = () => {
       productData.productName = ''; productData.quantity = ''; productData.description = '';
-      productData.buyingPrice = ''; productData.sellingPrice = ''; productData.category = '';
+      productData.buyingPrice = ''; productData.sellingPrice = ''; productData.category = null;
       productData.tax = 'tax';
     }
 
@@ -300,6 +301,7 @@ import { formatNumber } from "@/functions";
         if (validation.passes()){ // If validation passes
           e.target.addProductBtn.disabled = true
           e.target.addProductBtn.innerText = 'Processing...'
+          productData.category = productData.category.id;
 
           await db('products').insert(productData);
           resetProductData();
@@ -332,7 +334,6 @@ import { formatNumber } from "@/functions";
         })
 
         if (validation.passes()){ // If validation passes
-
           await db('products').where('id', editProductData.id).first().update({...editProductData, id: undefined, categoryName: undefined});
           editProductDialog.value.close(); // Close edit dialog
           products.value.map(product => { //Update data in front end without reloading from database
@@ -347,7 +348,7 @@ import { formatNumber } from "@/functions";
               product.productName = editProductData.productName;
               product.quantity = editProductData.quantity;
               product.sellingPrice = formatNumber(parseFloat(editProductData.sellingPrice));
-            };
+            }
           })
 
         }else ipcRenderer.send('errorMessage', `${ Object.values(validation.errors.all())[0] }`)
@@ -388,9 +389,9 @@ import { formatNumber } from "@/functions";
       }
     }) // ./Delete Product
 
-
     // open dialog for editing product
     const openDialog = (data) => {
+
           editProductData.id = data.id;
 
           editProductData.productName = data.productName;
@@ -401,7 +402,8 @@ import { formatNumber } from "@/functions";
           editProductData.category = data.categoryId;
           editProductData.categoryName = data.category;
           editProductData.tax = data.tax;
-      editProductDialog.value.showModal()
+          editProductDialog.value.showModal();
+
     }
 
 </script>

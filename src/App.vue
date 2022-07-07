@@ -15,11 +15,19 @@
                Home
               </router-link>
             </li>
+
             <li class="nav-item">
-              <router-link :to="{name: 'sales'}" class="nav-link">
-                <span class="pi pi-shopping-cart"></span>
-               Sales
-              </router-link>
+              <div class="dropdown">
+                <a class="dropdown-toggle nav-link" id="sales" data-bs-toggle="dropdown" aria-expanded="false">
+                  <span class="pi pi-shopping-cart"></span>
+                  Sales
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="sales" style="font-size: 0.9em !important;">
+                  <li><router-link :to="{name: 'sales'}" class="dropdown-item">New Sales Receipt</router-link></li>
+                  <li><router-link :to="{name: 'held-items'}" class="dropdown-item">Held Receipts</router-link></li>
+                  <li><a class="dropdown-item" href="#">Sales History</a></li>
+                </ul>
+              </div>
             </li>
             <li class="nav-item">
               <router-link :to="{name: 'products'}" class="nav-link">
@@ -51,8 +59,8 @@
                   <span data-feather="users">&#127513;</span>
                   Purchasing
                 </a>
-                <ul class="dropdown-menu" aria-labelledby="purchasing" style="background: #ccc;">
-                  <li><a class="dropdown-item" href="#">Receive Items</a></li>
+                <ul class="dropdown-menu" aria-labelledby="purchasing">
+                  <li><router-link :to="{name: 'receiveItems'}" class="dropdown-item">Receive Items</router-link></li>
                   <li><a class="dropdown-item" href="#">Return Voucher</a></li>
                   <li class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="#">Receiving History</a></li>
@@ -127,10 +135,12 @@ settings();
 
 import {onMounted, ref} from "vue";
 import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 
 const time = ref(null);
 const backup = ref(false)
 const store = useStore();
+const router = useRouter();
 
 
       ipcRenderer.on('backing-up', (event, args) =>{
@@ -162,6 +172,11 @@ const insertUser = async () => {
         },10)
       })
 
+// listen to report events and redirect to page
+ipcRenderer.on('report', (event, args) => {
+  router.push({name: args})
+})
+
 </script>
 
 <style scoped>
@@ -176,5 +191,8 @@ nav a.router-link-exact-active {
   color: white;
   font-weight: bold;
   background: #041e34;
+}
+.dropdown-menu{
+  background: #ccc;
 }
 </style>

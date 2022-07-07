@@ -117,8 +117,24 @@ const cartModule = {
         clearCart: (state) => state.cart = [],
 
         //Set Tax
-        setTax: (state, payload) => {state.tax = payload}
+        setTax: (state, payload) => {state.tax = payload},
+
+        //Put on hold
+        putOnHold: (state, {payload, getters}) => {
+            if (!sessionStorage.heldItems) sessionStorage.heldItems = JSON.stringify([]);
+            const id = new Date().getTime();
+            const heldItems = JSON.parse(sessionStorage.heldItems)
+            heldItems.unshift({id, cart: state.cart, total: getters.total})
+            sessionStorage.heldItems = JSON.stringify(heldItems);
+            state.cart = [];
+        },
+
+        //Unhold item
+        unhold: (state, payload) => {
+            state.cart = payload;
+        }
     },
+
 
 
               //...........................Actions....................................
@@ -149,6 +165,14 @@ const cartModule = {
 
         setTax: ({commit}, payload) => { //Set Tax
             commit('setTax', parseFloat(payload))
+        },
+
+        putOnHold: ({commit, getters}, payload) => { //Put on hold
+            commit('putOnHold', {payload, getters})
+        },
+
+        unhold: ({commit}, payload) => { //Unhold item
+            commit('unhold', payload)
         }
     }
 

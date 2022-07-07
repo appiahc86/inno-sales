@@ -1,10 +1,12 @@
 <template>
-
+<div class="">
+  <h4>Daily sales report</h4>
+</div>
 </template>
 
 <script>
 export default {
-  name: "recieveItems"
+  name: "dailySalesView"
 }
 </script>
 

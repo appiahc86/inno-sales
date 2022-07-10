@@ -20,7 +20,7 @@
               <thead style="border-bottom: 1px solid #ccc;">
               <tr>
                 <th style="width: 45%;">Item</th>
-                <th>Price</th>
+                <th>Cost</th>
                 <th style="width: 20%; text-align: center;">Qty</th>
                 <th>Ext Price</th>
                 <th style="min-width: 50px;"></th>
@@ -30,19 +30,19 @@
 
               <template v-for="cartItem in cart" :key="cartItem.id">
                 <tr class="fw-bold">
-                  <td>{{ 'iphone' }}</td>
-                  <td>{{ formatNumber(9090) }}</td>
+                  <td>{{ cartItem.productName }}</td>
+                  <td>{{ formatNumber(cartItem.buyingPrice) }}</td>
                   <td>
-                    <button @click="" style="border-radius: 7px; font-size: 9px">&#10134;</button>
-                    <span class="mx-3">{{ 7 }} </span>
-                    <button @click="" style="border-radius: 7px; font-size: 9px"> &#10133;</button>
+                    <button @click="decrement(cartItem.id)" style="border-radius: 7px; font-size: 9px">&#10134;</button>
+                    <span class="mx-3">{{ cartItem.qty }} </span>
+                    <button @click="increment(cartItem.id)" style="border-radius: 7px; font-size: 9px"> &#10133;</button>
                   </td>
-                  <td>{{ formatNumber(900 * 2) }}</td>
+                  <td>{{ formatNumber(cartItem.buyingPrice * cartItem.qty) }}</td>
                   <td>
-                 <span @click="" class="text-danger fw-bold" style="cursor: pointer" title="Remove item">
+                 <span @click="removeFromCart(cartItem.id)" class="text-danger fw-bold" style="cursor: pointer" title="Remove item">
                    X
                  </span>&nbsp;
-                    <span title="Price & Discount" style="cursor: pointer" @click="">&#128221;</span>
+                    <span title="Price & Discount" style="cursor: pointer" @click="openDialog(cartItem)">&#128221;</span>
                   </td>
                 </tr>
               </template>
@@ -50,6 +50,16 @@
               </tbody>
             </table>
           </div>
+
+          <div class="pt-4">
+            <div class="container-fluid p-1" style="background: black; color: white;">
+              <div class="row">
+                <div class="col justify-content-end"> <h6><span class="text-warning">Total: </span>{{ formatNumber(total) }}</h6></div>
+              </div>
+            </div>
+            <h5><span class="text-danger fw-bold">Amount Due: </span>GHS {{ formatNumber(total) }}</h5>
+          </div>
+
         </div>
       </div>
 
@@ -103,6 +113,44 @@
 
     </div>
   </div>
+
+
+  <!-- Edit cart item -->
+  <dialog ref="dialog" class="border border-5 border-light">
+    <div class="container-fluid">
+      <h6 class="text-primary">Price & Qty</h6>
+      <form @submit.prevent="edit">
+
+        <div class="row">
+          <div class="col">
+            <b>Quantity</b>
+          </div>
+          <div class="col">
+            <b>Cost Price</b>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <input type="number" class="form-control-dark" min="1" v-model="editData.qty">
+          </div>
+          <div class="col">
+            <input type="number" class="form-control-dark" min="0" step="0.01" v-model="editData.buyingPrice">
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div>
+            <button class="float-end mx-3 w-25" type="button" @click="dialog.close()">cancel</button>
+            <button class="float-end w-25 btn-secondary" type="submit">Save</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </dialog>
+
+
 </template>
 
 <script setup>
@@ -110,13 +158,30 @@
 import {ref} from "vue";
 import {formatNumber} from "@/functions";
 import db from "@/dbConfig/db";
+import {watch} from "vue";
+import {useStore} from "vuex";
+import {computed} from "vue";
+import {reactive} from "vue";
 
 const loading = ref(false);
 const products = ref([]);
 const vendors = ref([]);
+const dialog = ref(null);
 const selectedVendor = ref(null);
-const cart = ref([]);
 const selectedProduct = ref(null)
+const store = useStore();
+const editData = reactive({
+  id: '',
+  qty: 0,
+  buyingPrice: 0,
+})
+
+
+
+const cart = computed(() => store.getters["purchaseCartModule/cart"]); //Cart array
+const total = computed(() => store.getters["purchaseCartModule/total"]); //get cart total
+
+const clearCart = () => store.dispatch('purchaseCartModule/clearCart'); //Clear cart
 
 // Get all products from db
 const getAllProducts = async () => {
@@ -155,6 +220,47 @@ const getVendors = async () => {
 
 }
 getVendors();
+
+//Add to cart
+watch(selectedProduct, (value, oldValue) => {
+  if (value) {
+    store.dispatch("purchaseCartModule/addToCart", value)
+    selectedProduct.value = null;
+  }
+})
+
+//Increment cart item
+const increment = (id) => {
+  store.dispatch("purchaseCartModule/increment", id);
+}
+
+//Decrement cart item
+const decrement = (id) => {
+  store.dispatch("purchaseCartModule/decrement", id);
+}
+
+//Remove from cart
+const removeFromCart = (id) => {
+  store.dispatch("purchaseCartModule/removeFromCart", id);
+}
+
+
+        //...................Edit cart...................
+
+//Edit cart Item
+const edit = () => {
+  store.dispatch("purchaseCartModule/edit", editData)
+  dialog.value.close();
+}
+
+//Open edit dialog
+const openDialog = (item) => {
+  editData.id = item.id;
+  editData.qty = item.qty;
+  editData.buyingPrice = item.buyingPrice;
+  dialog.value.showModal();
+}
+
 
 
 

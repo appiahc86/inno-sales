@@ -79,7 +79,7 @@
      </div>
    </div>
 
-<!--  checkout  -->
+  <!--  checkout  -->
    <div class="col-4">
      <div class="card shadow-lg p-1">
        <v-select :options="customers" label="display" v-model="selectedCustomer"
@@ -115,9 +115,9 @@
 
 
       <!-- Print table  -->
-   <template class="">
+   <template>
      <div id="printTable">
-       <div style="fonst-size: 0px;">
+       <div>
 <div class="mt-0" style="font-size: 11px;">
   <span>{{ new Date().toLocaleString() }}</span>
   <b style="float: right;">Receipt #{{ barcode }}</b>
@@ -171,8 +171,8 @@
        </div><br>
 
 
-        <div style="font-size: 12px; flaot: left;">Amount Tendered: GHS {{ formatNumber(tendered) }}</div>
-        <div style="font-size: 12px; flaot: left;">Change Given: GHS {{ formatNumber(change) }}</div>
+        <div style="font-size: 12px;">Amount Tendered: GHS {{ formatNumber(tendered) }}</div>
+        <div style="font-size: 12px;">Change Given: GHS {{ formatNumber(change) }}</div>
 
        <p style="font-size: 11px; text-align: center;">Thanks for shopping with us!</p>
 
@@ -249,7 +249,6 @@
 </template>
 
 <script setup>
-//TODO Put on hold
 import {ref, watch, computed, reactive, onMounted} from "vue";
 import db from "@/dbConfig/db";
 import 'vue-select/dist/vue-select.css'
@@ -279,7 +278,6 @@ const editData = reactive({
 })
 
 //get all products
-
 const getAllProducts = async () => {
   try {
         loading.value = true;
@@ -516,6 +514,7 @@ const checkout = async (e) => {
          for (const item of cart.value) {
            orderDetailsArray.push({
              productId: item.id,
+             productName: item.productName,
              quantity: item.qty,
              buyingPrice: item.buyingPrice,
              originalPrice: item.originalPrice,
@@ -549,6 +548,7 @@ const checkout = async (e) => {
       fontSize: 13,
       fontOptions: 'bold'
     })
+
     printTiny(receipt, {scanStyles: false, scanHTML: true});
 
     selectedCustomer.value = null; //clear selected customer
@@ -583,6 +583,4 @@ const checkout = async (e) => {
     opacity: 1;
   }
 }
-
-
 </style>

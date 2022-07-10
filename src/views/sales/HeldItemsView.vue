@@ -5,6 +5,7 @@
       <div class="card p-3 mt-5">
         <h4 class="text-center">Held Receipts</h4>
         <div class="table-responsive">
+        <!--    Table     -->
           <table class="table table-sm table-hover table-borderless table-striped">
 
             <thead>
@@ -50,7 +51,6 @@
           </table>
         </div>
       </div>
-
     </div>
   </div>
 </div>

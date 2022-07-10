@@ -1,5 +1,6 @@
 import {createStore} from 'vuex'
 import cartModule from "@/store/cartModule";
+import purchaseCartModule from "@/store/purchaseCartModule";
 
 export default createStore({
 
@@ -37,7 +38,7 @@ export default createStore({
 
 
   modules: {
-    cartModule
+    cartModule, purchaseCartModule
   }
 })
 

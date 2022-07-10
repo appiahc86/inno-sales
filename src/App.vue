@@ -26,6 +26,7 @@
                   <li><router-link :to="{name: 'sales'}" class="dropdown-item">New Sales Receipt</router-link></li>
                   <li><router-link :to="{name: 'held-items'}" class="dropdown-item">Held Receipts</router-link></li>
                   <li><a class="dropdown-item" href="#">Sales History</a></li>
+                  <li><a class="dropdown-item" href="#">Products List</a></li>
                 </ul>
               </div>
             </li>

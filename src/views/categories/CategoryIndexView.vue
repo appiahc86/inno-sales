@@ -73,7 +73,7 @@
 
 <script setup>
 import db from "@/dbConfig/db";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {FilterMatchMode} from "primevue/api";
 import errorMessages from "@/errorMessages";
 
@@ -172,6 +172,20 @@ import errorMessages from "@/errorMessages";
     }
 
 
+
+
+    onMounted(async () => {
+      const orders = await db('orders')
+          .leftJoin('orderDetails', 'orderDetails.orderId', '=','orders.id')
+          .select('orders.id',
+              'orders.numberOfItems',
+              'orders.total',
+              'orderDetails.sellingPrice',
+              'orderDetails.quantity',
+              'orderDetails.orderId'
+          );
+      console.log(orders)
+    })
 </script>
 
 <style scoped>

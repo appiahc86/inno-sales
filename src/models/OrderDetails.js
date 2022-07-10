@@ -6,6 +6,7 @@ const OrderDetails = async () => {
         await db.schema.createTable('orderDetails', table => {
             table.bigIncrements('id').primary();
             table.bigInteger('productId').unsigned();
+            table.string('productName')
             table.integer('quantity', 7);
             table.float('buyingPrice');
             table.float('originalPrice');

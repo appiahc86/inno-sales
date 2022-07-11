@@ -7,9 +7,11 @@
   import OrderDetails from "./OrderDetails";
   import Settings from "@/models/Settings";
   import Vendor from "@/models/Vendor";
+  import Purchase from "@/models/Purchase";
+  import PurchaseDetails from "@/models/PurchaseDetails";
 
 const migrations =  [
-    Category, User, Product, Customer, Order, OrderDetails, Settings, Vendor
+    Category, User, Product, Customer, Order, OrderDetails, Settings, Vendor, Purchase, PurchaseDetails
 ]
 
   const runMigrations = ()=> {

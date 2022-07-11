@@ -5,7 +5,15 @@ const Purchase = async () => {
 
         await db.schema.createTable('purchases', table => {
             table.bigIncrements('id').primary();
-            table.date()
+            table.date('billDate');
+            table.date('invoiceDue');
+            table.bigInteger( 'vendorId');
+            table.integer('numberOfItems');
+            table.string('invoice');
+            table.float('total');
+            table.string('payment');
+
+            table.foreign('vendorId').references('id').inTable('vendors');
 
         })
     }

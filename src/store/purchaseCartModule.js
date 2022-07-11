@@ -25,7 +25,7 @@ const purchaseCartModule = {
     },
 
 
-    //...........................................Mutations...............................
+    //...........................................Mutations...............................//
     mutations: {
           //Add item to cart
         addToCart: (state, payload) => {
@@ -37,9 +37,6 @@ const purchaseCartModule = {
                 }
             }
             if (!inCart) { //if item is not in cart
-                payload.sellingPrice = payload.originalPrice;
-                payload.discount = 0;
-                payload.qty = 1;
                 state.cart.push(payload);
             }
         }, // ./Add item to cart
@@ -77,10 +74,6 @@ const purchaseCartModule = {
             }
         },
 
-        //Set cash tendered
-        setCashTendered: (state, payload) => {
-            state.cashTendered = payload;
-        },
         //Clear the cart
         clearCart: (state) => state.cart = []
 

@@ -171,21 +171,6 @@ import errorMessages from "@/errorMessages";
       editDialog.value.showModal()
     }
 
-
-
-
-    onMounted(async () => {
-      const orders = await db('orders')
-          .leftJoin('orderDetails', 'orderDetails.orderId', '=','orders.id')
-          .select('orders.id',
-              'orders.numberOfItems',
-              'orders.total',
-              'orderDetails.sellingPrice',
-              'orderDetails.quantity',
-              'orderDetails.orderId'
-          );
-      console.log(orders)
-    })
 </script>
 
 <style scoped>

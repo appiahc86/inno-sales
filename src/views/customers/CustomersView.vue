@@ -2,42 +2,46 @@
   <nav id="customersNav">
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
       <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-customer" type="button" role="tab" aria-controls="nav-add-customer" aria-selected="false">Add Customer</button>
-      <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-customers" type="button" role="tab" aria-controls="nav-home" aria-selected="true">All Customer</button>
+      <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-customers" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Customer List</button>
     </div>
   </nav>
   <div class="tab-content" id="nav-tabContent">
 
     <!--  Customer Form  -->
     <div class="tab-pane mt-5 show active" id="add-customer" role="tabpanel" aria-labelledby="nav-add-customer-tab">
-      <div class="card pb-4 pt-4">
+      <div class=" py-4">
         <div class="container">
           <div class="row justify-content-center">
             <div class="col-md-9">
     <form @submit.prevent="addCustomer">
-      <table class="w-100" id="formTable">
+      <table class="w-100 myTable">
 
         <tr>
-          <th class="w-25 text-center">Customer Name</th>
-          <td class="w-50"><input type="text" maxlength="40" class="form-control-dark w-75" v-model.trim="customerData.name"></td>
+          <th class="float-end"><span class="pi pi-user"></span> Customer Name &nbsp;</th>
+          <td><input type="text" maxlength="40" class="form-control-dark" v-model.trim="customerData.name"></td>
         </tr>
 
         <tr>
-          <th class="w-25 text-center">Company</th>
-          <td class="w-50"><input type="text" maxlength="60" class="form-control-dark w-75" v-model.trim="customerData.company"></td>
+          <th class="float-end"><span class="pi pi-home"></span> Company &nbsp;</th>
+          <td><input type="text" maxlength="60" class="form-control-dark" v-model.trim="customerData.company"></td>
         </tr>
 
         <tr>
-          <th class="w-25 text-center">Phone</th>
-          <td class="w-50"><input type="text" maxlength="36" class="form-control-dark w-75"  v-model.trim="customerData.phone"></td>
+          <th class="float-end"><span class="pi pi-phone"></span> Phone &nbsp;</th>
+          <td><input type="text" maxlength="36" class="form-control-dark"  v-model.trim="customerData.phone"></td>
         </tr>
 
         <tr>
-          <th class="w-25 text-center">Address</th>
-          <td><input type="text" maxlength="100" class="form-control-dark w-75" v-model.trim="customerData.address"></td>
+          <th class="float-end"><span class="pi pi-list"></span> Address &nbsp;</th>
+          <td><input type="text" maxlength="100" class="form-control-dark" v-model.trim="customerData.address"></td>
         </tr>
 
       </table>
-      <button class="w-10 mt-5 btn-secondary p-1" style="margin-left: 30%" name="submitBtn">Add Customer</button>
+
+      <button class=" mt-1 btn-secondary p-1" type="submit" style="margin-left: 37%;" name="submitBtn">
+        <span class="pi pi-save"></span>
+        Add Customer
+      </button>
     </form>
             </div>
           </div>
@@ -260,7 +264,7 @@ const confirm = (id) => {
     }
     singleOrMultiple = ids;
   }else { singleOrMultiple = [singleOrMultiple]}  //If user selected a single record
-  ipcRenderer.send('confirm', { id:singleOrMultiple, type: 'customer' });
+  ipcRenderer.send('confirm', { id:singleOrMultiple, type: 'customer', message: 'Are you sure you want to delete this item(s)?' });
 }
 
 ipcRenderer.on('deleteCustomer', async (event, args) => {
@@ -280,14 +284,17 @@ ipcRenderer.on('deleteCustomer', async (event, args) => {
 </script>
 
 <style scoped>
-#formTable th{
-  padding: 1em;
+
+
+.myTable th{
+  padding: 10px 0;
 }
 .form-control-dark{
   padding: 5px;
 }
-#formTable input{
-  max-width: 250px;
+.myTable input, .myTable textarea{
+  width: 250px;
+  padding: 4px;
 }
 
 </style>

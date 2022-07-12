@@ -134,11 +134,11 @@ ipcMain.on('successMessage', async (event, args) => {
 
 
 //Confirm Dialog box
-ipcMain.on('confirm', async (event, {id, type}) => {
+ipcMain.on('confirm', async (event, {id, type, message}) => {
   let confirm = await dialog.showMessageBox(
       win,
       {type: 'question',
-        message: 'Are you sure you want to delete this item?',
+        message: message,
         buttons: ['No','Yes']
       }
   )

@@ -15,7 +15,7 @@
               <div class="row justify-content-center">
 
                 <div class="col-5">
-                  <div class="card shadow p-4 login-form-container">
+                  <div class="card shadow-lg p-4 login-form-container">
                       <h3 class="text-center text-info">{{ companyName }}</h3>
                       <form @submit.prevent="login">
                         <table class="myTable">
@@ -32,7 +32,7 @@
                             <td><label><input type="checkbox" class="p-checkbox" v-model="showPass"> Show password</label></td>
                           </tr>
                         </table>
-                        <button type="submit" class="btn btn-secondary btn-sm loginBtn">
+                        <button type="submit" class="btn btn-secondary btn-sm loginBtn" nama="submitBtn">
                           <span class="pi pi-lock"></span>
                           Login
                         </button>
@@ -82,7 +82,7 @@ const login = async (e) => {
 }
 
 //Close modal before leaving this page
-onBeforeRouteLeave( (to, from, next) =>{
+onBeforeRouteLeave( (to, from, next) => {
    closeModal.value.click();
   next();
 })
@@ -105,19 +105,28 @@ onBeforeRouteLeave( (to, from, next) =>{
 }
 
 .form-control-dark{
-  width: 100%
+  width: 100%;
 }
 .loginBtn{
   margin-top: 10px;
   width: 23%;
   margin-left: 35%;
+  background: linear-gradient(45deg, red, blue) !important;
 }
-.modal-body{
-  background-image: url("../assets/bg.jpg");
+.loginBtn:hover{
+  background: linear-gradient(45deg, blue, black, red) !important;
+}
+
+.modal-body, .modal-body .card{
+  /*background-image: url("../assets/bg.jpg");*/
+  background: linear-gradient(45deg, red, blue) !important;
+  color: white;
 }
 .login-form-container{
   max-width: 530px;
 }
-
+.card, .form-control-dark{
+  border-radius: 50px;
+}
 
 </style>

@@ -11,7 +11,7 @@
           <ul class="nav flex-column">
             <li class="nav-item">
               <router-link :to="{ name: 'home' }" class="nav-link">
-                <span data-feather="home" class="pi pi-home"></span>
+                <span class="pi pi-home"></span>
                Home
               </router-link>
             </li>
@@ -23,75 +23,81 @@
                   Sales
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="sales" style="font-size: 0.9em !important;">
-                  <li><router-link :to="{name: 'sales'}" class="dropdown-item">New Sales Receipt</router-link></li>
-                  <li><router-link :to="{name: 'held-items'}" class="dropdown-item">Held Receipts</router-link></li>
-                  <li><a class="dropdown-item" href="#">Sales History</a></li>
-                  <li><a class="dropdown-item" href="#">Products List</a></li>
+                  <li><router-link :to="{name: 'sales'}" class="dropdown-item fw-bold">New Sales Receipt</router-link></li>
+
+                  <li><router-link :to="{name: 'held-items'}" class="dropdown-item fw-bold">Held Receipts</router-link></li>
+                  <li><a class="dropdown-item fw-bold">Sales History</a></li>
+                  <li><a class="dropdown-item fw-bold">Products List</a></li>
                 </ul>
               </div>
             </li>
+
             <li class="nav-item">
-              <router-link :to="{name: 'products'}" class="nav-link">
-                <span class="pi pi-cog"></span>
-                Inventory
-              </router-link>
+              <div class="dropdown">
+                <a class="dropdown-toggle nav-link" id="purchasing" data-bs-toggle="dropdown" aria-expanded="false">
+                  <span class="pi pi-tag"></span>
+                  Inventory
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="purchasing" style="font-size: 0.9em !important;">
+                  <li><router-link :to="{name: 'products'}" class="dropdown-item fw-bold">Products</router-link>
+                  </li>
+                  <li>
+                    <router-link :to="{name: 'categories'}" class="dropdown-item fw-bold">Categories</router-link>
+                  </li>
+                </ul>
+              </div>
             </li>
-            <li class="nav-item">
-              <router-link :to="{name: 'categories'}" class="nav-link">
-                <span data-feather="users">&#127513;</span>
-                Categories
-              </router-link>
-            </li>
+
             <li class="nav-item">
               <router-link :to="{name: 'customers'}" class="nav-link">
-                <span class="pi pi-user"></span>
+                <span class="pi pi-users"> </span>
                 Customers
               </router-link>
             </li>
             <li class="nav-item">
               <router-link :to="{name: 'vendors'}" class="nav-link">
-                <span class="pi pi-user"></span>
-                Vendors
+                <span class="pi pi-users"></span>
+                 Vendors
               </router-link>
             </li>
             <li class="nav-item">
               <div class="dropdown">
                 <a class="dropdown-toggle nav-link" id="purchasing" data-bs-toggle="dropdown" aria-expanded="false">
-                  <span data-feather="users">&#127513;</span>
+                  <span class="pi pi-shopping-bag"></span>
                   Purchasing
                 </a>
-                <ul class="dropdown-menu" aria-labelledby="purchasing">
-                  <li><router-link :to="{name: 'receiveItems'}" class="dropdown-item">Receive Items</router-link></li>
-                  <li><a class="dropdown-item" href="#">Return Voucher</a></li>
-                  <li class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="#">Receiving History</a></li>
-                  <li><a class="dropdown-item" href="#">Held Vouchers</a></li>
+                <ul class="dropdown-menu" aria-labelledby="purchasing" style="font-size: 0.9em !important;">
+                  <li><router-link :to="{name: 'receiveItems'}" class="dropdown-item fw-bold">Receive Items</router-link></li>
+                  <li><a class="dropdown-item fw-bold">Return Voucher</a></li>
+                  <li class="dropdown-divider fw-bold"></li>
+                  <li><router-link :to="{name: 'receivingHistory'}" class="dropdown-item fw-bold">Receiving History</router-link></li>
+                  <li><a class="dropdown-item fw-bold">Held Vouchers</a></li>
                 </ul>
               </div>
             </li>
           </ul>
 
-          <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-            <span>Saved reports</span>
+          <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-2 mt-4 mb-1 text-white-50">
+            <span>Settings</span>
           </h6>
           <ul class="nav flex-column mb-2">
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="file-text"></span>
-                Current month
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="file-text"></span>
-                Last quarter
-              </a>
-            </li>
             <li class="nav-item">
               <router-link :to="{name: 'settings'}" class="nav-link">
                 <span class="pi pi-cog"></span>
                 App Settings
               </router-link>
+            </li>
+            <li class="nav-item">
+              <div class="dropdown">
+                <a class="dropdown-toggle nav-link" id="purchasing" data-bs-toggle="dropdown" aria-expanded="false">
+                  <span class="pi pi-user"></span>
+                  Appiah
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="purchasing" style="font-size: 0.9em !important;">
+                  <li><a class="dropdown-item fw-bold"><span class="pi pi-lock"></span> Reset Password</a></li>
+                  <li><a class="dropdown-item fw-bold"><span class="pi pi-power-off text-danger"></span> Logout</a></li>
+                </ul>
+              </div>
             </li>
           </ul>
         </div>
@@ -166,12 +172,12 @@ const insertUser = async () => {
 }
 
 
-      onMounted(()=>{
-        insertUser()
-        setInterval(()=>{
-          time.value.innerHTML = new Date().toLocaleTimeString();
-        },10)
-      })
+      // onMounted(()=>{
+      //   insertUser()
+      //   setInterval(()=>{
+      //     time.value.innerHTML = new Date().toLocaleTimeString();
+      //   },10)
+      // })
 
 // listen to report events and redirect to page
 ipcRenderer.on('report', (event, args) => {

@@ -1,9 +1,9 @@
 <template>
 <div class="container-fluid mt-5">
   <form @submit.prevent="save">
-  <div class="row shadow shadow-lg p-3">
+  <div class="row shadow shadow p-3">
 
-    <div class="col-6" style="border: 0.5px solid #ccc;">
+    <div class="col-6">
       <h4 class="w-100 p-1 text-center text-dark" >Company Settings</h4>
 
         <table class="myTable w-100">
@@ -27,19 +27,17 @@
 
     </div>
 
-    <div class="col-3" style="border: 0.5px solid #ccc;">
+    <div class="col-3">
       <h4 class="w-100 p-1 text-center text-dark">Tax Settings</h4>
-      <table class="">
+      <table class="myTable w-100">
         <tr>
           <th>Tax(%)</th>
           <td> <input type="number" class="form-control-dark w-100" step="any" min="0" max="99" v-model.number="settings.tax"></td>
         </tr>
       </table>
+      <button class="w-50 btn-dark p-1 mt-2 float-end" type="submit"><span class="pi pi-save"></span> Save</button>
     </div>
 
-    <div class="col-3">
-      <button class="w-50 btn-dark p-1 mt-2" type="submit">Save</button>
-    </div>
 
   </div>
   </form>

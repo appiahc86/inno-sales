@@ -69,6 +69,7 @@ const purchaseCartModule = {
             for (const item of state.cart) {
                 if (item.id === payload.id) {
                     item.buyingPrice = payload.buyingPrice;
+                    item.sellingPrice = payload.sellingPrice;
                     item.qty = payload.qty;
                 }
             }
@@ -106,7 +107,6 @@ const purchaseCartModule = {
     }
 
 }
-
 
 
 export default purchaseCartModule;

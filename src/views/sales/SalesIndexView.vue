@@ -356,7 +356,10 @@ const totalTax = computed(() => store.getters["cartModule/totalTax"]); //get tot
 const total = computed(() => store.getters["cartModule/total"]); //get cart total
 const totalDiscount = computed(() => store.getters["cartModule/totalDiscount"]); //get total discount
 
-const clearCart = () => store.dispatch('cartModule/clearCart'); //Clear cart
+const clearCart = () => {
+  store.dispatch('cartModule/clearCart');
+  resetPayment();
+}; //Clear cart
 
 //Put on hold
 const putOnHold = () => store.dispatch("cartModule/putOnHold", '');

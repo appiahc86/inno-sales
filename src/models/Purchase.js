@@ -11,7 +11,7 @@ const Purchase = async () => {
             table.integer('numberOfItems');
             table.string('invoice');
             table.float('total');
-            table.string('payment');
+            table.float('payment');
 
             table.foreign('vendorId').references('id').inTable('vendors');
 

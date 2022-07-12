@@ -1,4 +1,5 @@
 <template>
+  <div class="">
   <nav id="vendorsNav">
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
       <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-vendor" type="button" role="tab" aria-controls="nav-add-vendor" aria-selected="false">Add Vendor</button>
@@ -9,7 +10,7 @@
 
     <!--  Vendor Form  -->
     <div class="tab-pane mt-5 show active" id="add-vendor" role="tabpanel" aria-labelledby="nav-add-vendor-tab">
-      <div class="card py-4">
+      <div class="py-4">
         <div class="container">
           <div class="row justify-content-center">
             <div class="col-md-9">
@@ -162,7 +163,7 @@
       </div>
     </div>
   </dialog>
-
+  </div>
 </template>
 
 <script setup>
@@ -171,6 +172,7 @@ import {reactive, ref} from "vue";
 import { FilterMatchMode } from "primevue/api";
 import * as Validator from "validatorjs";
 import db from "@/dbConfig/db";
+import errorMessages from "@/errorMessages";
 
 const selectedVendors = ref([]);
 const vendors = ref([])
@@ -290,7 +292,7 @@ const confirm = (id) => {
     }
     singleOrMultiple = ids;
   }else { singleOrMultiple = [singleOrMultiple]}  //If user selected a single record
-  ipcRenderer.send('confirm', { id:singleOrMultiple, type: 'vendor' });
+  ipcRenderer.send('confirm', { id:singleOrMultiple, type: 'vendor', message: 'Are you sure you want to delete this item(s)?' });
 }
 
 ipcRenderer.on('deleteVendor', async (event, args) => {
@@ -302,7 +304,11 @@ ipcRenderer.on('deleteVendor', async (event, args) => {
       if (!args.includes(v.id)) newVendors.push(v)
     }
     vendors.value = newVendors;
-  }catch (e) { ipcRenderer.send("errorMessage", e.message) }
+  }catch (e) {
+    if (e.code === "SQLITE_CONSTRAINT")
+      ipcRenderer.send('errorMessage', errorMessages.sqlConstraint);
+    else ipcRenderer.send('errorMessage', e.message);
+  }
 })//. /delete Customer
 
 const filters = ref({
@@ -318,7 +324,5 @@ const filters = ref({
   width: 250px;
   padding: 4px;
 }
-.resize{
-  font-size: 0.7em;
-}
+
 </style>

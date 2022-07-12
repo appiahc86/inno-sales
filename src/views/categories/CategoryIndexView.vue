@@ -73,7 +73,7 @@
 
 <script setup>
 import db from "@/dbConfig/db";
-import {onMounted, ref} from "vue";
+import {ref} from "vue";
 import {FilterMatchMode} from "primevue/api";
 import errorMessages from "@/errorMessages";
 
@@ -150,7 +150,7 @@ import errorMessages from "@/errorMessages";
 
 
     //Delete Category
-    const confirm = (id) => ipcRenderer.send('confirm', {id:id, type: 'category' } )
+    const confirm = (id) => ipcRenderer.send('confirm', {id:id, type: 'category', message: 'Are you sure you want to delete this item?' } )
 
     ipcRenderer.on('deleteCategory', async (event, id ) => {
       try {

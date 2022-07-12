@@ -11,7 +11,7 @@ const PurchaseDetails = async () => {
             table.float('cost');
             table.float('total');
 
-            table.foreign('purchaseId').references('id').inTable('purchases');
+            table.foreign('purchaseId').references('id').inTable('purchases').onDelete('CASCADE');
 
         })
     }

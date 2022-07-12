@@ -9,37 +9,45 @@
 
     <!--  product Form  -->
       <div class="tab-pane mt-5 show active" id="add-product" role="tabpanel" aria-labelledby="nav-add-product-tab">
-        <div class="card pb-4 pt-4">
+        <div class="py-4">
           <div class="container">
             <div class="row justify-content-center">
               <div class="col-md-10">
                 <form @submit.prevent="addProduct">
-                  <table class="formTable">
+                  <table class="w-100 myTable">
                     <tr>
-                      <th class="w-10">Category</th>
-                      <td class="w-40">
+                      <th class="float-end"><span class="pi pi-cog"></span> Category &nbsp;</th>
+                      <td>
                         <v-select :options="categories" label="name" v-model="productData.category"
-                                  placeholder="" class="form-control-dark w-75">
+                                  placeholder="" class="form-control-dark select" >
                         </v-select>
                       </td>
-                      <th class="w-10">Product Name</th>
-                      <td class="w-40"><input type="text" class="form-control-dark w-75" v-model.trim="productData.productName"></td>
                     </tr>
 
                     <tr>
-                      <th class="w-10">Buying Price</th>
-                      <td class="w-40"><input type="number" step="0.01" min="0" class="form-control-dark w-75" v-model.number="productData.buyingPrice"></td>
-                      <th class="w-10">Selling Price</th>
-                      <td class="w-40"><input type="number" step="0.01" min="0" class="form-control-dark w-75" v-model.number="productData.sellingPrice"></td>
+                      <th class="float-end"><span class="pi pi-tag"></span> Product Name &nbsp;</th>
+                      <td><input type="text" class="form-control-dark" v-model.trim="productData.productName"></td>
                     </tr>
 
+                    <tr>
+                      <th class="float-end"><span class="pi pi-money-bill"></span> Buying Price &nbsp;</th>
+                      <td><input type="number" step="0.01" min="0" class="form-control-dark" v-model.number="productData.buyingPrice"></td>
+                    </tr>
 
                     <tr>
-                      <th>Quantity</th>
-                      <td><input type="number" class="form-control-dark w-75" v-model.number="productData.quantity"></td>
-                      <th>Tax</th>
+                      <th class="float-end"><span class="pi pi-money-bill"></span> Selling Price &nbsp;</th>
+                      <td class="w-40"><input type="number" step="0.01" min="0" class="form-control-dark" v-model.number="productData.sellingPrice"></td>
+                    </tr>
+
+                    <tr>
+                      <th class="float-end"><span class="pi pi-sort-numeric-up"></span> Quantity &nbsp;</th>
+                      <td><input type="number" class="form-control-dark" v-model.number="productData.quantity"></td>
+                    </tr>
+
+                    <tr>
+                      <th class="float-end"><span class="pi pi-money-bill"></span> Tax &nbsp;</th>
                       <td>
-                        <select class="form-control-dark w-75" v-model="productData.tax">
+                        <select class="form-control-dark select" v-model="productData.tax">
                           <option value="tax">Tax</option>
                           <option value="non">Non</option>
                         </select>
@@ -47,15 +55,17 @@
                     </tr>
 
                     <tr>
-                      <th>Description</th>
-                      <td><textarea class="form-control-dark w-75" cols="10" rows="3" v-model.trim="productData.description"></textarea></td>
-                      <th></th>
-                      <td><button name="addProductBtn" class="btn-secondary p-1" type="submit">
-                       <span class="pi pi-save"></span>  Add Product
-                      </button></td>
+                      <th class="float-end"><span class="pi pi-list"></span> Description &nbsp;</th>
+                      <td><textarea class="form-control-dark" cols="10" rows="3" v-model.trim="productData.description"></textarea></td>
                     </tr>
 
                   </table>
+
+                  <button class=" mt-1 btn-secondary p-1" type="submit" style="margin-left: 37%;" name="addProductBtn">
+                    <span class="pi pi-save"></span>
+                    Add Product
+                  </button>
+
                 </form>
               </div>
             </div>
@@ -139,9 +149,6 @@
                   <select class="form-control-dark w-100" v-model="editProductData.category">
                     <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name.toUpperCase() }}</option>
                   </select>
-<!--                  <v-select :options="categories" label="name" v-model="editProductData.category"-->
-<!--                            placeholder="" class="form-control-dark w-100">-->
-<!--                  </v-select>-->
                 </td>
                 <th class="w-10">Product Name</th>
                 <td class="w-40"><input type="text" class="form-control-dark w-100" v-model.trim="editProductData.productName"></td>
@@ -259,11 +266,6 @@ import { formatNumber } from "@/functions";
                   'categories.name as category',
                   'categories.id as categoryId'
               )
-          products.value.map(product => {
-            product.sellingPrice = formatNumber(parseFloat(product.sellingPrice))
-            product.buyingPrice = formatNumber(parseFloat(product.buyingPrice))
-          })
-
 
       }
       catch (e){ ipcRenderer.send('errorMessage', e.message) }
@@ -300,19 +302,21 @@ import { formatNumber } from "@/functions";
 
         if (validation.passes()){ // If validation passes
           e.target.addProductBtn.disabled = true
-          e.target.addProductBtn.innerText = 'Processing...'
           productData.category = productData.category.id;
 
-          await db('products').insert(productData);
+          const product = await db('products').insert(productData);
+
+          //Update on front-end
+          const cat = categories.value.filter(c => c.id.toString() === productData.category.toString());
+
+          products.value.push({ ...productData, id: product[0], categoryId: productData.category, category: cat[0].name })
           resetProductData();
-          getAllProducts(); //TODO update in front end
 
         }else ipcRenderer.send('errorMessage', `${Object.values(validation.errors.all())[0]}`)
 
       }catch (e) {ipcRenderer.send('errorMessage', e.message)}
       finally {
         e.target.addProductBtn.disabled = false
-        e.target.addProductBtn.innerText = 'Add Product'
       }
 
     } // ./Add product
@@ -339,7 +343,7 @@ import { formatNumber } from "@/functions";
           products.value.map(product => { //Update data in front end without reloading from database
             if (product.id === editProductData.id){
               const cat = categories.value.filter(c => c.id.toString() === editProductData.category.toString());
-              product.buyingPrice = formatNumber(parseFloat(editProductData.buyingPrice));
+              product.buyingPrice = parseFloat(editProductData.buyingPrice);
               product.category = cat[0].name;
               product.categoryId = editProductData.category;
               product.description = editProductData.description;
@@ -347,7 +351,7 @@ import { formatNumber } from "@/functions";
               product.id = editProductData.id;
               product.productName = editProductData.productName;
               product.quantity = editProductData.quantity;
-              product.sellingPrice = formatNumber(parseFloat(editProductData.sellingPrice));
+              product.sellingPrice = parseFloat(editProductData.sellingPrice);
             }
           })
 
@@ -370,7 +374,7 @@ import { formatNumber } from "@/functions";
         singleOrMultiple = ids;
       }else { singleOrMultiple = [singleOrMultiple]} //If user selected a single record
 
-      ipcRenderer.send('confirm', {id: singleOrMultiple, type: 'product'})
+      ipcRenderer.send('confirm', {id: singleOrMultiple, type: 'product', message: 'Are you sure you want to delete this item(s)?'})
     }
 
     ipcRenderer.on('deleteProduct', async (event, args) => {
@@ -397,8 +401,8 @@ import { formatNumber } from "@/functions";
           editProductData.productName = data.productName;
           editProductData.quantity = data.quantity;
           editProductData.description = data.description;
-          editProductData.buyingPrice = data.buyingPrice.replaceAll(',','');
-          editProductData.sellingPrice = data.sellingPrice.replaceAll(',','');
+          editProductData.buyingPrice = data.buyingPrice;
+          editProductData.sellingPrice = data.sellingPrice;
           editProductData.category = data.categoryId;
           editProductData.categoryName = data.category;
           editProductData.tax = data.tax;
@@ -410,29 +414,17 @@ import { formatNumber } from "@/functions";
 
 <style scoped>
 
-#nav-tab button{
-  color: black;
-}
-#nav-tab button.active{
-  color: #b02a37;
-  font-weight: bold;
-}
 .form-control-dark{
-  width: 70%;
   padding: 5px;
 }
 
-.formTable td, .formTable th{
-  padding: 10px  5px;
+.myTable th{
+  padding: 13px 0;
 }
-.w-10{
-  width: 10%;
-}
-.w-40{
-  width: 40%;
-}
-.formTable input, .formTable textarea, .formTable select {
-  max-width: 300px;
+
+.myTable input, .myTable textarea, .myTable .select{
+  width: 350px;
+  padding: 5px;
 }
 
 </style>

@@ -95,10 +95,17 @@
                 <h6 class="w-50">Invoice Due</h6>
               </div>
               <div class="d-flex">
-                <input type="date" class="form-control-dark w-50" v-model.trim="paymentData.invoiceDue">
+                <input type="date" class="form-control-dark w-50" v-model="paymentData.invoiceDue">
               </div>
 
-              <button class="float-end mt-2" name="submitBtn" style="width: 80px;" type="submit">
+
+                <label class="mt-2">
+                  <input type="checkbox" class="p-checkbox" v-model="paymentData.printInvoice">
+                  <b> Print Invoice</b>
+                </label>
+
+
+              <button class="float-end mt-2" name="submitBtn" style="width: 80px;" type="submit" :disabled="total === 0">
                 <span class="pi pi-print"></span> Save</button>
             </form>
           </div>
@@ -131,6 +138,9 @@
           <div class="col">
             <b>Cost Price</b>
           </div>
+          <div class="col">
+            <b>Selling Price</b>
+          </div>
         </div>
 
         <div class="row">
@@ -138,7 +148,10 @@
             <input type="number" class="form-control-dark" min="1" v-model="editData.qty">
           </div>
           <div class="col">
-            <input type="number" class="form-control-dark" min="0" step="0.01" v-model="editData.buyingPrice">
+            <input type="number" class="form-control-dark" min="0" step="any" v-model="editData.buyingPrice">
+          </div>
+          <div class="col">
+            <input type="number" class="form-control-dark" min="0" step="any" v-model="editData.sellingPrice">
           </div>
         </div>
 
@@ -166,12 +179,12 @@ import {useStore} from "vuex";
 import {computed} from "vue";
 import {reactive} from "vue";
 import * as Validator from "validatorjs";
+import purchase from "@/models/Purchase";
 
 const loading = ref(false);
 const products = ref([]);
 const vendors = ref([]);
 const dialog = ref(null);
-const selectedVendor = ref(null);
 const selectedProduct = ref(null)
 const store = useStore();
 
@@ -179,14 +192,16 @@ const editData = reactive({
   id: '',
   qty: 0,
   buyingPrice: 0,
+  sellingPrice: 0,
 })
 
 const paymentData = reactive({ //payment form Data
   vendor: null,
   invoice: null,
   billDate: null,
-  alreadyPaid: false,
-  invoiceDue: null
+  alreadyPaid: true,
+  invoiceDue: null,
+  printInvoice: true
 })
 
 
@@ -203,11 +218,8 @@ const getAllProducts = async () => {
         .leftJoin('categories', 'products.category', '=','categories.id')
         .select('products.id',
             'products.productName',
-            'products.sellingPrice',
             'products.buyingPrice',
-            'products.quantity',
-            'products.tax',
-            'categories.id as categoryId'
+            'products.sellingPrice',
         );
     products.value.map(p => {
       p.qty = 1;
@@ -256,7 +268,6 @@ const removeFromCart = (id) => {
   store.dispatch("purchaseCartModule/removeFromCart", id);
 }
 
-
         //...................Edit cart...................
 
 //Edit cart Item
@@ -270,11 +281,12 @@ const openDialog = (item) => {
   editData.id = item.id;
   editData.qty = item.qty;
   editData.buyingPrice = item.buyingPrice;
+  editData.sellingPrice = item.sellingPrice;
   dialog.value.showModal();
 }
 
 const resetFormData = () => {
-  paymentData.alreadyPaid = false; paymentData.invoiceDue = null;
+  paymentData.alreadyPaid = true; paymentData.invoiceDue = null; paymentData.printInvoice = true;
   paymentData.vendor = null; paymentData.invoice = null; paymentData.billDate = null;
 }
 
@@ -285,15 +297,57 @@ const savePurchase = async (e) => {
     // validation
     let validation = new Validator(paymentData,{
       vendor: 'required',
-      invoice: 'required',
-      billDate: 'required',
     })
 
     if (validation.passes()){ // If validation passes
       e.target.submitBtn.disabled = true;
-      console.log(total.value)
+      let payment = 0;
+      if (paymentData.alreadyPaid) payment = parseFloat(total.value)
+
+      await db.transaction( async trx => {
+      const purchase = await trx('purchases').insert({ //Save to purchase table
+        billDate: paymentData.billDate,
+        invoiceDue: paymentData.invoiceDue,
+        vendorId: paymentData.vendor.id,
+        numberOfItems: cart.value.length,
+        invoice: paymentData.invoice,
+        total: total.value,
+        payment: payment
+      })
 
 
+      const purchaseDetailsArray = [];     //prepare for batch insert into purchase details
+      for (const item of cart.value) {
+        purchaseDetailsArray.push({
+          purchaseId: purchase,
+          productName: item.productName,
+          quantity: item.qty,
+          cost: item.buyingPrice,
+          total: parseFloat(item.buyingPrice) * parseInt(item.qty)
+        })
+      }
+      //Batch Insert into purchase details table
+      await trx.batchInsert('purchaseDetails', purchaseDetailsArray, 30);
+
+      //Add quantity to products table
+      for (const item of cart.value) {
+        await trx('products').where('id', '=', item.id )
+            .first()
+            .update({
+              buyingPrice: parseFloat(item.buyingPrice),
+              sellingPrice: item.sellingPrice
+            }).increment({quantity: parseInt(item.qty)})
+      }
+
+    })
+
+      if (paymentData.printInvoice){
+        window.print();
+      }
+
+
+
+      clearCart();
       resetFormData();
     }else ipcRenderer.send('errorMessage', `${Object.values(validation.errors.all())[0]}`)
 

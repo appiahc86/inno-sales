@@ -17,8 +17,8 @@
        </template>
 
          <div class="table-responsive" style="height: 400px;">
-           <table class="table table-sm mt-4 table-hover table-borderless table-striped">
-             <thead style="border-bottom: 1px solid #ccc;">
+           <table class="table table-sm mt-2 table-hover table-borderless table-striped">
+             <thead style="border-bottom: 1px solid #ccc;  background: linear-gradient(45deg, #c498e5, white, #ee8e8e ) !important;">
              <tr>
                <th style="width: 45%;">Item</th>
                <th>Price</th>
@@ -71,7 +71,7 @@
              <button class="btn-info text-white" @click="putOnHold"><b>Put On Hold</b></button>
            </div>
            <div class="col">
-             <button class="btn-warning" @click="clearCart"><b>Clear Cart</b></button>
+             <button class="btn-warning float-end" @click="clearCart"><b>Clear Cart</b></button>
            </div>
          </div>
        </div>
@@ -83,7 +83,7 @@
    <div class="col-4">
      <div class="card shadow-lg p-1">
        <v-select :options="customers" label="display" v-model="selectedCustomer"
-                 placeholder="--select customer--" class="v-select">
+                 placeholder="select customer" class="v-select">
        </v-select>
          <h5 class="text-center fw-bold blink text-danger mt-1" v-if="tendered < total">Awaiting Payment</h5>
          <h5 class="mt-1 invisible" v-else>.</h5>
@@ -512,7 +512,6 @@ const checkout = async (e) => {
            userId: user.value.id
          })
 
-
          const orderDetailsArray = [];      //prepare for batch insert into order details
          for (const item of cart.value) {
            orderDetailsArray.push({
@@ -572,18 +571,4 @@ const checkout = async (e) => {
   background: #fff;
 }
 
-.blink{
-  animation: blink 1s infinite;
-}
-@keyframes blink {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
 </style>

@@ -123,6 +123,12 @@ import db from "./dbConfig/db";
 runMigrations() //Run all migrations
 db.raw("VACUUM").then(()=>{})
 db.raw('PRAGMA foreign_keys = ON').then(()=>{});
+
+import {onMounted, ref} from "vue";
+import {useStore} from "vuex";
+import {useRouter} from "vue-router";
+
+
 const settings = async () => { // insert data into company settings table
   try {
     let data = await db('settings').first();
@@ -140,9 +146,7 @@ const settings = async () => { // insert data into company settings table
 }
 settings();
 
-import {onMounted, ref} from "vue";
-import {useStore} from "vuex";
-import {useRouter} from "vue-router";
+
 
 const time = ref(null);
 const backup = ref(false)
@@ -172,12 +176,13 @@ const insertUser = async () => {
 }
 
 
-      // onMounted(()=>{
-      //   insertUser()
-      //   setInterval(()=>{
-      //     time.value.innerHTML = new Date().toLocaleTimeString();
-      //   },10)
-      // })
+      onMounted(()=>{
+        insertUser();
+        // console.clear();
+        setInterval(()=>{
+          if(time.value) time.value.innerHTML = new Date().toLocaleTimeString();
+        },10)
+      })
 
 // listen to report events and redirect to page
 ipcRenderer.on('report', (event, args) => {

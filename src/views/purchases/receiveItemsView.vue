@@ -60,6 +60,14 @@
             <h5><span class="text-danger fw-bold">Amount Due: </span>GHS {{ formatNumber(total) }}</h5>
           </div>
 
+          <div class="container" v-if="cart.length">
+            <div class="row">
+              <div class="col">
+                <button class="btn-warning float-end" @click="clearCart"><b>Clear Cart</b></button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -67,7 +75,10 @@
       <div class="col-4">
         <div class="card shadow-lg ">
           <div class="card-body">
-            <h5 class="text-center fw-bold">Enter billing info</h5>
+
+            <h5 class="text-center fw-bold blink" v-if="total && paymentData.vendor === null">
+              Please Select Vendor</h5>
+            <h5 class="text-center fw-bold" v-else>Enter billing info</h5>
 
             <form @submit.prevent="savePurchase">
               <v-select :options="vendors" label="company" v-model="paymentData.vendor"
@@ -83,7 +94,7 @@
               <p><b>Enter the billing info from the vendor invoice</b></p>
 
               <div class="d-flex">
-                <h6 class="w-50">Invoice#<span class="text-danger">*</span></h6>
+                <h6 class="w-50">Invoice#</h6>
                 <h6 class="w-50">Bill Date<span class="text-danger">*</span></h6>
               </div>
               <div class="d-flex">
@@ -105,7 +116,7 @@
                 </label>
 
 
-              <button class="float-end mt-2" name="submitBtn" style="width: 80px;" type="submit" :disabled="total === 0">
+             <button class="float-end mt-2" name="submitBtn" style="width: 80px;" type="submit" :disabled="total === 0 || paymentData.vendor === null">
                 <span class="pi pi-print"></span> Save</button>
             </form>
           </div>
@@ -114,10 +125,11 @@
         <div class="card mt-5 p-2" v-if="paymentData.vendor" style="max-width: 300px; margin-left: auto;">
           <h6 class="text-center">{{ paymentData.vendor.company }}</h6>
           <div class="d-flex mt-0">
-          <div>Invoice#: <b>00443</b></div> <div style="margin-left: auto;"><b>Bill:</b> 07/05/2022</div>
+          <div>Invoice#: <b>{{ paymentData.invoice }}</b></div>
+            <div style="margin-left: auto;"><b>Bill:</b> {{ paymentData.billDate }}</div>
           </div>
           <div class="d-flex">
-            <div  style="margin-left: auto;"><b>Due: </b>08/08/2022</div>
+            <div  style="margin-left: auto;"><b>Due: </b>{{ paymentData.invoiceDue }}</div>
           </div>
         </div>
       </div>
@@ -297,6 +309,7 @@ const savePurchase = async (e) => {
     // validation
     let validation = new Validator(paymentData,{
       vendor: 'required',
+      billDate: 'required'
     })
 
     if (validation.passes()){ // If validation passes
@@ -309,6 +322,7 @@ const savePurchase = async (e) => {
         billDate: paymentData.billDate,
         invoiceDue: paymentData.invoiceDue,
         vendorId: paymentData.vendor.id,
+        status: 'received',
         numberOfItems: cart.value.length,
         invoice: paymentData.invoice,
         total: total.value,
@@ -321,6 +335,7 @@ const savePurchase = async (e) => {
         purchaseDetailsArray.push({
           purchaseId: purchase,
           productName: item.productName,
+          productId: item.id,
           quantity: item.qty,
           cost: item.buyingPrice,
           total: parseFloat(item.buyingPrice) * parseInt(item.qty)

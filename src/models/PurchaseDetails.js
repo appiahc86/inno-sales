@@ -8,6 +8,7 @@ const PurchaseDetails = async () => {
             table.bigInteger( 'purchaseId');
             table.string('productName');
             table.integer('quantity');
+            table.bigInteger('productId');
             table.float('cost');
             table.float('total');
 

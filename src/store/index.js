@@ -6,7 +6,7 @@ export default createStore({
 
   state: {
     user: null,
-    settings: null
+    settings: {}
   },
 
                           //GETTERS

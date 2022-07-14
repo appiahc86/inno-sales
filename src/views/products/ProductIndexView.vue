@@ -18,9 +18,18 @@
                     <tr>
                       <th class="float-end"><span class="pi pi-cog"></span> Category &nbsp;</th>
                       <td>
-                        <v-select :options="categories" label="name" v-model="productData.category"
-                                  placeholder="" class="form-control-dark select" >
-                        </v-select>
+                        <div class="input-group">
+
+                          <v-select :options="categories" label="name"
+                                    v-model="productData.category" class="form-control-dark select">
+                          </v-select>
+                          <div class="input-group-text text-success">
+                          <span class="pi pi-plus-circle" title="Add New Category"
+                                style="cursor: pointer; font-size: 1.3em;"
+                                @click="openCategoryDialog"></span>
+                          </div>
+                        </div>
+
                       </td>
                     </tr>
 
@@ -142,31 +151,41 @@
       <div class="row justify-content-center">
         <div class="col-md-12">
           <form @submit.prevent="editProduct">
-            <table class="formTable">
+            <table class="w-100 myTable">
+
               <tr>
-                <th class="w-10">Category</th>
-                <td class="w-40">
-                  <select class="form-control-dark w-100" v-model="editProductData.category">
+                <th class="float-end"><span class="pi pi-cog"></span> Category &nbsp;</th>
+                <td>
+                  <select class="form-control-dark select" v-model="editProductData.category">
                     <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name.toUpperCase() }}</option>
                   </select>
                 </td>
-                <th class="w-10">Product Name</th>
-                <td class="w-40"><input type="text" class="form-control-dark w-100" v-model.trim="editProductData.productName"></td>
               </tr>
 
               <tr>
-                <th class="w-10">Buying Price</th>
+                <th class="float-end"><span class="pi pi-tag"></span> Product Name &nbsp;</th>
+                <td><input type="text" class="form-control-dark" v-model.trim="editProductData.productName"></td>
+              </tr>
+
+              <tr>
+                <th class="w-10"><span class="pi pi-money-bill"></span> Buying Price &nbsp;</th>
                 <td class="w-40"><input type="number" step="0.01" min="0" class="form-control-dark w-100" v-model.number="editProductData.buyingPrice"></td>
-                <th class="w-10">Selling Price</th>
-                <td class="w-40"><input type="number" step="0.01" min="0" class="form-control-dark w-100" v-model.number="editProductData.sellingPrice"></td>
               </tr>
 
               <tr>
-                <th class="w-10">Quantity</th>
-                <td class="w-40"><input type="number" class="form-control-dark w-100" v-model.number="editProductData.quantity"></td>
-                <th class="w-10">Tax</th>
-                <td class="w-40">
-                  <select class="form-control-dark w-100" v-model="editProductData.tax">
+                <th class="float-end"><span class="pi pi-money-bill"></span> Selling Price &nbsp;</th>
+                <td><input type="number" step="0.01" min="0" class="form-control-dark" v-model.number="editProductData.sellingPrice"></td>
+              </tr>
+
+              <tr>
+                <th class="float-end"><span class="pi pi-sort-numeric-up"></span> Quantity &nbsp;</th>
+                <td><input type="number" class="form-control-dark" v-model.number="editProductData.quantity"></td>
+              </tr>
+
+              <tr>
+                <th class="float-end"><span class="pi pi-money-bill"></span> Tax &nbsp;</th>
+                <td>
+                  <select class="form-control-dark select" v-model="editProductData.tax">
                     <option value="tax">Tax</option>
                     <option value="non">Non</option>
                   </select>
@@ -174,12 +193,15 @@
               </tr>
 
               <tr>
-                <th class="w-10">Description</th>
-                <td class="w-40"><textarea class="form-control-dark w-100" cols="10" rows="3" v-model.trim="editProductData.description"></textarea></td>
-                <th class="w-10"></th>
-                <td class="w-40">
-                <button name="addProductBtn" class="btn-secondary p-1 w-50" type="submit">Save</button>&nbsp;
-                <button name="addProductBtn" class="btn-outline-dark p-1 w-40" type="button" @click="editProductDialog.close()">cancel</button>
+                <th class="float-end"><span class="pi pi-list"></span> Description &nbsp;</th>
+                <td><textarea class="form-control-dark" cols="10" rows="3" v-model.trim="editProductData.description"></textarea></td>
+              </tr>
+
+              <tr>
+                <td></td>
+                <td colspan="2">
+                  <button name="addProductBtn" class="btn-secondary p-1 w-25" type="submit">Save</button>&nbsp;
+                  <button name="addProductBtn" class="p-1 w-25" type="button" @click="editProductDialog.close()">cancel</button>
                 </td>
               </tr>
 
@@ -188,6 +210,20 @@
         </div>
       </div>
     </div>
+  </dialog>
+
+<!--  Category Dialog -->
+  <dialog ref="categoryDialog" style="border: 2px solid #ccc;">
+
+      <button class="bg-danger text-white float-end" title="Close" @click="categoryDialog.close()"><b>X</b></button>
+
+   <div class="clearfix"></div>
+
+    <form @submit.prevent="addCategory" class="my-3">
+      <label><b>Category Name</b> <input type="text" class="form-control-dark p-1" v-model.trim="categoryName"></label>
+      &nbsp;
+      <button type="submit" name="submitBtn"><span class="pi pi-save px-2 py-1"></span> Save</button>
+    </form>
   </dialog>
 
 </template>
@@ -210,7 +246,9 @@ import { formatNumber } from "@/functions";
     const loading = ref(false);
     const categories = ref([]);
     const products = ref([]);
-    const editProductDialog = ref(null)
+    const categoryDialog = ref(null);
+    const editProductDialog = ref(null);
+    const categoryName = ref('')
     const productData = reactive({
       productName: '',
       quantity: '',
@@ -408,6 +446,33 @@ import { formatNumber } from "@/functions";
           editProductData.tax = data.tax;
           editProductDialog.value.showModal();
 
+    }
+
+
+    //Add category
+const openCategoryDialog = () => {
+  categoryName.value = '';
+  categoryDialog.value.showModal();
+}
+    const addCategory = async (e) => {
+      try {
+        e.target.submitBtn.disabled = true;
+        const cat = categoryName.value.toLowerCase()
+        //validation
+        if (!cat) return ipcRenderer.send('errorMessage', "Category name cannot be empty")
+
+        //Save record
+        const newCat =  await db('categories').insert({ name: cat });
+        categories.value.push({ id: newCat[0], name: cat });
+        categoryDialog.value.close();
+        categoryName.value = '';
+
+      }catch (e){
+        if(e.code === "SQLITE_CONSTRAINT") return ipcRenderer.send('errorMessage', 'Record already exists')
+        ipcRenderer.send('errorMessage', e.message)
+      }finally {
+        e.target.submitBtn.disabled = false;
+      }
     }
 
 </script>

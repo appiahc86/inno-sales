@@ -19,6 +19,7 @@ const OrderDetails = async () => {
             table.bigInteger('orderId').unsigned().notNullable();
 
             table.foreign('orderId').references('id').inTable('orders').onDelete('CASCADE');
+            table.foreign('categoryId').references('id').inTable('categories')
         })
     }
 

@@ -13,7 +13,7 @@
 
       </div>
 
-      <div class="col-6">
+      <div class="col-6 mt-4">
       <!--   Table     -->
         <div class="table-responsive">
 
@@ -40,7 +40,7 @@
             </template>
             <Column field="name" header="Name" sortable style="font-size: 0.85em;">
               <template #body="{data}">
-                <td style="font-size: 0.8em;">{{ data.name.toUpperCase() }}</td>
+                <td style="font-size: 0.8em;" class="text-capitalize">{{ data.name }}</td>
               </template>
             </Column>
             <template #body="{data}" style="font-size: 0.85em;">

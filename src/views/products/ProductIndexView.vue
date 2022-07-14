@@ -120,7 +120,11 @@
                <td :style="{color: data.quantity < 5 ? 'red' : '' }">{{ data.productName }}</td>
              </template>
            </Column>
-           <Column field="category" header="Category" sortable style="font-size: 0.85em;"></Column>
+           <Column field="category" header="Category" sortable style="font-size: 0.85em;">
+             <template #body="{data}">
+               <td class="text-capitalize">{{ data.category }}</td>
+             </template>
+           </Column>
            <Column field="buyingPrice" header="Buy. Price" sortable style="font-size: 0.85em;"></Column>
            <Column field="sellingPrice" header="Sel. Price" sortable style="font-size: 0.85em;"></Column>
            <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" style="font-size: 0.85em;"></Column>
@@ -145,7 +149,7 @@
   </div>
 
 <!--  Edit Dialog-->
-  <dialog ref="editProductDialog" name="dialog">
+  <dialog ref="editProductDialog" style="border: 2px solid #ccc;" name="dialog">
     <h4>Edit product</h4>
     <div class="container-fluid">
       <div class="row justify-content-center">
@@ -156,8 +160,10 @@
               <tr>
                 <th class="float-end"><span class="pi pi-cog"></span> Category &nbsp;</th>
                 <td>
-                  <select class="form-control-dark select" v-model="editProductData.category">
-                    <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name.toUpperCase() }}</option>
+                  <select class="form-control-dark select text-capitalize" v-model="editProductData.category">
+                    <option v-for="category in categories" :key="category.id" :value="category.id">
+                      {{ category.name }}
+                    </option>
                   </select>
                 </td>
               </tr>

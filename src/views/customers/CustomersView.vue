@@ -104,7 +104,7 @@
   </div>
 
   <!--  Edit Dialog-->
-  <dialog ref="editCustomerDialog">
+  <dialog ref="editCustomerDialog" style="border: 2px solid #ccc;">
     <h4>Edit Customer</h4>
     <div class="container-fluid">
       <div class="row justify-content-center">

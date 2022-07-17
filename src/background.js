@@ -154,6 +154,8 @@ ipcMain.on('confirm', async (event, {id, type, message}) => {
       break;
       case 'vendor': event.sender.send('deleteVendor', id);
       break;
+      case 'undoBillPayment': event.sender.send('undoBillPayment', id); //thia will take 3 arguments
+      break;
       default:
         console.clear();
             break;

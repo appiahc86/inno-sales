@@ -50,8 +50,8 @@
 
             <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" style="font-size: 0.85em;">
               <template #body="{data}">
-                <span style="font-size: 0.8em;" type="button" title="Edit" @click="showModal(data.id, data.name)">&#128221;</span> &nbsp;
-                <span style="font-size: 0.8em;" type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
+                <span style="font-size: 1em;" type="button" title="Edit" @click="showModal(data.id, data.name)">&#128221;</span> &nbsp;
+                <span style="font-size: 1em;" type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
               </template>
             </Column>
           </DataTable>

@@ -1,17 +1,19 @@
 <template>
-<div class="container-fluid mt-5">
+<div class="container-fluid mt-4">
   <div class="row">
     <div class="col-12">
+
+      <h4 class="text-center">List Of Invoices Received From Vendors</h4>
+
       <div class="table-responsive">
         <DataTable
             :value="purchases" :paginator="true" dataKey="id"
             class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
             filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedRecord"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            :globalFilterFields="['company', 'invoice', 'total']" responsiveLayout="scroll">
-
+            :rowsPerPageOptions="[10,25,50]" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            :globalFilterFields="['company', 'invoice', 'total']" responsiveLayout="scroll"
+        >
           <template #header>
             <div class="d-flex justify-content-center align-items-center" style="height: 15px">
               <h6 class="px-3">Receiving History</h6>
@@ -42,7 +44,11 @@
           <Column field="billDate" header="Bill Date" sortable  style="font-size: 0.85em;"></Column>
           <Column field="invoiceDue" header="Due Date" sortable  style="font-size: 0.85em;"></Column>
           <Column field="numberOfItems" header="Total Items" sortable  style="font-size: 0.85em;"></Column>
-          <Column field="total" header="Total" sortable  style="font-size: 0.85em;"></Column>
+          <Column field="total" header="Total" sortable  style="font-size: 0.85em;">
+            <template #body="{data}">
+              {{ formatNumber(data.total) }}
+            </template>
+          </Column>
           <Column headerStyle="text-align: center" header="Return To Vendor" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.85em;">
             <template #body="{data}">
               <span title="Return to Vendor" @click="openReturnDialog(data.id, data.company)" style="cursor: pointer;" v-if="data.status === 'received'">
@@ -116,7 +122,7 @@
               <label><b>Return Date</b> <input type="date" class="form-control-dark p-1" v-model="returnData.date"></label>
             </div>
             <button name="submitBtn" type="submit" class="px-2 btn-dark">Proceed</button>
-            <button type="button" class="float-end px-2 btn-secondary" @click="returnDialog.close()">Cancel</button>
+            <button type="button" class="float-end px-2 btn-secondary" @click="closeReturnDialog">Cancel</button>
 
           </form>
         </div>
@@ -136,7 +142,6 @@ import * as Validator from "validatorjs";
 
 const purchases = ref([]);
 const loading = ref(false);
-const selectedRecord = ref(null);
 const details = ref([]);
 const  detailsDialog = ref(null);
 const  returnDialog = ref(null);
@@ -160,9 +165,11 @@ const getPurchases = async () => {
 
    purchases.value = await db('purchases')
        .join('vendors', 'purchases.vendorId', '=', 'vendors.id')
+       .leftJoin('billPayments', 'purchases.id', 'billPayments.purchaseId')
        .select('purchases.id', 'purchases.billDate', 'purchases.invoiceDue',
            'purchases.numberOfItems','purchases.invoice', 'purchases.total',
            'purchases.status', 'vendors.company')
+       .groupBy('purchases.id')
        .orderBy('purchases.id', 'DESC').limit(200);
 
   }catch (e) { ipcRenderer.send("errorMessage", e.message) }
@@ -185,6 +192,15 @@ const showDetails = async (id) => {
     ipcRenderer.send('errorMessage', e.message);
   }
 
+}
+
+
+// Close ReturnDialog
+const closeReturnDialog = () => {
+  returnData.date = null;
+  returnData.id = null;
+  returnData.vendor = null;
+  returnDialog.value.close();
 }
 
 

@@ -17,6 +17,12 @@
               <form @submit.prevent="addVendor">
                 <table class="w-100 myTable">
                   <tr>
+                    <th></th>
+                    <td>
+                      <h4 style="width: 300px; text-align: center;">Add A New Vendor</h4>
+                    </td>
+                  </tr>
+                  <tr>
                     <th class="float-end"><span class="pi pi-home"></span> Company &nbsp;&nbsp;</th>
                     <td><input type="text" class="form-control-dark" v-model.trim="vendorData.company"></td>
                   </tr>
@@ -45,12 +51,18 @@
                     <th class="float-end"><span class="pi pi-list"></span> Notes &nbsp;&nbsp;</th>
                     <td><textarea rows="4" class="form-control-dark" v-model.trim="vendorData.notes"></textarea></td>
                   </tr>
+
+                  <tr>
+                    <th class="float-end"></th>
+                    <td>
+                      <button class=" mt-1 btn-secondary" type="submit" name="submitBtn" style="width: 300px;">
+                        <span class="pi pi-save"></span>
+                        <b style="font-size: 1.5em;"> Save</b>
+                      </button>
+                    </td>
+                  </tr>
                 </table>
 
-                <button class=" mt-1 btn-secondary p-1" type="submit" style="margin-left: 45%;" name="submitBtn">
-                  <span class="pi pi-save"></span>
-                  Add Vendor
-                </button>
               </form>
             </div>
           </div>
@@ -151,13 +163,22 @@
                 <th class="float-end"><span class="pi pi-list"></span> Notes &nbsp;&nbsp;</th>
                 <td><textarea rows="4" class="form-control-dark" v-model.trim="editVendorData.notes"></textarea></td>
               </tr>
+
+              <tr>
+                <th class="float-end"></th>
+                <td>
+                  <button class=" mt-1 btn-secondary p-1" style="width: 45%;" type="submit" name="submitBtn">
+                    <span class="pi pi-save"></span>
+                    Save
+                  </button> &nbsp;
+                  <button type="button" class="p-1" @click="editDialog.close()" style="width: 45%;">Cancel</button>
+                </td>
+              </tr>
+
             </table>
 
-            <button class=" mt-1 btn-secondary p-1" type="submit" style="margin-left: 45%;" name="submitBtn">
-              <span class="pi pi-save"></span>
-               Save
-            </button> &nbsp; &nbsp; &nbsp;
-            <button type="button" class="p-1 " @click="editDialog.close()">Cancel</button>
+
+
           </form>
         </div>
       </div>
@@ -321,7 +342,7 @@ const filters = ref({
   padding: 10px 0;
 }
 .myTable input, .myTable textarea{
-  width: 250px;
+  width: 300px;
   padding: 4px;
 }
 

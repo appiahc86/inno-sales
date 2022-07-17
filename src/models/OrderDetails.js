@@ -14,7 +14,7 @@ const OrderDetails = async () => {
             table.float('total');
             table.float('tax');
             table.float('discount');
-            table.date('date');
+            table.date('date').defaultTo(db.fn.now());
             table.bigInteger('categoryId').unsigned();
             table.bigInteger('orderId').unsigned().notNullable();
 

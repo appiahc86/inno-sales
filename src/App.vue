@@ -7,7 +7,6 @@
 
             <h4 class="mt-2">&#128337; <span class="" ref="time" style="color: goldenrod"></span></h4>
 
-
           <ul class="nav flex-column">
             <li class="nav-item">
               <router-link :to="{ name: 'home' }" class="nav-link">
@@ -26,7 +25,7 @@
                   <li><router-link :to="{name: 'sales'}" class="dropdown-item fw-bold">New Sales Receipt</router-link></li>
 
                   <li><router-link :to="{name: 'held-items'}" class="dropdown-item fw-bold">Held Receipts</router-link></li>
-                  <li><a class="dropdown-item fw-bold">Sales History</a></li>
+                  <li><router-link :to="{name: 'sales-history'}" class="dropdown-item fw-bold">Sales History</router-link></li>
                   <li><a class="dropdown-item fw-bold">Products List</a></li>
                 </ul>
               </div>
@@ -68,10 +67,10 @@
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="purchasing" style="font-size: 0.9em !important;">
                   <li><router-link :to="{name: 'receiveItems'}" class="dropdown-item fw-bold">Receive Items</router-link></li>
+                  <li><router-link :to="{name: 'receivingHistory'}" class="dropdown-item fw-bold">Receiving History</router-link></li>
                   <li><a class="dropdown-item fw-bold">Return Voucher</a></li>
                   <li class="dropdown-divider fw-bold"></li>
-                  <li><router-link :to="{name: 'receivingHistory'}" class="dropdown-item fw-bold">Receiving History</router-link></li>
-                  <li><a class="dropdown-item fw-bold">Held Vouchers</a></li>
+                  <li><router-link :to="{name: 'bills'}" class="dropdown-item fw-bold">Bills</router-link></li>
                 </ul>
               </div>
             </li>
@@ -101,6 +100,8 @@
             </li>
           </ul>
         </div>
+
+        <b class="text-white-50" style="position: absolute; bottom: 0">Inno Sales 0.0.1</b>
       </nav>
 
 
@@ -176,9 +177,9 @@ const insertUser = async () => {
 }
 
 
-      onMounted(()=>{
+      onMounted(async ()=>{
         insertUser();
-        // console.clear();
+
         setInterval(()=>{
           if(time.value) time.value.innerHTML = new Date().toLocaleTimeString();
         },10)

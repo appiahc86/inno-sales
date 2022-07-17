@@ -10,11 +10,19 @@
     <!--  Customer Form  -->
     <div class="tab-pane mt-5 show active" id="add-customer" role="tabpanel" aria-labelledby="nav-add-customer-tab">
       <div class=" py-4">
+
         <div class="container">
           <div class="row justify-content-center">
             <div class="col-md-9">
-    <form @submit.prevent="addCustomer">
+              <form @submit.prevent="addCustomer">
       <table class="w-100 myTable">
+
+        <tr>
+          <th></th>
+          <td>
+            <h4 style="width: 300px; text-align: center;">Add A New Customer</h4>
+          </td>
+        </tr>
 
         <tr>
           <th class="float-end"><span class="pi pi-user"></span> Customer Name &nbsp;</th>
@@ -36,12 +44,16 @@
           <td><input type="text" maxlength="100" class="form-control-dark" v-model.trim="customerData.address"></td>
         </tr>
 
+        <tr>
+          <th></th>
+          <td>
+            <button class=" mt-1 btn-secondary" type="submit" name="submitBtn" style="width: 300px;">
+              <span class="pi pi-save"></span>
+              <b style="font-size: 1.5em;"> Save</b>
+            </button>
+          </td>
+        </tr>
       </table>
-
-      <button class=" mt-1 btn-secondary p-1" type="submit" style="margin-left: 37%;" name="submitBtn">
-        <span class="pi pi-save"></span>
-        Add Customer
-      </button>
     </form>
             </div>
           </div>
@@ -110,31 +122,37 @@
       <div class="row justify-content-center">
         <div class="col-md-12">
           <form @submit.prevent="editCustomer">
-            <table class="w-100" id="formTable">
+            <table class="w-100 myTable" id="formTable">
 
               <tr>
-                <th class="w-25 text-center">Customer Name</th>
+                <th class="float-end">Customer Name &nbsp;</th>
                 <td class="w-50"><input type="text" maxlength="40" class="form-control-dark w-100" v-model.trim="editCustomerData.name"></td>
               </tr>
 
               <tr>
-                <th class="w-25 text-center">Company</th>
-                <td class="w-50"><input type="text" maxlength="60" class="form-control-dark w-100" v-model.trim="editCustomerData.company"></td>
+                <th class="float-end">Company &nbsp;</th>
+                <td class="w-50"><input type="text" maxlength="60" class="form-control-dark" v-model.trim="editCustomerData.company"></td>
               </tr>
 
               <tr>
-                <th class="w-25 text-center">Phone</th>
-                <td class="w-50"><input type="text" maxlength="36" class="form-control-dark w-100"  v-model.trim="editCustomerData.phone"></td>
+                <th class="float-end">Phone &nbsp;</th>
+                <td class="w-50"><input type="text" maxlength="36" class="form-control-dark"  v-model.trim="editCustomerData.phone"></td>
               </tr>
 
               <tr>
-                <th class="w-25 text-center">Address</th>
-                <td><input type="text" maxlength="100" class="form-control-dark w-100" v-model.trim="editCustomerData.address"></td>
+                <th class="float-end">Address &nbsp;</th>
+                <td><input type="text" maxlength="100" class="form-control-dark" v-model.trim="editCustomerData.address"></td>
               </tr>
 
+              <tr>
+                <th class="float-end"></th>
+                <td>
+                  <button class="mt-2 btn-secondary py-1" type="submit" style="width: 45%;">Update</button>&nbsp;
+                  <button type="button" @click="closeDialog" class="py-1" style="width: 45%;">Cancel</button>
+                </td>
+              </tr>
             </table>
-            <button class="mt-5 btn-secondary p-1" type="submit">Update Customer</button>
-            <button type="button" @click="closeDialog" class="w-25 mx-4 p-1">Cancel</button>
+
           </form>
         </div>
       </div>
@@ -293,7 +311,7 @@ ipcRenderer.on('deleteCustomer', async (event, args) => {
   padding: 5px;
 }
 .myTable input, .myTable textarea{
-  width: 250px;
+  width: 300px;
   padding: 4px;
 }
 

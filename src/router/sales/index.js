@@ -1,6 +1,7 @@
 
 import SalesIndexView from "@/views/sales/SalesIndexView";
 import HeldItemsView from "@/views/sales/HeldItemsView";
+import SalesHistoryView from "@/views/sales/SalesHistoryView";
 
 const salesRouter = [
     {
@@ -12,6 +13,11 @@ const salesRouter = [
         path: '/sales/held-items',
         name: 'held-items',
         component: HeldItemsView
+    },
+    {
+        path: '/sales/sales-history',
+        name: 'sales-history',
+        component: SalesHistoryView
     }
 
 ]

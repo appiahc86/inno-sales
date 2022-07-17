@@ -9,6 +9,7 @@ import salesRouter from "@/router/sales";
 import salesReportRouter from "@/router/reports/sales";
 import customerRouter from "@/router/customers";
 import vendorsRouter from "@/router/vendors";
+import billsRouter from "@/router/bills";
 import store from "@/store";
 
 const routes = [
@@ -37,6 +38,7 @@ const routes = [
     ...customerRouter,
     ...vendorsRouter,
     ...purchasesRouter,
+    ...billsRouter,
 
     //Report routes
     ...salesReportRouter

@@ -13,7 +13,7 @@ const Purchase = async () => {
             table.date('returnedDate');
             table.string('invoice');
             table.float('total');
-            table.float('payment');
+            table.enum('paymentStatus', ['paid', 'unpaid']);
 
             table.foreign('vendorId').references('id').inTable('vendors');
 

@@ -13,8 +13,15 @@
           <div class="container">
             <div class="row justify-content-center">
               <div class="col-md-10">
+
                 <form @submit.prevent="addProduct">
                   <table class="w-100 myTable">
+                    <tr>
+                      <th></th>
+                      <td>
+                        <h4 style="width: 350px; text-align: center;">Add A New Product</h4>
+                      </td>
+                    </tr>
                     <tr>
                       <th class="float-end"><span class="pi pi-cog"></span> Category &nbsp;</th>
                       <td>
@@ -68,12 +75,18 @@
                       <td><textarea class="form-control-dark" cols="10" rows="3" v-model.trim="productData.description"></textarea></td>
                     </tr>
 
+                    <tr>
+                      <th class="float-end"></th>
+                      <td>
+                        <button class=" mt-1 btn-secondary" type="submit" style="width: 350px;" name="addProductBtn">
+                          <span class="pi pi-save"></span>
+                          <b style="font-size: 1.5em;"> Save</b>
+                        </button>
+                      </td>
+                    </tr>
                   </table>
 
-                  <button class=" mt-1 btn-secondary p-1" type="submit" style="margin-left: 37%;" name="addProductBtn">
-                    <span class="pi pi-save"></span>
-                    Add Product
-                  </button>
+
 
                 </form>
               </div>
@@ -206,8 +219,8 @@
               <tr>
                 <td></td>
                 <td colspan="2">
-                  <button name="addProductBtn" class="btn-secondary p-1 w-25" type="submit">Save</button>&nbsp;
-                  <button name="addProductBtn" class="p-1 w-25" type="button" @click="editProductDialog.close()">cancel</button>
+                  <button name="addProductBtn" class="btn-secondary p-1 fw-bold" type="submit" style="width: 45%;">Save</button>&nbsp;
+                  <button name="addProductBtn" class="p-1 fw-bold" type="button" @click="editProductDialog.close()" style="width: 45%;">cancel</button>
                 </td>
               </tr>
 
@@ -226,9 +239,9 @@
    <div class="clearfix"></div>
 
     <form @submit.prevent="addCategory" class="my-3">
-      <label><b>Category Name</b> <input type="text" class="form-control-dark p-1" v-model.trim="categoryName"></label>
+      <label><b>Category Name</b> <input type="text" class="form-control-dark p-1" v-model.trim="categoryName" id="catInput"></label>
       &nbsp;
-      <button type="submit" name="submitBtn"><span class="pi pi-save px-2 py-1"></span> Save</button>
+      <button type="submit" name="submitBtn"><span class="pi pi-save px-2 py-1"></span><b>Save</b></button>
     </form>
   </dialog>
 
@@ -456,9 +469,10 @@ import { formatNumber } from "@/functions";
 
 
     //Add category
-const openCategoryDialog = () => {
+const openCategoryDialog = (e) => {
   categoryName.value = '';
   categoryDialog.value.showModal();
+  document.querySelector("#catInput").focus();
 }
     const addCategory = async (e) => {
       try {

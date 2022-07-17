@@ -122,7 +122,7 @@
           </div>
         </div>
 
-        <div class="card mt-5 p-2" v-if="paymentData.vendor" style="max-width: 300px; margin-left: auto;">
+        <div class="card mt-5 p-2" v-if="paymentData.vendor" style="max-width: 400px; margin-left: auto;">
           <h6 class="text-center">{{ paymentData.vendor.company }}</h6>
           <div class="d-flex mt-0">
           <div>Invoice#: <b>{{ paymentData.invoice }}</b></div>
@@ -309,13 +309,15 @@ const savePurchase = async (e) => {
     // validation
     let validation = new Validator(paymentData,{
       vendor: 'required',
-      billDate: 'required'
+      invoice: 'required',
+      billDate: 'required',
+      invoiceDue: 'required'
     })
 
     if (validation.passes()){ // If validation passes
       e.target.submitBtn.disabled = true;
-      let payment = 0;
-      if (paymentData.alreadyPaid) payment = parseFloat(total.value)
+      let paymentStatus = 'unpaid';
+      if (paymentData.alreadyPaid) paymentStatus = 'paid'
 
       await db.transaction( async trx => {
       const purchase = await trx('purchases').insert({ //Save to purchase table
@@ -326,7 +328,7 @@ const savePurchase = async (e) => {
         numberOfItems: cart.value.length,
         invoice: paymentData.invoice,
         total: total.value,
-        payment: payment
+        paymentStatus: paymentStatus
       })
 
 
@@ -357,13 +359,12 @@ const savePurchase = async (e) => {
     })
 
       if (paymentData.printInvoice){
-        window.print();
+        window.print(); //TODO print
       }
-
-
 
       clearCart();
       resetFormData();
+
     }else ipcRenderer.send('errorMessage', `${Object.values(validation.errors.all())[0]}`)
 
   }catch (e) {ipcRenderer.send('errorMessage', e.message)}

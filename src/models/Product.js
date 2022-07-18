@@ -12,7 +12,7 @@ const Product = async () => {
             table.float('buyingPrice');
             table.float('sellingPrice').notNullable();
             table.string('tax', 6).notNullable();
-            table.date('dateAdded').defaultTo(db.fn.now());
+            table.date('dateAdded');
 
             table.bigInteger('category').unsigned().notNullable();
             table.foreign('category').references('id').inTable('categories');

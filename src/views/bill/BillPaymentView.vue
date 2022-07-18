@@ -76,7 +76,7 @@ onMounted(() => {
   company.value = route.params.company;
   invoice.value = route.params.invoice;
   amountDue.value = parseFloat(route.params.amountDue);
-  invoiceDue.value = route.params.invoiceDue;
+  invoiceDue.value = parseInt(route.params.invoiceDue);
   formData.amount = parseFloat(route.params.amountDue);
 })
 
@@ -95,7 +95,7 @@ const pay = async (e) => {
 
        await trx('billPayments').insert({ // Save to billPayments table
         purchaseId: purchaseId.value,
-        date: formData.date,
+        date: new Date(formData.date).setHours(0,0,0,0),
         amount: parseFloat(formData.amount),
         note: formData.note
       })

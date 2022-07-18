@@ -361,7 +361,8 @@ import { formatNumber } from "@/functions";
           e.target.addProductBtn.disabled = true
           productData.category = productData.category.id;
 
-          const product = await db('products').insert(productData);
+          const product = await db('products')
+              .insert({...productData, dateAdded:   new Date().setHours(0,0,0,0)});
 
           //Update on front-end
           const cat = categories.value.filter(c => c.id.toString() === productData.category.toString());

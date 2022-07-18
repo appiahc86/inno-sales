@@ -5,7 +5,7 @@ const Order = async () => {
 
         await db.schema.createTable('orders', table => {
             table.bigIncrements('id').primary();
-            table.date('orderDate').defaultTo(db.fn.now());
+            table.date('orderDate');
             table.integer('numberOfItems', 7);
             table.float('momo');
             table.float('total');

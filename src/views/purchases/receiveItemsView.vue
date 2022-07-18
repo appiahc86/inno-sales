@@ -321,8 +321,8 @@ const savePurchase = async (e) => {
 
       await db.transaction( async trx => {
       const purchase = await trx('purchases').insert({ //Save to purchase table
-        billDate: paymentData.billDate,
-        invoiceDue: paymentData.invoiceDue,
+        billDate: new Date(paymentData.billDate).setHours(0,0,0,0),
+        invoiceDue: new Date(paymentData.invoiceDue).setHours(0,0,0,0),
         vendorId: paymentData.vendor.id,
         status: 'received',
         numberOfItems: cart.value.length,

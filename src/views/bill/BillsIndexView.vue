@@ -33,8 +33,16 @@
 
           <Column field="company" header="Vendor" sortable style="font-size: 0.85em;"></Column>
           <Column field="invoice" header="Invoice#" sortable style="font-size: 0.85em;"></Column>
-          <Column field="billDate" header="Bill Date" sortable  style="font-size: 0.85em;"></Column>
-          <Column field="invoiceDue" header="Due Date" sortable  style="font-size: 0.85em;"></Column>
+          <Column field="billDate" header="Bill Date" sortable  style="font-size: 0.85em;">
+            <template #body="{data}">
+              <td>{{ new Date(data.billDate).toLocaleDateString() }}</td>
+            </template>
+          </Column>
+          <Column field="invoiceDue" header="Due Date" sortable  style="font-size: 0.85em;">
+            <template #body="{data}">
+              <td>{{ new Date(data.invoiceDue).toLocaleDateString() }}</td>
+            </template>
+          </Column>
           <Column field="total" header="Total" sortable  style="font-size: 0.85em;">
             <template #body="{data}">
               <td>{{ formatNumber(data.total) }}</td>
@@ -86,7 +94,7 @@
               <tbody>
               <template v-for="rec in paymentHistory" :key="rec.id">
                 <tr>
-                  <td>{{ rec.date }}</td>
+                  <td>{{ new Date(rec.date).toLocaleDateString() }}</td>
                   <td>{{ formatNumber(parseFloat(rec.amount)) }}</td>
                   <td>{{ rec.note }}</td>
                   <td>
@@ -135,7 +143,7 @@ const getPurchases = async () => {
     loading.value = true;
 
     purchases.value = await db('purchases')
-        .join('vendors', 'purchases.vendorId', '=', 'vendors.id')
+        .innerJoin('vendors', 'purchases.vendorId', '=', 'vendors.id')
         .leftJoin('billPayments', 'purchases.id', 'billPayments.purchaseId')
         .select('purchases.id', 'purchases.billDate', 'purchases.invoiceDue',
             'purchases.invoice', 'purchases.total', 'vendors.company')

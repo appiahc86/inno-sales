@@ -41,8 +41,16 @@
               </span>
             </template>
           </Column>
-          <Column field="billDate" header="Bill Date" sortable  style="font-size: 0.85em;"></Column>
-          <Column field="invoiceDue" header="Due Date" sortable  style="font-size: 0.85em;"></Column>
+          <Column field="billDate" header="Bill Date" sortable  style="font-size: 0.85em;">
+            <template #body="{data}">
+              <td>{{ new Date(data.billDate).toLocaleDateString() }}</td>
+            </template>
+          </Column>
+          <Column field="invoiceDue" header="Due Date" sortable  style="font-size: 0.85em;">
+            <template #body="{data}">
+              <td>{{ new Date(data.invoiceDue).toLocaleDateString() }}</td>
+            </template>
+          </Column>
           <Column field="numberOfItems" header="Total Items" sortable  style="font-size: 0.85em;"></Column>
           <Column field="total" header="Total" sortable  style="font-size: 0.85em;">
             <template #body="{data}">
@@ -183,7 +191,7 @@ getPurchases();
 const showDetails = async (id) => {
   try {
     details.value = await db('purchases')
-        .join('purchaseDetails', 'purchases.id', '=', 'purchaseDetails.purchaseId')
+        .innerJoin('purchaseDetails', 'purchases.id', '=', 'purchaseDetails.purchaseId')
         .select('purchases.invoice', 'purchases.total', 'purchaseDetails.productName',
             'purchaseDetails.cost', 'purchaseDetails.quantity', 'purchaseDetails.total as extCost'
         ).where('purchases.id', id)
@@ -237,7 +245,7 @@ const returnToVendor = async (e) => {
 
         // Set purchase status to returned
         await trx('purchases').where('id', returnData.id)
-            .update({status: 'returned', returnedDate: returnData.date});
+            .update({status: 'returned', returnedDate: new Date(returnData.date).setHours(0,0,0,0) });
 
 
         // Update on front-end

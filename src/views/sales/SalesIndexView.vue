@@ -152,7 +152,7 @@
              <td>{{ item.productName }}</td>
              <td>{{ item.qty }}</td>
              <td>{{ formatNumber(item.sellingPrice) }}</td>
-             <td>{{ formatNumber(item.total) }}</td>
+             <td>{{ formatNumber(item.sellingPrice * item.qty ) }}</td>
            </tr>
          </template>
          </tbody>
@@ -480,7 +480,7 @@ resetPayment();
 const checkout = async (e) => {
   e.target.submitBtn.disabled = true;
   const receipt = document.querySelector("#printTable");
-  // const date = new Date().setHours(0,0,0,0);
+  const date = new Date().setHours(0,0,0,0);
   const user = computed(() => store.getters.user);
   const customerId = selectedCustomer.value ? selectedCustomer.value.id : '';
   const getTax = computed(() => store.getters["cartModule/getTax"]);
@@ -501,7 +501,7 @@ const checkout = async (e) => {
        await db.transaction( async trx => {
 
          const order = await trx('orders').insert({ //Save to Orders table
-           // orderDate: date,
+           orderDate: date,
            numberOfItems: cart.value.length,
            momo: momo.value || 0,
            total: total.value,
@@ -524,7 +524,7 @@ const checkout = async (e) => {
              total: item.total,
              tax: item.salesTax,
              discount: item.discount,
-             // date: date,
+             date: date,
              categoryId: item.categoryId,
              orderId: order
            })
@@ -566,9 +566,6 @@ const checkout = async (e) => {
 <style scoped>
 .v-select{
   background: #e7e6e6;
-}
-.v1{
-  background: #fff;
 }
 
 </style>

@@ -82,7 +82,7 @@
 
             <form @submit.prevent="savePurchase">
               <v-select :options="vendors" label="company" v-model="paymentData.vendor"
-                        placeholder="--select Vendor--" class="v-select mb-3">
+                        placeholder="select Vendor" class="v-select mb-3">
               </v-select>
 
               <label>
@@ -316,19 +316,15 @@ const savePurchase = async (e) => {
 
     if (validation.passes()){ // If validation passes
       e.target.submitBtn.disabled = true;
-      let paymentStatus = 'unpaid';
-      if (paymentData.alreadyPaid) paymentStatus = 'paid'
 
       await db.transaction( async trx => {
       const purchase = await trx('purchases').insert({ //Save to purchase table
         billDate: new Date(paymentData.billDate).setHours(0,0,0,0),
         invoiceDue: new Date(paymentData.invoiceDue).setHours(0,0,0,0),
         vendorId: paymentData.vendor.id,
-        status: 'received',
         numberOfItems: cart.value.length,
         invoice: paymentData.invoice,
         total: total.value,
-        paymentStatus: paymentStatus
       })
 
 
@@ -345,6 +341,17 @@ const savePurchase = async (e) => {
       }
       //Batch Insert into purchase details table
       await trx.batchInsert('purchaseDetails', purchaseDetailsArray, 30);
+
+
+      //add payment if already paid
+        if (paymentData.alreadyPaid){
+          await trx('billPayments').insert({
+            purchaseId: purchase,
+            date: new Date(paymentData.billDate).setHours(0,0,0,0),
+            amount: total.value,
+            note: ''
+          })
+        }
 
       //Add quantity to products table
       for (const item of cart.value) {

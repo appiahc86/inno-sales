@@ -83,13 +83,16 @@
               </tbody>
             </table>
           </div>
-          <div class="mt-2" v-if="details.length">
-            <div class="float-end">Subtotal: <b>{{ formatNumber(parseFloat(subtotal)) }}</b></div> <br>
-            <template v-if="details[0].tax"><div class="float-end" >Tax: <b>{{ parseFloat(details[0].tax) }}</b></div> <br></template>
-            <template v-if="details[0].discount"><div class="float-end">Discount: <b>{{ parseFloat(details[0].discount) }}</b></div> <br></template>
-            <div class="float-end">Amount Tendered: <b>{{ parseFloat(details[0].tendered) }}</b></div><br>
-            <div class="float-end">Change Given: <b>{{ parseFloat(details[0].tendered -details[0].total) }}</b></div> <br>
-          </div>
+      <div class="mt-2" v-if="details.length">
+        <div class="float-end">Subtotal: <b>{{ formatNumber(parseFloat(subtotal)) }}</b></div> <br>
+        <template v-if="details[0].tax"><div class="float-end" >Tax: <b>{{ formatNumber(parseFloat(details[0].tax)) }}</b>
+        </div> <br></template>
+        <template v-if="details[0].discount"><div class="float-end">
+          Discount: <b>{{ formatNumber(parseFloat(details[0].discount)) }}</b> </div> <br></template>
+        <div class="float-end">Amount Tendered: <b>{{ formatNumber(parseFloat(details[0].tendered)) }}</b></div><br>
+        <div class="float-end">Change Given: <b>{{ formatNumber(parseFloat(details[0].tendered -details[0].total)) }}</b>
+        </div> <br>
+      </div>
           <br>
           <h5>Total : <span class="text-danger">{{ details.length ? formatNumber(details[0].total) : 0 }}</span></h5>
           <div class="text-center py-1">
@@ -261,7 +264,7 @@ const closeDialog = () => {
 
 
 //Reprint receipt
-const reprint = (receiptNumber) => {
+const reprint = async (receiptNumber) => {
   const receipt = document.querySelector("#printTable");
 
   // Initialize barcode
@@ -271,7 +274,8 @@ const reprint = (receiptNumber) => {
     fontOptions: 'bold'
   })
 
-  printTiny(receipt, {scanStyles: false, scanHTML: true});
+  await printTiny(receipt, {scanStyles: false, scanHTML: true});
+  console.clear();
 }
 
 </script>

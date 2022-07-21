@@ -8,12 +8,11 @@ const Purchase = async () => {
             table.date('billDate');
             table.date('invoiceDue');
             table.bigInteger( 'vendorId');
-            table.enum('status', ['received', 'returned'])
+            table.enum('status', ['received', 'returned']).defaultTo('received')
             table.integer('numberOfItems');
             table.date('returnedDate');
             table.string('invoice');
             table.float('total');
-            table.enum('paymentStatus', ['paid', 'unpaid']);
 
             table.foreign('vendorId').references('id').inTable('vendors');
 

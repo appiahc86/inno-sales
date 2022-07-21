@@ -21,14 +21,12 @@ module.exports = {
           }
         ],
 
-        appId: 'com.sales.app',
+        appId: 'com.innosales.app',
         win: {
           target: 'nsis',
           icon: ''
         },
         nsis: {
-          installerIcon: 'public/installer.ico',
-          uninstallerIcon: 'public/installer.ico',
           uninstallDisplayName: 'Inno Sales',
           // deleteAppDataOnUninstall: true,
           oneClick: false,
@@ -36,7 +34,7 @@ module.exports = {
           allowToChangeInstallationDirectory: true,
           allowElevation: true,
           createDesktopShortcut: true,
-          shortcutName: 'Sales',
+          shortcutName: 'Inno Sales',
         }
 
       }

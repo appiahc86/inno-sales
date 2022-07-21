@@ -9,8 +9,9 @@ const path = require('path');
 //Import menus
 import indexMenu from "@/menu/indexMenu";
 import adminMenu from "@/menu/adminMenu";
+import endingMenu from "@/menu/endingMenu";
 
-let template = indexMenu;
+let template = indexMenu.concat(endingMenu);
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -121,12 +122,16 @@ if (isDevelopment) {
 
 //Error Message
 ipcMain.on('errorMessage', async (event, args) => {
-  template = adminMenu;
+  const template = indexMenu.concat(adminMenu).concat(endingMenu);
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
+
+  Menu.getApplicationMenu().getMenuItemById('products').enabled = false
+
   await dialog.showMessageBox(win,{type: 'warning', detail: args, title: 'error'  })
 })
 
+//Success Message
 ipcMain.on('successMessage', async (event, args) => {
   await dialog.showMessageBox(win,{type: 'info', detail: args, title: 'Success'  })
 })

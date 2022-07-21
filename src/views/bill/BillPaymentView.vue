@@ -100,11 +100,6 @@ const pay = async (e) => {
         note: formData.note
       })
 
-      //Set paymentStatus to paid in purchases table if payment is fully made
-      if ((parseFloat(amountDue.value) - parseFloat(formData.amount)) === 0){
-        await trx('purchases').where('id', purchaseId.value).update({paymentStatus: 'paid'})
-      }
-
     })
 
     //Go back to previous page

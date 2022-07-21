@@ -13,7 +13,7 @@
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             :rowsPerPageOptions="[10,25,50]"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            :globalFilterFields="['company', 'invoice', 'billDate', 'invoiceDue']" responsiveLayout="scroll">
+            :globalFilterFields="['company', 'invoice']" responsiveLayout="scroll">
 
           <template #header>
             <div class="d-flex justify-content-center align-items-center" style="height: 15px">
@@ -147,11 +147,12 @@ const getPurchases = async () => {
         .leftJoin('billPayments', 'purchases.id', 'billPayments.purchaseId')
         .select('purchases.id', 'purchases.billDate', 'purchases.invoiceDue',
             'purchases.invoice', 'purchases.total', 'vendors.company')
-        .select(db.raw('sum(billPayments.amount) as totalPaid'))
-        .where('purchases.paymentStatus', 'unpaid')
+        .sum('billPayments.amount as totalPaid')
         .where('purchases.status', 'received')
+        .havingRaw('?? > ?', ['purchases.total',  db.raw('coalesce(sum(billPayments.amount), 0)'  )] )
         .groupBy('purchases.id')
-        .orderBy('purchases.id', 'DESC');
+        .orderBy('purchases.id', 'DESC')
+
 
   }catch (e) { ipcRenderer.send("errorMessage", e.message) }
   finally { loading.value = false; }
@@ -192,7 +193,6 @@ const paymentHistoryTotal = computed(() => {
 
 //close payment history dialog
 const closePaymentHistoryDialog = () => {
-  // paymentHistory.value = [];
   paymentHistoryDialog.value.close();
 }
 

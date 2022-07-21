@@ -39,7 +39,7 @@ import {onMounted} from "vue";
 
 const  router = useRouter();
 onMounted(() => {
-  setTimeout(()=>{router.push({name: 'login'})},2000)
+  router.push({name: 'login'})
 })
 </script>
 

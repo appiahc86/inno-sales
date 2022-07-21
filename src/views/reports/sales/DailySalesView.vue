@@ -1,6 +1,10 @@
 <template>
-<div class="">
-  <h4>Daily sales report</h4>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <h4 class="text-center">Daily sales report</h4>
+    </div>
+  </div>
 </div>
 </template>
 

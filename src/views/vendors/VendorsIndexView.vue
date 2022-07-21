@@ -1,11 +1,13 @@
 <template>
-  <div class="">
-  <nav id="vendorsNav">
-    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+
+  <nav id="vendorsNav" class="topNav">
+    <div class="nav nav-tabs" role="tablist">
       <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-vendor" type="button" role="tab" aria-controls="nav-add-vendor" aria-selected="false">Add Vendor</button>
       <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-vendors" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Vendors List</button>
     </div>
   </nav>
+
+    <div class="container-fluid">
   <div class="tab-content" id="nav-tabContent">
 
     <!--  Vendor Form  -->
@@ -107,7 +109,13 @@
           <Column field="contactPerson" header="Contact Person" sortable style="font-size: 0.85em;"></Column>
           <Column field="phone" header="Address" sortable style="font-size: 0.85em;"></Column>
           <Column field="accountNumber" header="Account#" sortable style="font-size: 0.85em;"></Column>
-          <Column field="notes" header="Notes" sortable style="font-size: 0.85em;"></Column>
+          <Column field="notes" header="Notes" sortable style="font-size: 0.85em;">
+            <template #body="{data}">
+              <td :title="data.notes">
+                {{ data.notes.length > 20 ? data.notes.substring(0, 20) + '...' : data.notes }}
+              </td>
+            </template>
+          </Column>
 
           <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" style="font-size: 0.85em;">
             <template #body="{data}">

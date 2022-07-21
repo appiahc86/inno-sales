@@ -1,6 +1,6 @@
 <template>
-  <nav id="customersNav">
-    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+  <nav id="customersNav" class="topNav">
+    <div class="nav nav-tabs" role="tablist">
       <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-customer" type="button" role="tab" aria-controls="nav-add-customer" aria-selected="false">Add Customer</button>
       <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-customers" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Customer List</button>
     </div>
@@ -65,52 +65,59 @@
 
     <!--  Customers Table  -->
     <div class="tab-pane mt-2" id="all-customers" role="tabpanel" aria-labelledby="nav-all-customers-tab">
-      <div class="table-responsive">
-        <DataTable
-            :value="customers" :paginator="true" dataKey="id"
-            class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
-            filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedCustomers"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            :globalFilterFields="['name','company', 'phone', 'address']" responsiveLayout="scroll"
-        >
-          <template #header>
-            <div class="d-flex justify-content-center align-items-center" style="height: 15px">
-              <h6 class="px-3">Customers</h6>
-              <span class="p-input-icon-left">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="table-responsive">
+              <DataTable
+                  :value="customers" :paginator="true" dataKey="id"
+                  class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
+                  filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
+                  paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                  :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedCustomers"
+                  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                  :globalFilterFields="['name','company', 'phone', 'address']" responsiveLayout="scroll"
+              >
+                <template #header>
+                  <div class="d-flex justify-content-center align-items-center" style="height: 15px">
+                    <h6 class="px-3">Customers</h6>
+                    <span class="p-input-icon-left">
                         <i class="pi pi-search" />
                         <InputText v-model="filters['global'].value" placeholder="Keyword Search" style="height: 30px"/>
                     </span>
+                  </div>
+                </template>
+                <template #empty>
+                  No record found.
+                </template>
+                <template #loading>
+                  <h4 class="text-white"> Loading Customers data. Please wait.</h4>
+                </template>
+
+                <Column selection-mode="multiple"  style="font-size: 0.85em;"></Column>
+
+                <Column field="name" header="Name" sortable  style="font-size: 0.85em;"></Column>
+                <Column field="company" header="Company" sortable  style="font-size: 0.85em;"></Column>
+                <Column field="phone" header="Contact" sortable  style="font-size: 0.85em;"></Column>
+                <Column field="address" header="Address" sortable  style="font-size: 0.85em;"></Column>
+
+                <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.85em;">
+                  <template #body="{data}">
+                    <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span> &nbsp;
+                    <span type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
+                  </template>
+                </Column>
+              </DataTable>
             </div>
-          </template>
-          <template #empty>
-            No record found.
-          </template>
-          <template #loading>
-            <h4 class="text-white"> Loading Customers data. Please wait.</h4>
-          </template>
-
-          <Column selection-mode="multiple"  style="font-size: 0.85em;"></Column>
-
-          <Column field="name" header="Name" sortable  style="font-size: 0.85em;"></Column>
-          <Column field="company" header="Company" sortable  style="font-size: 0.85em;"></Column>
-          <Column field="phone" header="Contact" sortable  style="font-size: 0.85em;"></Column>
-          <Column field="address" header="Address" sortable  style="font-size: 0.85em;"></Column>
-
-          <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.85em;">
-            <template #body="{data}">
-              <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span> &nbsp;
-              <span type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
-            </template>
-          </Column>
-        </DataTable>
+            <br>
+            <button class="btn-secondary"  @click="confirm(selectedCustomers)" v-if="selectedCustomers.length">
+              <span class="pi pi-trash"></span>
+              Delete Selection
+            </button>
+          </div>
+        </div>
       </div>
-      <br>
-      <button class="btn-secondary"  @click="confirm(selectedCustomers)" v-if="selectedCustomers.length">
-        <span class="pi pi-trash"></span>
-        Delete Selection
-      </button>
+
     </div>
 
   </div>

@@ -2,6 +2,8 @@
 import SalesIndexView from "@/views/sales/SalesIndexView";
 import HeldItemsView from "@/views/sales/HeldItemsView";
 import SalesHistoryView from "@/views/sales/SalesHistoryView";
+import ProductsListView from "@/views/sales/ProductsListView";
+import SalesReturnView from "@/views/sales/SalesReturnView";
 
 const salesRouter = [
     {
@@ -18,6 +20,16 @@ const salesRouter = [
         path: '/sales/sales-history',
         name: 'sales-history',
         component: SalesHistoryView
+    },
+    {
+        path: '/sales/products-list',
+        name: 'sales-products-list',
+        component: ProductsListView
+    },
+    {
+        path: '/sales/sales-return',
+        name: 'sales-return',
+        component: SalesReturnView
     }
 
 ]

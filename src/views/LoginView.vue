@@ -21,11 +21,11 @@
                         <table class="myTable">
                           <tr>
                             <th>Username</th>
-                            <td><input type="text" v-model.trim="username" class="form-control-dark py-1"></td>
+                            <td><input type="text" v-model.trim="username" class="form-control-dark py-1 px-3"></td>
                           </tr>
                           <tr>
                             <th>Password</th>
-                            <td><input :type="showPass ? 'text' : 'password'" v-model="password" class="form-control-dark py-1"></td>
+                            <td><input :type="showPass ? 'text' : 'password'" v-model="password" class="form-control-dark py-1 px-3"></td>
                           </tr>
                           <tr>
                             <th></th>

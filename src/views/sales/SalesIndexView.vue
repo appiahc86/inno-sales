@@ -1,6 +1,6 @@
 <template>
-<div class="container-fluid mt-2">
- <div class="row mt-4">
+<div class="container-fluid mt-4">
+ <div class="row">
 
    <!--   CART -->
    <div class="col-8">
@@ -554,6 +554,7 @@ const checkout = async (e) => {
     printTiny(receipt, {scanStyles: false, scanHTML: true});
 
     selectedCustomer.value = null; //clear selected customer
+    console.clear();
 
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message)

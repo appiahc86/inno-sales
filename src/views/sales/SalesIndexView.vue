@@ -521,7 +521,7 @@ const checkout = async (e) => {
              buyingPrice: item.buyingPrice,
              originalPrice: item.originalPrice,
              sellingPrice: item.sellingPrice,
-             total: item.total,
+             total: item.sellingPrice * item.qty,
              tax: item.salesTax,
              discount: item.discount,
              date: date,

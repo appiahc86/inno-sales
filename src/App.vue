@@ -202,7 +202,7 @@ const insertUser = async () => {
 
         setInterval(()=>{
           if(time.value) time.value.innerHTML = new Date().toLocaleTimeString();
-        },10)
+        },500)
       })
 
 // listen to report events and redirect to page

@@ -41,7 +41,11 @@
                 <td class="text-capitalize">{{ data.category }}</td>
               </template>
             </Column>
-            <Column field="sellingPrice" header="Sel. Price" sortable style="font-size: 0.85em;"></Column>
+            <Column field="sellingPrice" header="Price" sortable style="font-size: 0.85em;">
+              <template #body="{data}">
+                <td><b>{{ formatNumber(parseFloat(data.sellingPrice))}}</b></td>
+              </template>
+            </Column>
             <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" style="font-size: 0.85em;"></Column>
             <Column field="tax" header="Tax" sortable style="font-size: 0.85em;"></Column>
             <Column field="description" header="Desc" sortable style="font-size: 0.85em;">
@@ -64,6 +68,7 @@
 <script setup>
 import db from "@/dbConfig/db";
 import {ref} from "vue";
+import {formatNumber} from "@/functions";
 import {FilterMatchMode} from "primevue/api";
 
 const products = ref([]);

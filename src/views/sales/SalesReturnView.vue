@@ -166,6 +166,9 @@ ipcRenderer.on('salesReturn', async (event, args) => {
     const user = computed(() => store.getters.user);
     const data =[];
     for (const ret of returningItems.value) {
+      let calculatedDiscount = parseFloat(ret.discount) / parseInt(ret.quantity);
+      let calculatedTax = parseFloat(ret.tax) / parseInt(ret.quantity);
+
       data.push({
         userId: user.value.id,
         productId: ret.productId,
@@ -175,8 +178,8 @@ ipcRenderer.on('salesReturn', async (event, args) => {
         originalPrice: ret.originalPrice,
         sellingPrice: ret.sellingPrice,
         total: parseFloat(ret.sellingPrice) * parseInt(ret.returnQty),
-        tax: ret.tax,
-        discount: ret.discount,
+        tax: calculatedTax * parseInt(ret.returnQty),
+        discount: calculatedDiscount * parseInt(ret.returnQty),
         date: new Date().setHours(0,0,0,0),
         categoryId: ret.categoryId,
         orderId: ret.orderId

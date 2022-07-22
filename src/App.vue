@@ -44,6 +44,9 @@
                 <li>
                   <router-link :to="{name: 'categories'}" class="dropdown-item fw-bold">Categories</router-link>
                 </li>
+                <li>
+                  <router-link :to="{name: 'price-adjustment'}" class="dropdown-item fw-bold">Price Adjustment</router-link>
+                </li>
               </ul>
             </div>
           </li>
@@ -116,7 +119,7 @@
       <div class="bottom text-center">&nbsp;<span class="pi pi-arrow-circle-right text-white"></span></div>
     </div>
 
-    <main class="main" ref="main">
+    <main class="main mb-3" ref="main">
       <div class="container-fluid">
       <div class="row">
         <div class="col-12">
@@ -125,6 +128,7 @@
             <h2 v-if="backup">Backing up database please wait...</h2>
 
             <router-view/>
+
 
 
         </div>

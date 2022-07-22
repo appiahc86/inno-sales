@@ -9,7 +9,7 @@ body {
  */
 
 .sidebar {
-  position: absolute;
+  position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
@@ -79,13 +79,6 @@ body {
   box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
 }
 
-/*.nav-tabs button{*/
-/*  color: black !important;*/
-/*}*/
-/*.nav-tabs button:active{*/
-/*  color: #b02a37 !important;*/
-/*  font-weight: bold !important;*/
-/*}*/
 
 /* Add blinking animation to text*/
 .blink{

@@ -60,6 +60,7 @@
 import {computed, onMounted, ref} from "vue";
 import {useStore} from "vuex";
 import {onBeforeRouteLeave, useRouter} from "vue-router";
+import db from "@/dbConfig/db";
 
 const router = useRouter();
 const username = ref('');
@@ -69,11 +70,19 @@ const showPass = ref(false);
 const store = useStore();
 const closeModal = ref(null);
 const companyName = ref('');
-const settings = computed(() => store.getters.setting);
+
+const getCompany = async () => {
+  try {
+    const data = await db('settings').first();
+    if (data) companyName.value = data.companyName;
+  }catch (e) {
+    ipcRenderer.send('errorMessage', e.message);
+  }
+}
+getCompany();
 
 onMounted(() => {
   loginModal.value.click();
-  companyName.value = settings.value.companyName;
 })
 
 const login = async (e) => {

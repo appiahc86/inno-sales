@@ -141,8 +141,16 @@
                     <td class="text-capitalize">{{ data.category }}</td>
                   </template>
                 </Column>
-                <Column field="buyingPrice" header="Buy. Price" sortable style="font-size: 0.85em;"></Column>
-                <Column field="sellingPrice" header="Sel. Price" sortable style="font-size: 0.85em;"></Column>
+                <Column field="buyingPrice" header="Buy. Price" sortable style="font-size: 0.85em;">
+                  <template #body="{data}">
+                    <td>{{ formatNumber(parseFloat(data.buyingPrice)) }}</td>
+                  </template>
+                </Column>
+                <Column field="sellingPrice" header="Sel. Price" sortable style="font-size: 0.85em;">
+                  <template #body="{data}">
+                    <td>{{ formatNumber(parseFloat(data.sellingPrice)) }}</td>
+                  </template>
+                </Column>
                 <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" style="font-size: 0.85em;"></Column>
                 <Column field="tax" header="Tax" sortable style="font-size: 0.85em;"></Column>
                 <Column field="description" header="Desc" sortable style="font-size: 0.85em;">
@@ -199,20 +207,22 @@
                 <td><input type="text" class="form-control-dark" v-model.trim="editProductData.productName"></td>
               </tr>
 
-              <tr>
-                <th class="w-10"><span class="pi pi-money-bill"></span> Buying Price &nbsp;</th>
-                <td class="w-40"><input type="number" step="0.01" min="0" class="form-control-dark w-100" v-model.number="editProductData.buyingPrice"></td>
-              </tr>
+<!--              <tr>-->
+<!--                <th class="w-10"><span class="pi pi-money-bill"></span> Buying Price &nbsp;</th>-->
+<!--                <td class="w-40"><input type="number" step="0.01" min="0" class="form-control-dark w-100"-->
+<!--                                        v-model.number="editProductData.buyingPrice" disabled></td>-->
+<!--              </tr>-->
 
-              <tr>
-                <th class="float-end"><span class="pi pi-money-bill"></span> Selling Price &nbsp;</th>
-                <td><input type="number" step="0.01" min="0" class="form-control-dark" v-model.number="editProductData.sellingPrice"></td>
-              </tr>
+<!--              <tr>-->
+<!--                <th class="float-end"><span class="pi pi-money-bill"></span> Selling Price &nbsp;</th>-->
+<!--                <td><input type="number" step="0.01" min="0" class="form-control-dark" disabled-->
+<!--                           v-model.number="editProductData.sellingPrice"></td>-->
+<!--              </tr>-->
 
-              <tr>
-                <th class="float-end"><span class="pi pi-sort-numeric-up"></span> Quantity &nbsp;</th>
-                <td><input type="number" class="form-control-dark" v-model.number="editProductData.quantity"></td>
-              </tr>
+<!--              <tr>-->
+<!--                <th class="float-end"><span class="pi pi-sort-numeric-up"></span> Quantity &nbsp;</th>-->
+<!--                <td><input type="number" class="form-control-dark" v-model.number="editProductData.quantity" disabled></td>-->
+<!--              </tr>-->
 
               <tr>
                 <th class="float-end"><span class="pi pi-money-bill"></span> Tax &nbsp;</th>
@@ -226,7 +236,8 @@
 
               <tr>
                 <th class="float-end"><span class="pi pi-list"></span> Description &nbsp;</th>
-                <td><textarea class="form-control-dark" cols="10" rows="3" v-model.trim="editProductData.description"></textarea></td>
+                <td><textarea class="form-control-dark" cols="10" rows="3"
+                              v-model.trim="editProductData.description"></textarea></td>
               </tr>
 
               <tr>
@@ -294,10 +305,10 @@ import { formatNumber } from "@/functions";
     const editProductData = reactive({
       id: '',
       productName: '',
-      quantity: '',
+      // quantity: '',
       description: '',
-      buyingPrice: '',
-      sellingPrice: '',
+      // buyingPrice: '',
+      // sellingPrice: '',
       category: '',
       categoryName: '',
       tax: ''
@@ -401,9 +412,9 @@ import { formatNumber } from "@/functions";
         let validation = new Validator(editProductData,{
           category: 'required',
           productName: 'required|string|min:2|max:100',
-          buyingPrice: 'required|numeric',
-          sellingPrice: 'required|numeric',
-          quantity: 'required|numeric',
+          // buyingPrice: 'required|numeric',
+          // sellingPrice: 'required|numeric',
+          // quantity: 'required|numeric',
           tax: 'required',
           description: 'string|max:100'
         })
@@ -414,15 +425,15 @@ import { formatNumber } from "@/functions";
           products.value.map(product => { //Update data in front end without reloading from database
             if (product.id === editProductData.id){
               const cat = categories.value.filter(c => c.id.toString() === editProductData.category.toString());
-              product.buyingPrice = parseFloat(editProductData.buyingPrice);
+              // product.buyingPrice = parseFloat(editProductData.buyingPrice);
               product.category = cat[0].name;
               product.categoryId = editProductData.category;
               product.description = editProductData.description;
               product.tax = editProductData.tax;
               product.id = editProductData.id;
               product.productName = editProductData.productName;
-              product.quantity = editProductData.quantity;
-              product.sellingPrice = parseFloat(editProductData.sellingPrice);
+              // product.quantity = editProductData.quantity;
+              // product.sellingPrice = parseFloat(editProductData.sellingPrice);
             }
           })
 
@@ -470,10 +481,10 @@ import { formatNumber } from "@/functions";
           editProductData.id = data.id;
 
           editProductData.productName = data.productName;
-          editProductData.quantity = data.quantity;
+          // editProductData.quantity = data.quantity;
           editProductData.description = data.description;
-          editProductData.buyingPrice = data.buyingPrice;
-          editProductData.sellingPrice = data.sellingPrice;
+          // editProductData.buyingPrice = data.buyingPrice;
+          // editProductData.sellingPrice = data.sellingPrice;
           editProductData.category = data.categoryId;
           editProductData.categoryName = data.category;
           editProductData.tax = data.tax;

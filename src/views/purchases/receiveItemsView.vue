@@ -22,7 +22,7 @@
                 <th style="width: 45%;">Item</th>
                 <th>Cost</th>
                 <th style="width: 20%; text-align: center;">Qty</th>
-                <th>Ext Price</th>
+                <th>Ext Cost</th>
                 <th style="min-width: 50px;"></th>
               </tr>
               </thead>
@@ -178,7 +178,62 @@
     </div>
   </dialog>
 
+<!--  Print Invoice -->
+  <template>
+    <div id="printTable">
+      <div>
+        <div class="mt-0" style="font-size: 11px;">
+          <span>Bill Date: {{ paymentData.billDate }}</span>
+          <b style="float: right;">Invoice # {{ paymentData.invoice }}</b>
+        </div>
+        <div  style="font-size: 12px;">Store: {{ companySettings.storeName }}</div>
 
+
+
+        <template v-if="paymentData.vendor">
+          <div style="font-size: 12px"><br>
+           <b class="text-decoration-underline">Billed From</b>
+          <div style="font-size: 12px !important">
+          <div>{{ paymentData.vendor.company }}</div>
+          <div v-if="paymentData.vendor.address">{{ paymentData.vendor.address }}</div>
+          <div v-if="paymentData.vendor.phone">{{ paymentData.vendor.phone }}</div><br>
+          <div v-if="paymentData.vendor.accountNumber">Account#: {{ paymentData.vendor.accountNumber }}<br></div>
+        </div>
+        </div>
+        </template>
+
+
+        <table style="width: 100%; font-size: 11px;">
+          <thead>
+          <tr style="border-bottom: 1px solid black; text-align: left; border-bottom: 1px solid black;">
+            <th style="width: 40%;">Item</th>
+            <th style="width: 10%;">Qty</th>
+            <th style="width: 20%;">Cost</th>
+            <th style="width: 30%;">Ext Cost</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <template v-for="item in cart">
+            <tr style="text-align: left;">
+              <td>{{ item.productName }}</td>
+              <td>{{ item.qty }}</td>
+              <td>{{ formatNumber(item.buyingPrice) }}</td>
+              <td>{{ formatNumber(item.buyingPrice * item.qty ) }}</td>
+            </tr>
+          </template>
+          </tbody>
+        </table>
+        <hr>
+
+        <div style="font-size: 12px !important">
+          <div style="float: right;">Subtotal: GHS {{ formatNumber(total) }}</div> <br>
+          <div style="float: right;"><b>TOTAL: GHS {{ formatNumber(total) }}</b></div>
+        </div><br>
+
+      </div>
+    </div>
+  </template>
 </template>
 
 <script setup>
@@ -199,6 +254,7 @@ const vendors = ref([]);
 const dialog = ref(null);
 const selectedProduct = ref(null)
 const store = useStore();
+const companySettings = computed(() => store.getters.setting); //get company settings
 
 const editData = reactive({
   id: '',
@@ -305,6 +361,8 @@ const resetFormData = () => {
 
                 //..............................Save Purchase.........................
 const savePurchase = async (e) => {
+  const receipt = document.querySelector("#printTable");
+
   try {
     // validation
     let validation = new Validator(paymentData,{
@@ -366,7 +424,8 @@ const savePurchase = async (e) => {
     })
 
       if (paymentData.printInvoice){
-        window.print(); //TODO print
+        printTiny(receipt, {scanStyles: false, scanHTML: true});
+        console.clear();
       }
 
       clearCart();

@@ -1,11 +1,11 @@
 
-import DailySalesView from "@/views/reports/sales/DailySalesView";
+import SalesSummaryView from "@/views/reports/sales/SalesSummaryView";
 
 const salesReportRouter = [
     {
-        path: '/report/sales/daily-sales',
-        name: 'report-dailySales',
-        component: DailySalesView
+        path: '/report/sales/report-sales-summary',
+        name: 'report-sales-summary',
+        component: SalesSummaryView
     }
 
 ]

@@ -40,18 +40,14 @@
             </template>
             <Column field="name" header="Name" sortable style="font-size: 0.85em;">
               <template #body="{data}">
-                <td style="font-size: 0.8em;" class="text-capitalize">{{ data.name }}</td>
+                <td class="text-capitalize">{{ data.name }}</td>
               </template>
             </Column>
-            <template #body="{data}" style="font-size: 0.85em;">
-              <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span> &nbsp;
-              <span type="button" title="Delete" @click="confirmDelete(data.id)">&#10060;</span>
-            </template>
 
             <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" style="font-size: 0.85em;">
               <template #body="{data}">
-                <span style="font-size: 1em;" type="button" title="Edit" @click="showModal(data.id, data.name)">&#128221;</span> &nbsp;
-                <span style="font-size: 1em;" type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
+                <span type="button" title="Edit" @click="showModal(data.id, data.name)">&#128221;</span> &nbsp;
+                <span type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
               </template>
             </Column>
           </DataTable>

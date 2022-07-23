@@ -1,6 +1,7 @@
 
 import ProductIndexView from "@/views/products/ProductIndexView";
 import PriceAdjustmentView from "@/views/products/PriceAdjustmentView";
+import QuantityAdjustmentView from "@/views/products/QuantityAdjustmentView";
 
 const productRouter = [
     {
@@ -12,6 +13,11 @@ const productRouter = [
         path: '/products/price-adjustment',
         name: 'price-adjustment',
         component: PriceAdjustmentView
+    },
+    {
+        path: '/products/qty-adjustment',
+        name: 'qty-adjustment',
+        component: QuantityAdjustmentView
     }
 ]
 

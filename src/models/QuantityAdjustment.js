@@ -10,7 +10,8 @@ const QuantityAdjustment = async () => {
             table.bigInteger('productId');
             table.date('date');
             table.integer('oldQuantity');
-            table.integer('newQuantity');
+            table.integer('quantity');
+            table.enum('type', ['increment', 'decrement']);
             table.string('productName');
             table.string('reason');
         })

@@ -46,6 +46,7 @@
                 </li>
                 <li>
                   <router-link :to="{name: 'price-adjustment'}" class="dropdown-item fw-bold">Price Adjustment</router-link>
+                  <router-link :to="{name: 'qty-adjustment'}" class="dropdown-item fw-bold">Qty Adjustment</router-link>
                 </li>
               </ul>
             </div>
@@ -204,9 +205,9 @@ const insertUser = async () => {
 
         insertUser();
 
-        setInterval(()=>{
-          if(time.value) time.value.innerHTML = new Date().toLocaleTimeString();
-        },500)
+        // setInterval(()=>{
+        //   if(time.value) time.value.innerHTML = new Date().toLocaleTimeString();
+        // },500)
       })
 
 // listen to report events and redirect to page

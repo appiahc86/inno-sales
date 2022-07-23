@@ -2,7 +2,7 @@
 <div class="container-fluid mt-4">
  <div class="row">
 
-   <h4 class="text-center mt-3 text-primary mb-3 text-uppercase" style="letter-spacing: 14px; word-spacing: 10px">
+   <h4 class="text-center mt-3 text-secondary mb-3 text-uppercase" style="letter-spacing: 14px; word-spacing: 10px">
      <b>make a sale</b>
    </h4>
 

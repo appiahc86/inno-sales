@@ -84,7 +84,6 @@ import db from "@/dbConfig/db";
 import {useStore} from "vuex";
 
 const loading = ref(false);
-const categories = ref([]);
 const products = ref([]);
 const selectedProduct = ref(null);
 const store = useStore()
@@ -107,14 +106,10 @@ const getAllProducts = async () => {
   try {
     loading.value = true;
     products.value = await db('products')
-        .leftJoin('categories', 'products.category', '=','categories.id')
         .select('products.id',
             'products.productName',
             'products.sellingPrice',
             'products.buyingPrice',
-            'products.quantity',
-            'products.tax',
-            'categories.id as categoryId'
         );
 
     loading.value = false;
@@ -159,7 +154,7 @@ const updatePrice = async (e) => {
 
     await db.transaction( async trx => {
 
-        //Insert into priceAdjustments tab;le
+        //Insert into priceAdjustments table
       await trx('priceAdjustments').insert({
         userId: user.value.id,
         date: new Date().setHours(0,0,0,0),
@@ -181,9 +176,18 @@ const updatePrice = async (e) => {
     })
 
     selectedProduct.value = null;
-    resetData();
     ipcRenderer.send("successMessage", "Update was successful");
 
+      //Update in frontend
+    for (const product of products.value) {
+      if (product.id.toString() === data.id.toString()){
+        product.buyingPrice = data.newBuyingPrice;
+        product.sellingPrice = data.newSellingPrice;
+        break;
+      }
+    }
+
+    resetData();
   }catch (e) { ipcRenderer.send('errorMessage', e.message) }
     finally {  e.target.submitBtn.disabled = false }
 

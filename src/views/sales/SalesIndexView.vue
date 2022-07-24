@@ -478,11 +478,10 @@ resetPayment();
 
 
 
-
                         //.........................Checkout...........................
 
 const checkout = async (e) => {
-  e.target.submitBtn.disabled = true;
+   e.target.submitBtn.disabled = true;
   const receipt = document.querySelector("#printTable");
   const date = new Date().setHours(0,0,0,0);
   const user = computed(() => store.getters.user);

@@ -200,8 +200,7 @@ const insertUser = async () => {
 
 }
 
-
-      onMounted(async ()=>{
+      onMounted(async () => {
 
         insertUser();
 

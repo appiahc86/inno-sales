@@ -210,12 +210,12 @@ const getOrders = async () => {
 
   try {
     loading.value = true;
-    const today = new Date().setHours(0,0,0,0);
 
     orders.value = await db('orders')
         .leftJoin('users', 'orders.userId', '=', 'users.id')
         .select('orders.id', 'orders.orderDate', 'users.firstName',
             'orders.numberOfItems', 'orders.total')
+        .where('type', 'sale')
         .orderBy('orders.id', 'DESC')
         .limit(150)
   }catch (e) { ipcRenderer.send('errorMessage', e.message); }

@@ -58,7 +58,7 @@ const adminMenu = [
                 label: 'Sales',
                 submenu: [
                     {label: 'Sales Summary', click(){sendReportEvent('report-sales-summary')}},
-                    {label: 'Sales Details'}
+                    {label: 'Sales Details', click(){sendReportEvent('report-sales-details')}}
                 ]
             },// ./Sales
 

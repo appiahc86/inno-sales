@@ -10,13 +10,13 @@
   import Purchase from "@/models/Purchase";
   import PurchaseDetails from "@/models/PurchaseDetails";
   import BillPayment from "@/models/BillPayment";
-  import SalesReturn from "@/models/SalesReturn";
+  // import SalesReturn from "@/models/SalesReturn";
   import QuantityAdjustment from "@/models/QuantityAdjustment";
   import PriceAdjustment from "@/models/PriceAdjustment";
 
 const migrations =  [
     Category, User, Product, Customer, Order, OrderDetails, Settings,
-    Vendor, Purchase, PurchaseDetails, BillPayment, SalesReturn, QuantityAdjustment, PriceAdjustment
+    Vendor, Purchase, PurchaseDetails, BillPayment, QuantityAdjustment, PriceAdjustment
 ]
 
   const runMigrations = ()=> {

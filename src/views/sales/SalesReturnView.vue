@@ -54,14 +54,15 @@
         </table>
       </div>
 
-        <button class="my-2 float-end p-1" :disabled="!anItemIsChecked" @click="confirmReturn" title="Return Item(s)">
+        <button class="my-2 float-end p-1" :disabled="!anItemIsChecked" ref="returnBtn"
+                @click="returnItems" title="Return Item(s)">
           <b><span class="pi pi-undo"></span> Return</b>
         </button>
       </div>
 
       <div class="text-center">
         <h5 v-if="discount">Discount: <b>-{{ formatNumber(discount) }}</b></h5>
-        <h5 v-if="tax">Tax: <b>{{ formatNumber(tax) }}</b></h5>
+        <h5 v-if="tax">Tax: <b>-{{ formatNumber(tax) }}</b></h5>
       <h3 class="text-danger" v-if="change">
         Change: <b>GHS {{ formatNumber(change) }}
       </b></h3>
@@ -84,8 +85,10 @@ const returningItems = ref([]);
 const change = ref(null);
 const discount = ref(null);
 const tax = ref(null);
+const returnBtn = ref(null);
 const store = useStore();
 
+const user = computed(() => store.getters.user);
 
 //Search for receipt number
 const searchReceipt = async () => {
@@ -96,7 +99,17 @@ const searchReceipt = async () => {
 
   if (!search.value) return ipcRenderer.send('errorMessage', 'Please Enter Receipt number');
   try {
-    const records = await db('orderDetails').where({ orderId: search.value });
+    const records = await db.select('orderDetails.id', 'orderDetails.productId', 'orderDetails.productName',
+        'orderDetails.quantity', 'orderDetails.buyingPrice', 'orderDetails.originalPrice',
+        'orderDetails.sellingPrice', 'orderDetails.total', 'orderDetails.tax', 'orderDetails.discount',
+        'orderDetails.date', 'orderDetails.orderId', 'orderDetails.categoryId'
+    )
+        .from('orderDetails')
+        .join('orders', 'orderDetails.orderId', '=', 'orders.id')
+        .where({ orderId: search.value })
+        .andWhere('orders.type', 'sale')
+        .groupBy('orderDetails.id');
+
     if (records.length){
       items.value = records;
       items.value.map(item => {
@@ -144,82 +157,94 @@ const anItemIsChecked = computed(() => {
   return false;
 })
 
+            //Calculate Change
+const calculateChange = async () => {
 
-//Confirm Return
-const confirmReturn = () => {
-   returningItems.value = [];
-   returningItems.value = items.value.filter(item => item.toBeReturned);
-  let message = 'You are about to return these item(s) \n \n';
+  let calc = 0;
+  let disc = 0;
+  let tx = 0;
   for (const ret of returningItems.value) {
-    message = message += `${ret.productName} ******* Qty: ${ret.returnQty}\n`;
+    let calculatedDiscount = parseFloat(ret.discount) / parseInt(ret.quantity);
+    let calculatedTax = parseFloat(ret.tax) / parseInt(ret.quantity);
+
+    disc += calculatedDiscount * parseInt(ret.returnQty);
+    tx += calculatedTax * parseInt(ret.returnQty);
+    calc += ( (parseFloat(ret.sellingPrice) * parseInt(ret.returnQty)) + (calculatedTax *  parseInt(ret.returnQty))  )
+        - ( calculatedDiscount *  parseInt(ret.returnQty) );
   }
-  message += '\n Are you sure you want to proceed? \n';
-  ipcRenderer.send('confirm', {id: '', type: 'salesReturn', message } )}
 
+  change.value = calc;
+  discount.value = disc;
+  tax.value = tx;
+}
 
-
-          //......................Return Items ........................
-ipcRenderer.on('salesReturn', async (event, args) => {
-
+          //...................... Return Items ........................
+const returnItems = async () => {
+  returningItems.value = items.value.filter(item => item.toBeReturned);
+  const date = new Date().setHours(0,0,0,0);
+  returnBtn.value.disabled = true;
   try {
-    //Prepare for batch insert into sales returns table
-    const user = computed(() => store.getters.user);
-    const data =[];
-    for (const ret of returningItems.value) {
-      let calculatedDiscount = parseFloat(ret.discount) / parseInt(ret.quantity);
-      let calculatedTax = parseFloat(ret.tax) / parseInt(ret.quantity);
 
-      data.push({
-        userId: user.value.id,
-        productId: ret.productId,
-        productName: ret.productName,
-        quantity: ret.returnQty,
-        buyingPrice: ret.buyingPrice,
-        originalPrice: ret.originalPrice,
-        sellingPrice: ret.sellingPrice,
-        total: parseFloat(ret.sellingPrice) * parseInt(ret.returnQty),
-        tax: calculatedTax * parseInt(ret.returnQty),
-        discount: calculatedDiscount * parseInt(ret.returnQty),
-        date: new Date().setHours(0,0,0,0),
-        categoryId: ret.categoryId,
-        orderId: ret.orderId
-      })
-    }
+    await calculateChange();
 
     await db.transaction( async trx => {
 
-      await trx.batchInsert('salesReturns', data, 30) // batch insert into salesReturns
+            // Save to Orders table
+      const data = {
+        orderDate: date,
+        numberOfItems: returningItems.value.length,
+        type: 'return',
+        momo: 0,
+        total:  change.value - (change.value * 2), //Get a negative value
+        tendered: 0,
+        discount: discount.value,
+        tax: tax.value,
+        customerId: '',
+        userId: user.value.id
+      }
+
+
+      const saveToOrders = await trx('orders').insert(data);
+
+      const orderDetailsData = []; //for order Details table
+      for (const ret of returningItems.value) {
+        let calculatedDiscount = parseFloat(ret.discount) / parseInt(ret.quantity);
+        let calculatedTax = parseFloat(ret.tax) / parseInt(ret.quantity);
+
+        orderDetailsData.push({
+          productId: ret.productId,
+          productName: ret.productName,
+          quantity: -ret.returnQty,
+          buyingPrice: ret.buyingPrice,
+          originalPrice: ret.originalPrice,
+          sellingPrice: ret.sellingPrice,
+          total: parseFloat(ret.sellingPrice) * parseInt(ret.returnQty),
+          tax: -(calculatedTax * parseInt(ret.returnQty)), //get negative value
+          discount: -(calculatedDiscount * parseInt(ret.returnQty)), //get negative value
+          date: date,
+          categoryId: ret.categoryId,
+          orderId: saveToOrders
+        })
+      }
+
+      await trx.batchInsert('orderDetails', orderDetailsData, 30) // batch insert into order details
 
       //add quantity to products table
       for (const ret of returningItems.value) {
-        await trx('products').where('id', ret.productId).increment('quantity', ret.returnQty)
+        await trx('products').where('id', ret.productId).increment('quantity', ret.returnQty);
       }
 
     })
 
-    //Calculate Change
-    let calc = 0;
-    let disc = 0;
-    let tx = 0;
-    for (const ret of returningItems.value) {
-      let calculatedDiscount = parseFloat(ret.discount) / parseInt(ret.quantity);
-      let calculatedTax = parseFloat(ret.tax) / parseInt(ret.quantity);
-      disc += calculatedDiscount * parseInt(ret.returnQty);
-      tx += calculatedTax * parseInt(ret.returnQty);
-      calc += ( (parseFloat(ret.sellingPrice) * parseInt(ret.returnQty)) + (calculatedTax *  parseInt(ret.returnQty))  )
-          - ( calculatedDiscount *  parseInt(ret.returnQty) );
-    }
-
-
     returningItems.value = [];
     items.value = [];
-    change.value = calc;
-    discount.value = disc;
-    tax.value = tx;
+
 
     }catch (e) { ipcRenderer.send('errorMessage', e.message) }
+  finally { returnBtn.value.disabled = true; }
 
-  })
+
+  }
 
 </script>
 

@@ -99,12 +99,12 @@
 
             <template v-for="record in records" :key="record.id">
               <tr>
-                <td>{{ record.id }}</td>
-                <td>{{ new Date(record.orderDate).toLocaleDateString() }}</td>
-                <td>{{ record.numberOfItems }}</td>
-                <td>{{ formatNumber(parseFloat(record.discount)) }}</td>
-                <td>{{ formatNumber(parseFloat(record.tax)) }}</td>
-                <td>{{ formatNumber(parseFloat(record.total)) }}</td>
+                <td>&nbsp; {{ record.id }}</td>
+                <td>&nbsp; {{ new Date(record.orderDate).toLocaleDateString() }}</td>
+                <td>&nbsp; {{ record.numberOfItems }}</td>
+                <td>&nbsp; {{ formatNumber(parseFloat(record.discount)) }}</td>
+                <td>&nbsp; {{ formatNumber(parseFloat(record.tax)) }}</td>
+                <td>&nbsp; {{ formatNumber(parseFloat(record.total)) }}</td>
               </tr>
             </template>
 

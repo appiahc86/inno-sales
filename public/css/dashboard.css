@@ -17,7 +17,6 @@ body {
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
   background: linear-gradient(75deg, #1a3250, #15509d);
   width: 230px;
-  /*overflow-y: scroll;*/
   overflow: auto;
 }
 

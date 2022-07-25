@@ -1,13 +1,14 @@
 <template>
 
   <div class="container-fluid">
-    <h4 class="text-center">Recent Sales Receipts</h4>
+    <h5 class="text-center" v-if="loading">Loading Data Please Wait... <span class="spinner-grow"></span></h5>
+    <h4 class="text-center" v-else>Recent Sales Receipts</h4>
     <div class="row">
       <div class="col">
         <DataTable
             :value="orders" :paginator="true" dataKey="id"
             class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
-            filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
+            filterDisplay="menu" :rows="10" v-model:filters="filters"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             :rowsPerPageOptions="[10,25,50]"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
@@ -24,9 +25,6 @@
           </template>
           <template #empty>
             No record found.
-          </template>
-          <template #loading>
-            <h4 class="text-white"> Loading data. Please wait...</h4>
           </template>
 
           <Column field="orderDate" header="Date" sortable style="font-size: 0.85em;">

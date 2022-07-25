@@ -1,6 +1,7 @@
 <template>
 <div class="container-fluid">
-  <h4 class="text-center">Item List</h4>
+  <h4 class="text-center" v-if="loading">Loading Data Please Wait... <span class="spinner-grow"></span></h4>
+  <h4 class="text-center" v-else>Item List</h4>
   <div class="row">
     <div class="col">
       <!--  Products Table  -->
@@ -9,7 +10,7 @@
           <DataTable
               :value="products" :paginator="true" dataKey="id"
               class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
-              filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
+              filterDisplay="menu" :rows="10" v-model:filters="filters"
               paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
               :rowsPerPageOptions="[10,25,50]" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
               :globalFilterFields="['productName','category', 'description']" responsiveLayout="scroll"
@@ -27,9 +28,9 @@
             <template #empty>
               No Record Found.
             </template>
-            <template #loading>
-              <h4 class="text-white"> Loading data. Please wait.</h4>
-            </template>
+<!--            <template #loading>-->
+<!--              <h4 class="text-white"> Loading data. Please wait.</h4>-->
+<!--            </template>-->
 
             <Column field="productName" header="Product" sortable style="font-size: 0.85em;">
               <template #body="{data}">
@@ -85,16 +86,16 @@ const getAllProducts = async () => {
 
     loading.value = true;
 
-    products.value = await db('products')
-        .leftJoin('categories', 'products.category', '=','categories.id')
-        .select(
-            'products.productName',
-            'products.sellingPrice',
-            'products.quantity',
-            'products.tax',
-            'products.description',
-            'categories.name as category',
-              )
+      products.value = await db('products')
+          .leftJoin('categories', 'products.category', '=','categories.id')
+          .select(
+              'products.productName',
+              'products.sellingPrice',
+              'products.quantity',
+              'products.tax',
+              'products.description',
+              'categories.name as category',
+          )
 
   }
   catch (e){ ipcRenderer.send('errorMessage', e.message) }

@@ -6,11 +6,14 @@ import productRouter from "@/router/products";
 import categoryRouter from "@/router/category";
 import purchasesRouter from "@/router/purchases";
 import salesRouter from "@/router/sales";
-import salesReportRouter from "@/router/reports/sales";
 import customerRouter from "@/router/customers";
 import vendorsRouter from "@/router/vendors";
 import billsRouter from "@/router/bills";
 import store from "@/store";
+
+//Reports
+import salesReportRouter from "@/router/reports/sales";
+import productsReportRouter from "@/router/reports/products";
 
 const routes = [
   {
@@ -41,7 +44,8 @@ const routes = [
     ...billsRouter,
 
     //Report routes
-    ...salesReportRouter
+    ...salesReportRouter,
+    ...productsReportRouter
 ]
 
 const router = createRouter({

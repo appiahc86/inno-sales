@@ -3,28 +3,28 @@
   <div class="container-fluid">
     <div class="row justify-content-center mb-4">
       <div class="col-12">
-        <div class="container">
-          <div class="row justify-content-center">
-            <div class="col-7" style="max-width: 600px">
+
               <form @submit.prevent="search">
-                <h5 class="text-center"><b>Sales Details</b></h5>
+                <h5 class="text-center"><b>Customer Sales Report</b></h5>
                 <div class="input-group">
+
+                    <v-select :options="customers" label="display" v-model="formData.selectedCustomer" placeholder="Select Customer"
+                              class="v-select form-control form-control-dark" style="width: 30%;">
+                    </v-select>
+
+
                   <div class="input-group-text bg-dark text-white"><b>From</b></div>
-                  <input type="date" class="form-control form-control-dark" v-model="from" onkeydown="return false">
+                  <input type="date" class="form-control form-control-dark" v-model="formData.from" onkeydown="return false">
                   <div class="input-group-text bg-dark text-white"><b>To</b></div>
-                  <input type="date" class="form-control form-control-dark" v-model="to" onkeydown="return false">
+                  <input type="date" class=" form-control form-control-dark" v-model="formData.to" onkeydown="return false" >
                   <button class="bg-primary text-white px-3" title="Search" name="submitBtn" style="border: none;">
                     <span class="spinner-border" v-if="loading"></span>
                     <span class="pi pi-search" v-else></span>
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
-
 
     <div class="row">
       <div class="col-12">
@@ -32,7 +32,8 @@
 
         <button class="p-1 fw-bold bg-secondary text-white" v-if="records.length" @click="printReport">
           <span class="pi pi-print"></span> Print</button>
-        <h6>{{ message }}</h6>
+        <h5 v-if="customerName">Customer: <b> {{ customerName }}</b></h5>
+        <h6 v-if="records.length">{{ message }}</h6>
         <div class="table-responsive">
 
           <DataTable
@@ -46,34 +47,16 @@
             <template #empty>
               No record found.
             </template>
+            <Column field="id" header="Receipt#" sortable style="font-size: 0.85em;"></Column>
 
-            <Column field="date" header="Date" sortable style="font-size: 0.85em;">
+            <Column field="orderDate" header="Date" sortable style="font-size: 0.85em;">
               <template #body="{data}">
-                <td>{{ new Date(data.date).toLocaleDateString() }}</td>
+                <td>{{ new Date(data.orderDate).toLocaleDateString() }}</td>
               </template>
             </Column>
 
-            <Column field="productName" header="Item" sortable style="font-size: 0.85em;"></Column>
 
-            <Column field="buyingPrice" header="Cost" sortable style="font-size: 0.85em;">
-              <template #body="{data}">
-                <td>{{ formatNumber(parseFloat(data.buyingPrice)) }}</td>
-              </template>
-            </Column>
-
-            <Column field="sellingPrice" header="SellingPrice" sortable style="font-size: 0.85em;">
-              <template #body="{data}">
-                <td>{{ formatNumber(parseFloat(data.sellingPrice)) }}</td>
-              </template>
-            </Column>
-
-            <Column field="quantity" header="Qty" sortable style="font-size: 0.85em;"></Column>
-
-            <Column field="tax" header="Tax" sortable style="font-size: 0.85em;">
-              <template #body="{data}">
-                <td>{{ formatNumber(parseFloat(data.tax)) }}</td>
-              </template>
-            </Column>
+            <Column field="numberOfItems" header="Number Of Items" sortable style="font-size: 0.85em;"></Column>
 
             <Column field="discount" header="Discount" sortable style="font-size: 0.85em;">
               <template #body="{data}">
@@ -81,11 +64,15 @@
               </template>
             </Column>
 
+            <Column field="tax" header="Tax" sortable style="font-size: 0.85em;">
+              <template #body="{data}">
+                <td>{{ formatNumber(parseFloat(data.tax)) }}</td>
+              </template>
+            </Column>
+
             <Column field="total" header="Total" sortable style="font-size: 0.85em;">
               <template #body="{data}">
-  <td>
-    {{ formatNumber( ( (parseInt(data.quantity) * parseFloat(data.sellingPrice)) + parseFloat(data.tax) ) - parseFloat(data.discount) ) }}
-  </td>
+                <td>{{ formatNumber(parseFloat(data.total)) }}</td>
               </template>
             </Column>
           </DataTable>
@@ -101,35 +88,30 @@
 
             <div id="printOut">
               <h4 style="text-align: center;" v-if="settings.companyName">{{ settings.companyName }}</h4>
+
               <p style="font-size: 0.85em;">
-                <span>{{ new Date().toDateString() }}</span><br>
-                <span class="">{{ message }}</span>
+                <span>Customer: <b> {{ customerName }}</b></span><br>
+                <span>{{ message }}</span>
               </p>
+
               <table id="print-table">
                 <tr>
+                  <th>Receipt#</th>
                   <th>Date</th>
-                  <th>Item</th>
-                  <th>Cost</th>
-                  <th>Selling Price</th>
-                  <th>Qty</th>
-                  <th>Tax</th>
+                  <th>Number Of Items</th>
                   <th>Discount</th>
+                  <th>Tax</th>
                   <th>Total</th>
                 </tr>
 
                 <template v-for="record in records" :key="record.id">
                   <tr>
-                    <td>&nbsp; {{ new Date(record.date).toLocaleDateString() }}</td>
-                    <td>&nbsp; {{ record.productName }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.buyingPrice)) }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.sellingPrice)) }}</td>
-                    <td>&nbsp; {{ formatNumber(parseInt(record.quantity)) }}</td>
+                    <td>&nbsp; {{ record.id }}</td>
+                    <td>&nbsp; {{ new Date(record.orderDate).toLocaleDateString() }}</td>
+                    <td>&nbsp; {{ record.numberOfItems }}</td>
+                    <td>&nbsp; {{ formatNumber(parseFloat(record.discount)) }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.tax)) }}</td>
-                    <td> {{ formatNumber(parseFloat(record.discount)) }}</td>
-                    <td>
-                      &nbsp; {{formatNumber( ( (parseInt(record.quantity)*parseFloat(record.sellingPrice)) + parseFloat(record.tax) ) - parseFloat(record.discount) ) }}
-                    </td>
-
+                    <td>&nbsp; {{ formatNumber(parseFloat(record.total)) }}</td>
                   </tr>
                 </template>
 
@@ -144,51 +126,77 @@
 
       </div>
     </div>
+
+
   </div>
 
 
 </template>
 
 <script setup>
-import {computed, ref} from "vue";
+import {computed, reactive, ref} from "vue";
 import db from "@/dbConfig/db";
 import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
 
 const loading = ref(false)
-const from = ref(null);
-const to = ref(null);
 const message = ref(null);
+const customerName = ref(null);
 const records = ref([]);
-const store = useStore();
+const customers = ref([]);
+const store = useStore()
+
+const formData = reactive({
+  from: null,
+  to: null,
+  selectedCustomer: null
+})
 
 const settings = computed(() => store.getters.setting)
 
 
-//....................Search.......................
+//.............Get all Customers .........................
+const getCustomers = async () => {
+  try {
+    customers.value = await db.select().from('customers');
+    customers.value.map(cust => {cust.display = cust.name + " | " + cust.phone;})
+  }catch (e) {
+    ipcRenderer.send("errorMessage", e.message)
+  }
+} // ./get all customers
+getCustomers();
 
+
+//Reset form data
+const resetForm = () => { formData.from = null; formData.to = null; formData.selectedCustomer = null; }
+
+
+
+//....................Search.......................
 const search = async (e) => {
 
-  if (!from.value || !to.value) return ipcRenderer.send('errorMessage', 'Please Select Date');
-  const dateFrom = new Date(from.value).setHours(0,0,0,0);
-  const dateTo = new Date(to.value).setHours(0,0,0,0);
+  // validation
+  if (!formData.selectedCustomer) return ipcRenderer.send('errorMessage', 'Please Select Customer');
+  if (!formData.from || !formData.to) return ipcRenderer.send('errorMessage', 'Please Select Date');
+
+  const dateFrom = new Date(formData.from).setHours(0,0,0,0);
+  const dateTo = new Date(formData.to).setHours(0,0,0,0);
   message.value = null;
+  customerName.value = null;
 
   try {
     e.target.submitBtn.disabled = true;
-    loading.value = true;
-    records.value = await db('orderDetails')
-        .select('orderDetails.productName', 'orderDetails.buyingPrice', 'orderDetails.sellingPrice',
-            'orderDetails.tax','orderDetails.discount', 'orderDetails.quantity', 'orderDetails.date'
-        )
-        .whereRaw('?? >= ?', ['date', dateFrom])
-        .andWhereRaw('?? <= ?', ['date', dateTo])
+
+    records.value = await db('orders')
+        .where('customerId', formData.selectedCustomer.id)
+        .andWhereRaw("?? >= ?", ['orderDate', dateFrom])
+        .andWhereRaw("?? <= ?", ['orderDate', dateTo])
 
     if (dateFrom === dateTo) message.value = `Sales Report On ${new Date(dateFrom).toDateString()}`;
     else message.value = `Sales Report From ${new Date(dateFrom).toLocaleDateString()} To ${new Date(dateTo).toLocaleDateString()}`;
 
-    from.value = null;
-    to.value = null;
+    if (records.value.length) customerName.value = formData.selectedCustomer.name;
+    resetForm();
 
   }catch (e) { ipcRenderer.send('errorMessage', e.message) }
   finally {
@@ -203,7 +211,7 @@ const recordTotal = computed(() => {
   let total = 0;
   if (records.value.length){
     for (const record of records.value) {
-      total += ( (parseInt(record.quantity) * parseFloat(record.sellingPrice)) + parseFloat(record.tax) ) - parseFloat(record.discount);
+      total += parseFloat(record.total)
     }
   }
   return total;

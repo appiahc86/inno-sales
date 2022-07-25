@@ -113,7 +113,7 @@ const searchReceipt = async () => {
     if (records.length){
       items.value = records;
       items.value.map(item => {
-        item.returnQty = 1;
+        item.returnQty = item.quantity;
         item.toBeReturned = false;
       });
     }else return  ipcRenderer.send('errorMessage', 'Sorry No Match Found');
@@ -241,7 +241,7 @@ const returnItems = async () => {
 
 
     }catch (e) { ipcRenderer.send('errorMessage', e.message) }
-  finally { returnBtn.value.disabled = true; }
+   finally { returnBtn.value.disabled = true; }
 
 
   }

@@ -10,15 +10,16 @@
              <h5 class="text-center"><b>Sales Summary</b></h5>
               <div class="input-group">
                 <div class="input-group-text bg-dark text-white"><b>From</b></div>
-                <input type="date" class="form-control" v-model="from" onkeydown="return false">
+                <input type="date" class="form-control form-control-dark" v-model="from" onkeydown="return false">
                 <div class="input-group-text bg-dark text-white"><b>To</b></div>
-                <input type="date" class="form-control" v-model="to" onkeydown="return false">
-                <button class="btn btn-primary text-white px-3" title="Search" name="submitBtn">
+                <input type="date" class="form-control form-control-dark" v-model="to" onkeydown="return false">
+                <button class="bg-primary text-white px-3" title="Search" name="submitBtn" style="border: none;">
                   <span class="spinner-border" v-if="loading"></span>
                   <span class="pi pi-search" v-else></span>
                 </button>
               </div>
             </form>
+
           </div>
         </div>
       </div>
@@ -86,7 +87,11 @@
         <div class="" v-if="records.length">
 
           <div id="printOut">
-          <h6>{{ message }}</h6>
+            <h4 style="text-align: center;" v-if="settings.companyName">{{ settings.companyName }}</h4>
+            <p style="font-size: 0.85em;">
+              <span>{{ new Date().toDateString() }}</span><br>
+              <span class="">{{ message }}</span>
+            </p>
           <table id="print-table">
             <tr>
               <th>Receipt#</th>
@@ -128,6 +133,7 @@
 import {computed, ref} from "vue";
 import db from "@/dbConfig/db";
 import {formatNumber} from "@/functions";
+import {useStore} from "vuex";
 
 const loading = ref(false)
 const from = ref(null);
@@ -135,6 +141,9 @@ const to = ref(null);
 const message = ref(null);
 const records = ref([]);
 
+const store = useStore();
+
+const settings = computed(() => store.getters.setting)
 
         //....................Search.......................
 
@@ -160,8 +169,8 @@ const search = async (e) => {
 
   }catch (e) { ipcRenderer.send('errorMessage', e.message) }
     finally {
-    e.target.submitBtn.disabled = false;
     loading.value = false;
+    e.target.submitBtn.disabled = false;
   }
 
 }
@@ -188,6 +197,7 @@ const printReport = () => {
 
 <style scoped>
 #print-table{
+  font-size: 0.85em;
   width: 100%;
   border-collapse: collapse;
 }

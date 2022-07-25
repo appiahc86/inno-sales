@@ -1,50 +1,59 @@
-import {dialog, BrowserWindow} from "electron";
-import * as path from "path";
-const fse = require('fs-extra');
+import {BrowserWindow} from "electron";
 
-//Send report event
-const sendReportEvent = (routeName) => {
+//Send Route event
+const sendRouteEvent = (routeName) => {
     const win = BrowserWindow.getAllWindows()[0];
-    win.webContents.send('report', routeName)
+    win.webContents.send('routing', routeName)
 }
 
-// Copy database
-const copyDatabaseFile = async (filePath) => {
-    try {
-        const win = BrowserWindow.getAllWindows()[0];
-        win.webContents.send('backing-up', '')
-
-        await fse.copy('./bk/sales.db', filePath);
-        win.webContents.send('backup-complete', '')
-
-        dialog.showMessageBox({type:'info', message: 'Backup was successful'});
-    }catch (e) {
-        dialog.showMessageBox({type:'error', message: e.message});
-    }
-}
-
-
-const options = {
-    title: 'Save database to..',
-    buttonLabel: 'Save',
-    defaultPath: path.join(__dirname, '../../bk/sales.db'),
-    filters: [{name: 'backup', extensions: ['db']}]
-}
 
 const adminMenu = [
+
+    //..........................Sales.........................
     {
-        label: 'File',
+        label: 'Sales',
         submenu: [
-            {
-                label: "Backup database",
-                async click(){
-                    const {filePath} = await dialog.showSaveDialog(BrowserWindow.getAllWindows()[0], options)
-                    if (filePath) copyDatabaseFile(filePath)
-                }
-            },
-            {role: 'quit'}
+            {label: 'New Sales Receipt', click(){sendRouteEvent('sales')}},
+            {label: 'Held Receipts', click(){sendRouteEvent('held-items')}},
+            {label: 'Sales History', click(){sendRouteEvent('sales-history')}},
+            {type: 'separator'},
+            {label: 'Products List', click(){sendRouteEvent('sales-products-list')}},
+            {label: 'Accept Return', click(){sendRouteEvent('sales-return')}}
         ]
     },
+    //..........................Sales.........................
+
+
+
+    //..........................Inventory.........................
+    {
+        label: 'Inventory',
+        submenu: [
+            {label: 'Products', click(){sendRouteEvent('products')}},
+            {label: 'Categories', click(){sendRouteEvent('categories')}},
+            {label: 'Price Adjustment', click(){sendRouteEvent('price-adjustment')}},
+            {label: 'Qty Adjustment', click(){sendRouteEvent('qty-adjustment')}}
+        ]
+    },
+    //..........................Inventory.........................
+
+
+
+
+    //..........................Purchasing.........................
+    {
+        label: 'Purchasing',
+        submenu: [
+            {label: 'Receive Items', click(){sendRouteEvent('receiveItems')}},
+            {label: 'Receiving History', click(){sendRouteEvent('receivingHistory')}},
+            {type: 'separator'},
+            {label: 'Outstanding Bills', click(){sendRouteEvent('bills')}}
+        ]
+    },
+    //..........................Purchasing.........................
+
+
+
                 //..........................Reports.........................
     {
         label: 'Reports',
@@ -57,8 +66,10 @@ const adminMenu = [
             {
                 label: 'Sales',
                 submenu: [
-                    {label: 'Sales Summary', click(){sendReportEvent('report-sales-summary')}},
-                    {label: 'Sales Details', click(){sendReportEvent('report-sales-details')}}
+                    {label: 'Sales Summary', click(){sendRouteEvent('report-sales-summary')}},
+                    {label: 'Sales Details', click(){sendRouteEvent('report-sales-details')}},
+                    {label: 'Customer Sales', click(){sendRouteEvent('report-customer-sales')}},
+                    {label: 'Sales Returns', click(){sendRouteEvent('report-sales-returns')}}
                 ]
             },// ./Sales
 
@@ -83,10 +94,19 @@ const adminMenu = [
                 id: 'products',
                 label: 'Products',
                 submenu: [
-                    {label: 'Summary'},
-                    {label: 'Products List'}
+                    {label: 'Products List', click(){sendRouteEvent('report-products-list')}},
+                    {label: 'Low Stock', click(){sendRouteEvent('report-products-low-stock')}}
                 ]
             }, // ./products
+
+            //Purchasing
+            {
+                label: 'Purchasing',
+                submenu: [
+                    {label: 'Receiving Summary'},
+                    {label: 'Receiving Details'}
+                ]
+            }, // ./Purchasing
         ]
     }
                     //  .........................../Reports.............................

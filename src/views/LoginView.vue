@@ -87,6 +87,7 @@ onMounted(() => {
 
 const login = async (e) => {
   console.log('logged in')
+  ipcRenderer.send('setMenu', 'admin');
     router.push({name: 'sales'});
 }
 

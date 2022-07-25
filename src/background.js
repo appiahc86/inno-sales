@@ -120,14 +120,18 @@ if (isDevelopment) {
 }
 
 
-//Error Message
-ipcMain.on('errorMessage', async (event, args) => {
+
+//Set application menu base on user type
+ipcMain.on('setMenu', async (event, args) => {
   const template = indexMenu.concat(adminMenu).concat(endingMenu);
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
 
-  Menu.getApplicationMenu().getMenuItemById('products').enabled = false
+  Menu.getApplicationMenu().getMenuItemById('backup').enabled = false
+})
 
+//Error Message
+ipcMain.on('errorMessage', async (event, args) => {
   await dialog.showMessageBox(win,{type: 'warning', detail: args, title: 'error'  })
 })
 

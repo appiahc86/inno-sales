@@ -127,7 +127,6 @@
 
             <hr class="mt-0 fw-bold">
             <h2 v-if="backup">Backing up database please wait...</h2>
-
             <router-view/>
 
 
@@ -204,13 +203,14 @@ const insertUser = async () => {
 
         insertUser();
 
-        // setInterval(()=>{
-        //   if(time.value) time.value.innerHTML = new Date().toLocaleTimeString();
-        // },500)
+        setInterval(()=>{
+          if(time.value) time.value.innerHTML = new Date().toLocaleTimeString();
+        },500)
+
       })
 
-// listen to report events and redirect to page
-ipcRenderer.on('report', (event, args) => {
+// listen to route events and redirect to page
+ipcRenderer.on('routing', (event, args) => {
   router.push({name: args})
 })
 

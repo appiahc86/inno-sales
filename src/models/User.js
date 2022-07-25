@@ -11,6 +11,7 @@ const User = async () => {
             table.string('password').notNullable();
             table.tinyint('role', 1).notNullable();
             table.boolean('isActive').defaultTo(true);
+            table.boolean('resetPassword').defaultTo(true);
         })
 
     }

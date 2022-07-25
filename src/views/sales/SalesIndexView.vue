@@ -99,12 +99,18 @@
              <h6 class="w-50">MoMo</h6>
            </div>
            <div class="d-flex">
-             <input type="number" class="form-control-dark w-50" step="0.01" v-model="cash" min="0" ref="cashRef"> &nbsp;
-             <input type="number" class="form-control-dark w-50" step="0.01" v-model="momo" min="0" ref="momoRef">
+             <input type="number" class="form-control-dark w-50" oninput="validity.valid||(value = 0);"
+                    step="any" v-model="cash" min="0" ref="cashRef"> &nbsp;
+             <input type="number" class="form-control-dark w-50" oninput="validity.valid||(value = 0);"
+                    step="any" v-model="momo" min="0" ref="momoRef">
            </div>
 
            <h6 class="mt-2 fw-bold">Tendered: {{ formatNumber(tendered) }}</h6>
-           <h5 class="mt-2 fw-bold text-primary">Change: {{ formatNumber(change) }}</h5>
+           <h5 class="mt-2 fw-bold text-primary">Change: {{ formatNumber(change) }}</h5><br>
+           <label>
+             <input type="checkbox" class="p-checkbox" v-model="printReceipt">
+             &nbsp; <b>Print Receipt</b>
+           </label>
            <button class="float-end" name="submitBtn" style="width: 80px;" type="submit" :disabled="tendered < total || total === 0">
              <span class="pi pi-print"></span> Save</button>
          </form>
@@ -267,6 +273,7 @@ const customers = ref([]);
 const dialog = ref(null);
 const barcode = ref(1); //For barcode
 const loading = ref(false);
+const printReceipt = ref(true);
 const companySettings = computed(() => store.getters.setting); //get company settings
 
 
@@ -547,15 +554,18 @@ const checkout = async (e) => {
     clearCart();
     resetPayment();
 
-     // Initialize barcode
-    JsBarcode("#barcode", barcode.value, {
-      height: 30,
-      fontSize: 13,
-      fontOptions: 'bold'
-    })
+    if (printReceipt.value){
+      // Initialize barcode
+      JsBarcode("#barcode", barcode.value, {
+        height: 30,
+        fontSize: 13,
+        fontOptions: 'bold'
+      })
 
-    printTiny(receipt, {scanStyles: false, scanHTML: true});
+      printTiny(receipt, {scanStyles: false, scanHTML: true});
+    }
 
+    printReceipt.value = true;
     selectedCustomer.value = null; //clear selected customer
     console.clear();
 

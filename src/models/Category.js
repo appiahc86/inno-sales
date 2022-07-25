@@ -7,6 +7,7 @@ const Category = async () => {
         await db.schema.createTable('categories', table => {
             table.bigIncrements('id').primary();
             table.string('name', 20).unique();
+            table.boolean('isActive').defaultTo(true)
         })
 
     }

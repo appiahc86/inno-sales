@@ -13,7 +13,7 @@ const Product = async () => {
             table.float('sellingPrice').notNullable();
             table.string('tax', 6).notNullable();
             table.date('dateAdded');
-
+            table.date('expiration');
             table.bigInteger('category').unsigned().notNullable();
             table.foreign('category').references('id').inTable('categories');
         })

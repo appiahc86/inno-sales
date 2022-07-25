@@ -9,6 +9,7 @@ const Customer = async () => {
             table.string('company', 60);
             table.string('phone', 36);
             table.string('address', 100);
+            table.boolean('isActive').defaultTo(true)
         })
     }
 

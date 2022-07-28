@@ -77,7 +77,7 @@
             </Column>
           </DataTable>
         </div>
-        <h5 class="mt-2" v-if="records.length">Total: GHS {{ formatNumber(parseFloat(recordTotal)) }}</h5>
+        <h5 class="mt-2" v-if="records.length">Total: GH¢ {{ formatNumber(parseFloat(recordTotal)) }}</h5>
 
 
 
@@ -114,7 +114,7 @@
                 </template>
 
               </table>
-              <div style="margin-top: 0;"><h5>Total: GHS {{ formatNumber(parseFloat(recordTotal)) }}</h5></div>
+              <div style="margin-top: 0;"><h5>Total: GH¢ {{ formatNumber(parseFloat(recordTotal)) }}</h5></div>
             </div>
 
           </div>

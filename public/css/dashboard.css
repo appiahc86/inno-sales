@@ -62,9 +62,6 @@ body {
   box-sizing: border-box;
 }
 
-.setMargin{
-  margin-left: 2em;
-}
 .form-control-dark {
   color: black;
   outline: none;

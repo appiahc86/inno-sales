@@ -21,7 +21,7 @@
                         <table class="myTable">
                           <tr>
                             <th>Username</th>
-                            <td><input type="text" v-model.trim="username" class="form-control-dark py-1 px-3"></td>
+                            <td><input type="text" v-model.trim="username" class="form-control-dark py-1 px-3" id="username"></td>
                           </tr>
                           <tr>
                             <th>Password</th>
@@ -32,7 +32,7 @@
                             <td><label><input type="checkbox" class="p-checkbox" v-model="showPass"> Show password</label></td>
                           </tr>
                         </table>
-                        <button type="submit" class="btn btn-secondary btn-sm loginBtn" nama="submitBtn">
+                        <button type="submit" class="btn btn-secondary btn-sm loginBtn" name="submitBtn">
                           <span class="pi pi-lock"></span>
                           Login
                         </button>
@@ -83,12 +83,27 @@ getCompany();
 
 onMounted(() => {
   loginModal.value.click();
+ document.querySelector("#username").focus();
+
 })
 
 const login = async (e) => {
-  console.log('logged in')
-  ipcRenderer.send('setMenu', 'admin');
-    router.push({name: 'sales'});
+
+  e.target.submitBtn.disabled = true;
+  try {
+
+    const user = await db('users').where('id', 1).first();
+    if (user) {
+      store.dispatch('setUser', user);
+      ipcRenderer.send('setMenu', 'admin');
+      router.push({name: 'home'})
+    }else  ipcRenderer.send('errorMessage', 'hellooooooooo');
+
+  }catch (e) {
+    ipcRenderer.send('errorMessage', e.message);
+  }finally {  e.target.submitBtn.disabled = false; }
+
+
 }
 
 //Close modal before leaving this page

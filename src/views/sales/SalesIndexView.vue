@@ -66,7 +66,7 @@
              <div class="col justify-content-end"> <h6><span class="text-warning">Total: </span>{{ formatNumber(total) }}</h6></div>
            </div>
          </div>
-         <h5><span class="text-danger fw-bold">Amount Due: </span>GHS {{ formatNumber(total) }}</h5>
+         <h5><span class="text-danger fw-bold">Amount Due: </span>GH¢ {{ formatNumber(total) }}</h5>
        </div>
 
        <div class="container" v-if="cart.length">
@@ -170,19 +170,19 @@
        <hr>
 
        <div style="font-size: 12px !important">
-         <div style="float: right;">Subtotal: GHS {{ formatNumber(subTotal) }}</div> <br>
+         <div style="float: right;">Subtotal: GH¢ {{ formatNumber(subTotal) }}</div> <br>
          <template v-if="totalTax">
-           <div style="float: right;">Tax: GHS {{ formatNumber(totalTax) }}</div> <br>
+           <div style="float: right;">Tax: GH¢ {{ formatNumber(totalTax) }}</div> <br>
          </template>
          <template v-if="totalDiscount">
-           <div style="float: right;">Discount: GHS {{ formatNumber(totalDiscount) }}</div> <br>
+           <div style="float: right;">Discount: GH¢ {{ formatNumber(totalDiscount) }}</div> <br>
          </template>
-         <div style="float: right;"><b>RECEIPT TOTAL: GHS {{ formatNumber(total) }}</b></div>
+         <div style="float: right;"><b>RECEIPT TOTAL: GH¢ {{ formatNumber(total) }}</b></div>
        </div><br>
 
 
-        <div style="font-size: 12px;">Amount Tendered: GHS {{ formatNumber(tendered) }}</div>
-        <div style="font-size: 12px;">Change Given: GHS {{ formatNumber(change) }}</div>
+        <div style="font-size: 12px;">Amount Tendered: GH¢ {{ formatNumber(tendered) }}</div>
+        <div style="font-size: 12px;">Change Given: GH¢ {{ formatNumber(change) }}</div>
 
        <p style="font-size: 11px; text-align: center;">Thanks for shopping with us!</p>
 

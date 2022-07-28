@@ -127,8 +127,18 @@ ipcMain.on('setMenu', async (event, args) => {
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
 
-  Menu.getApplicationMenu().getMenuItemById('backup').enabled = false
+  Menu.getApplicationMenu().getMenuItemById('backup').enabled = true;
+  Menu.getApplicationMenu().getMenuItemById('appSettings').enabled = true;
+  Menu.getApplicationMenu().getMenuItemById('home').enabled = true;
 })
+
+//when user logs out set application menu to default
+ipcMain.on('logout', () => {
+  const template = indexMenu.concat(endingMenu);
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+})
+
 
 //Error Message
 ipcMain.on('errorMessage', async (event, args) => {

@@ -54,12 +54,33 @@ const adminMenu = [
 
 
 
+    //..........................Vendors.........................
+    {
+        label: 'Vendors',
+        submenu: [
+            {label: 'Add or List Vendors', click(){sendRouteEvent('vendors')}},
+        ]
+    },
+    //..........................Vendors.........................
+
+
+
+    //..........................Customers.........................
+    {
+        label: 'Customers',
+        submenu: [
+            {label: 'Add or List Customers', click(){sendRouteEvent('customers')}},
+        ]
+    },
+    //..........................Customers.........................
+
+
                 //..........................Reports.........................
     {
         label: 'Reports',
         submenu: [
-            {label: 'Reports Center'},
             {label: 'Dashboard'},
+            {label: 'Profit & Loss'},
             {type: 'separator'},
 
             //Sales
@@ -104,7 +125,10 @@ const adminMenu = [
                 label: 'Purchasing',
                 submenu: [
                     {label: 'Receiving Summary'},
-                    {label: 'Receiving Details'}
+                    {label: 'Receiving Details'},
+                    {type: 'separator'},
+                    {label: 'Outstanding Bills'},
+                    {label: 'Bills By Vendor'},
                 ]
             }, // ./Purchasing
         ]

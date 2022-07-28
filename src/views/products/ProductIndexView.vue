@@ -1,69 +1,238 @@
 <template>
-  <nav id="productsNav" class="topNav">
-    <div class="nav nav-tabs" role="tablist">
-      <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-product" type="button" role="tab" aria-controls="nav-add-product" aria-selected="false">Add Product</button>
-      <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-products" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Products List</button>
-    </div>
-  </nav>
-  <div class="tab-content" id="nav-tabContent">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
 
-    <!--  product Form  -->
-      <div class="tab-pane mt-5 show active" id="add-product" role="tabpanel" aria-labelledby="nav-add-product-tab">
-        <div class="py-4">
-          <div class="container">
-            <div class="row justify-content-center">
-              <div class="col-md-10">
 
-                <form @submit.prevent="addProduct">
-                  <table class="w-100 myTable">
-                    <tr>
-                      <th></th>
-                      <td>
-                        <h4 style="width: 350px; text-align: center;">Add A New Product</h4>
-                      </td>
-                    </tr>
-                    <tr>
-                      <th class="float-end"><span class="pi pi-cog"></span> Category &nbsp;</th>
-                      <td>
-                        <div class="input-group">
+        <nav id="productsNav">
+          <div class="nav nav-tabs" role="tablist">
+            <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-product" type="button" role="tab" aria-controls="nav-add-product" aria-selected="false">Add Product</button>
+            <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-products" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Products List</button>
+          </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
 
-                          <v-select :options="categories" label="name"
-                                    v-model="productData.category" class="form-control-dark select">
-                          </v-select>
-                          <div class="input-group-text text-success">
+          <!--  product Form  -->
+          <div class="tab-pane mt-5 show active" id="add-product" role="tabpanel" aria-labelledby="nav-add-product-tab">
+            <div class="py-4">
+              <div class="container">
+                <div class="row justify-content-center">
+                  <div class="col-md-10">
+
+                    <form @submit.prevent="addProduct">
+                      <table class="w-100 myTable">
+                        <tr>
+                          <th></th>
+                          <td>
+                            <h4 style="width: 350px; text-align: center;">Add A New Product</h4>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th class="float-end"><span class="pi pi-cog"></span> Category &nbsp;</th>
+                          <td>
+                            <div class="input-group">
+
+                              <v-select :options="categories" label="name"
+                                        v-model="productData.category" class="form-control-dark select">
+                              </v-select>
+                              <div class="input-group-text text-success">
                           <span class="pi pi-plus-circle" title="Add New Category"
                                 style="cursor: pointer; font-size: 1.3em;"
                                 @click="openCategoryDialog"></span>
-                          </div>
-                        </div>
+                              </div>
+                            </div>
 
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <th class="float-end"><span class="pi pi-tag"></span> Product Name &nbsp;</th>
+                          <td><input type="text" class="form-control-dark" v-model.trim="productData.productName"></td>
+                        </tr>
+
+                        <tr>
+                          <th class="float-end"><span class="pi pi-money-bill"></span> Buying Price &nbsp;</th>
+                          <td><input type="number" step="0.01" min="0" class="form-control-dark" v-model.number="productData.buyingPrice"></td>
+                        </tr>
+
+                        <tr>
+                          <th class="float-end"><span class="pi pi-money-bill"></span> Selling Price &nbsp;</th>
+                          <td class="w-40"><input type="number" step="0.01" min="0" class="form-control-dark" v-model.number="productData.sellingPrice"></td>
+                        </tr>
+
+                        <tr>
+                          <th class="float-end"><span class="pi pi-sort-numeric-up"></span> Quantity &nbsp;</th>
+                          <td><input type="number" class="form-control-dark" v-model.number="productData.quantity"></td>
+                        </tr>
+
+                        <tr>
+                          <th class="float-end"><span class="pi pi-money-bill"></span> Tax &nbsp;</th>
+                          <td>
+                            <select class="form-control-dark select" v-model="productData.tax">
+                              <option value="tax">Tax</option>
+                              <option value="non">Non</option>
+                            </select>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <th class="float-end"><span class="pi pi-list"></span> Description &nbsp;</th>
+                          <td><textarea class="form-control-dark" cols="10" rows="3" v-model.trim="productData.description"></textarea></td>
+                        </tr>
+
+                        <tr>
+                          <th class="float-end"></th>
+                          <td>
+                            <button class=" mt-1 btn-secondary" type="submit" style="width: 350px;" name="addProductBtn">
+                              <span class="pi pi-save"></span>
+                              <b style="font-size: 1.5em;"> Save</b>
+                            </button>
+                          </td>
+                        </tr>
+                      </table>
+
+
+
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <!--  Products Table  -->
+          <div class="tab-pane mt-2" id="all-products" role="tabpanel" aria-labelledby="nav-all-products-tab">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-12">
+                  <div class="table-responsive">
+                    <DataTable
+                        :value="products" :paginator="true" dataKey="id"
+                        class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
+                        filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
+                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                        :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedProducts"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                        :globalFilterFields="['productName','category', 'description']" responsiveLayout="scroll"
+                    >
+                      <template #header>
+                        <div class="d-flex justify-content-center align-items-center" style="height: 15px">
+                          <h6 class="px-3">Products</h6>
+                          <span class="p-input-icon-left">
+                        <i class="pi pi-search" />
+                        <InputText v-model="filters['global'].value"
+                                   placeholder="Keyword Search" style="height: 30px;"/>
+                    </span>
+                        </div>
+                      </template>
+                      <template #empty>
+                        No product found.
+                      </template>
+                      <template #loading>
+                        <h4 class="text-white"> Loading data. Please wait.</h4>
+                      </template>
+
+                      <Column selection-mode="multiple" style="font-size: 0.85em;"></Column>
+
+                      <Column field="productName" header="Product" sortable style="font-size: 0.85em;">
+                        <template #body="{data}">
+                          <td :style="{color: data.quantity < 5 ? 'red' : '' }">{{ data.productName }}</td>
+                        </template>
+                      </Column>
+                      <Column field="category" header="Category" sortable style="font-size: 0.85em;">
+                        <template #body="{data}">
+                          <td class="text-capitalize">{{ data.category }}</td>
+                        </template>
+                      </Column>
+                      <Column field="buyingPrice" header="Buy. Price" sortable style="font-size: 0.85em;">
+                        <template #body="{data}">
+                          <td>{{ formatNumber(parseFloat(data.buyingPrice)) }}</td>
+                        </template>
+                      </Column>
+                      <Column field="sellingPrice" header="Sel. Price" sortable style="font-size: 0.85em;">
+                        <template #body="{data}">
+                          <td>{{ formatNumber(parseFloat(data.sellingPrice)) }}</td>
+                        </template>
+                      </Column>
+                      <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" style="font-size: 0.85em;"></Column>
+                      <Column field="tax" header="Tax" sortable style="font-size: 0.85em;"></Column>
+                      <Column field="description" header="Desc" sortable style="font-size: 0.85em;">
+                        <template #body="{data}">
+                          <td :title="data.description">
+                            {{ data.description.length > 20 ? data.description.substring(0, 20) + '...' : data.description }}
+                          </td>
+                        </template>
+                      </Column>
+
+                      <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" style="font-size: 0.85em;">
+                        <template #body="{data}">
+                          <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span> &nbsp;
+                          <span type="button" title="Delete" @click="confirmDelete(data.id)">&#10060;</span>
+                        </template>
+                      </Column>
+                    </DataTable>
+                  </div>
+                  <br>
+                  <button class="btn-secondary" v-if="selectedProducts.length" @click="confirmDelete(selectedProducts)">
+                    <span class="pi pi-trash"></span>
+                    Delete Selection
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!--  Edit Dialog-->
+        <dialog ref="editProductDialog" style="border: 2px solid #ccc;" name="dialog">
+          <h4>Edit product</h4>
+          <div class="container-fluid">
+            <div class="row justify-content-center">
+              <div class="col-md-12">
+                <form @submit.prevent="editProduct">
+                  <table class="w-100 myTable">
+
+                    <tr>
+                      <th class="float-end"><span class="pi pi-cog"></span> Category &nbsp;</th>
+                      <td>
+                        <select class="form-control-dark select text-capitalize" v-model="editProductData.category">
+                          <option v-for="category in categories" :key="category.id" :value="category.id">
+                            {{ category.name }}
+                          </option>
+                        </select>
                       </td>
                     </tr>
 
                     <tr>
                       <th class="float-end"><span class="pi pi-tag"></span> Product Name &nbsp;</th>
-                      <td><input type="text" class="form-control-dark" v-model.trim="productData.productName"></td>
+                      <td><input type="text" class="form-control-dark" v-model.trim="editProductData.productName"></td>
                     </tr>
 
-                    <tr>
-                      <th class="float-end"><span class="pi pi-money-bill"></span> Buying Price &nbsp;</th>
-                      <td><input type="number" step="0.01" min="0" class="form-control-dark" v-model.number="productData.buyingPrice"></td>
-                    </tr>
+                    <!--              <tr>-->
+                    <!--                <th class="w-10"><span class="pi pi-money-bill"></span> Buying Price &nbsp;</th>-->
+                    <!--                <td class="w-40"><input type="number" step="0.01" min="0" class="form-control-dark w-100"-->
+                    <!--                                        v-model.number="editProductData.buyingPrice" disabled></td>-->
+                    <!--              </tr>-->
 
-                    <tr>
-                      <th class="float-end"><span class="pi pi-money-bill"></span> Selling Price &nbsp;</th>
-                      <td class="w-40"><input type="number" step="0.01" min="0" class="form-control-dark" v-model.number="productData.sellingPrice"></td>
-                    </tr>
+                    <!--              <tr>-->
+                    <!--                <th class="float-end"><span class="pi pi-money-bill"></span> Selling Price &nbsp;</th>-->
+                    <!--                <td><input type="number" step="0.01" min="0" class="form-control-dark" disabled-->
+                    <!--                           v-model.number="editProductData.sellingPrice"></td>-->
+                    <!--              </tr>-->
 
-                    <tr>
-                      <th class="float-end"><span class="pi pi-sort-numeric-up"></span> Quantity &nbsp;</th>
-                      <td><input type="number" class="form-control-dark" v-model.number="productData.quantity"></td>
-                    </tr>
+                    <!--              <tr>-->
+                    <!--                <th class="float-end"><span class="pi pi-sort-numeric-up"></span> Quantity &nbsp;</th>-->
+                    <!--                <td><input type="number" class="form-control-dark" v-model.number="editProductData.quantity" disabled></td>-->
+                    <!--              </tr>-->
 
                     <tr>
                       <th class="float-end"><span class="pi pi-money-bill"></span> Tax &nbsp;</th>
                       <td>
-                        <select class="form-control-dark select" v-model="productData.tax">
+                        <select class="form-control-dark select" v-model="editProductData.tax">
                           <option value="tax">Tax</option>
                           <option value="non">Non</option>
                         </select>
@@ -72,202 +241,45 @@
 
                     <tr>
                       <th class="float-end"><span class="pi pi-list"></span> Description &nbsp;</th>
-                      <td><textarea class="form-control-dark" cols="10" rows="3" v-model.trim="productData.description"></textarea></td>
+                      <td><textarea class="form-control-dark" cols="10" rows="3"
+                                    v-model.trim="editProductData.description"></textarea></td>
                     </tr>
 
                     <tr>
-                      <th class="float-end"></th>
-                      <td>
-                        <button class=" mt-1 btn-secondary" type="submit" style="width: 350px;" name="addProductBtn">
-                          <span class="pi pi-save"></span>
-                          <b style="font-size: 1.5em;"> Save</b>
-                        </button>
+                      <td></td>
+                      <td colspan="2">
+                        <button name="addProductBtn" class="btn-secondary p-1 fw-bold" type="submit" style="width: 45%;">Save</button>&nbsp;
+                        <button name="addProductBtn" class="p-1 fw-bold" type="button" @click="editProductDialog.close()" style="width: 45%;">cancel</button>
                       </td>
                     </tr>
+
                   </table>
-
-
-
                 </form>
               </div>
             </div>
           </div>
-        </div>
+        </dialog>
+
+        <!--  Category Dialog -->
+        <dialog ref="categoryDialog" style="border: 2px solid #ccc;">
+
+          <button class="bg-danger text-white float-end" title="Close" @click="categoryDialog.close()"><b>X</b></button>
+
+          <div class="clearfix"></div>
+
+          <form @submit.prevent="addCategory" class="my-3">
+            <label><b>Category Name</b> <input type="text" class="form-control-dark p-1" v-model.trim="categoryName" id="catInput"></label>
+            &nbsp;
+            <button type="submit" name="submitBtn"><span class="pi pi-save px-2 py-1"></span><b>Save</b></button>
+          </form>
+        </dialog>
+
+
+
       </div>
-
-
-
-<!--  Products Table  -->
-    <div class="tab-pane mt-2" id="all-products" role="tabpanel" aria-labelledby="nav-all-products-tab">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-12">
-            <div class="table-responsive">
-              <DataTable
-                  :value="products" :paginator="true" dataKey="id"
-                  class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
-                  filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
-                  paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                  :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedProducts"
-                  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                  :globalFilterFields="['productName','category', 'description']" responsiveLayout="scroll"
-              >
-                <template #header>
-                  <div class="d-flex justify-content-center align-items-center" style="height: 15px">
-                    <h6 class="px-3">Products</h6>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-search" />
-                        <InputText v-model="filters['global'].value"
-                                   placeholder="Keyword Search" style="height: 30px;"/>
-                    </span>
-                  </div>
-                </template>
-                <template #empty>
-                  No product found.
-                </template>
-                <template #loading>
-                  <h4 class="text-white"> Loading data. Please wait.</h4>
-                </template>
-
-                <Column selection-mode="multiple" style="font-size: 0.85em;"></Column>
-
-                <Column field="productName" header="Product" sortable style="font-size: 0.85em;">
-                  <template #body="{data}">
-                    <td :style="{color: data.quantity < 5 ? 'red' : '' }">{{ data.productName }}</td>
-                  </template>
-                </Column>
-                <Column field="category" header="Category" sortable style="font-size: 0.85em;">
-                  <template #body="{data}">
-                    <td class="text-capitalize">{{ data.category }}</td>
-                  </template>
-                </Column>
-                <Column field="buyingPrice" header="Buy. Price" sortable style="font-size: 0.85em;">
-                  <template #body="{data}">
-                    <td>{{ formatNumber(parseFloat(data.buyingPrice)) }}</td>
-                  </template>
-                </Column>
-                <Column field="sellingPrice" header="Sel. Price" sortable style="font-size: 0.85em;">
-                  <template #body="{data}">
-                    <td>{{ formatNumber(parseFloat(data.sellingPrice)) }}</td>
-                  </template>
-                </Column>
-                <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" style="font-size: 0.85em;"></Column>
-                <Column field="tax" header="Tax" sortable style="font-size: 0.85em;"></Column>
-                <Column field="description" header="Desc" sortable style="font-size: 0.85em;">
-                  <template #body="{data}">
-                    <td :title="data.description">
-                      {{ data.description.length > 20 ? data.description.substring(0, 20) + '...' : data.description }}
-                    </td>
-                  </template>
-                </Column>
-
-                <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" style="font-size: 0.85em;">
-                  <template #body="{data}">
-                    <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span> &nbsp;
-                    <span type="button" title="Delete" @click="confirmDelete(data.id)">&#10060;</span>
-                  </template>
-                </Column>
-              </DataTable>
-            </div>
-            <br>
-            <button class="btn-secondary" v-if="selectedProducts.length" @click="confirmDelete(selectedProducts)">
-              <span class="pi pi-trash"></span>
-              Delete Selection
-            </button>
-          </div>
-        </div>
-      </div>
-
     </div>
-
   </div>
 
-<!--  Edit Dialog-->
-  <dialog ref="editProductDialog" style="border: 2px solid #ccc;" name="dialog">
-    <h4>Edit product</h4>
-    <div class="container-fluid">
-      <div class="row justify-content-center">
-        <div class="col-md-12">
-          <form @submit.prevent="editProduct">
-            <table class="w-100 myTable">
-
-              <tr>
-                <th class="float-end"><span class="pi pi-cog"></span> Category &nbsp;</th>
-                <td>
-                  <select class="form-control-dark select text-capitalize" v-model="editProductData.category">
-                    <option v-for="category in categories" :key="category.id" :value="category.id">
-                      {{ category.name }}
-                    </option>
-                  </select>
-                </td>
-              </tr>
-
-              <tr>
-                <th class="float-end"><span class="pi pi-tag"></span> Product Name &nbsp;</th>
-                <td><input type="text" class="form-control-dark" v-model.trim="editProductData.productName"></td>
-              </tr>
-
-<!--              <tr>-->
-<!--                <th class="w-10"><span class="pi pi-money-bill"></span> Buying Price &nbsp;</th>-->
-<!--                <td class="w-40"><input type="number" step="0.01" min="0" class="form-control-dark w-100"-->
-<!--                                        v-model.number="editProductData.buyingPrice" disabled></td>-->
-<!--              </tr>-->
-
-<!--              <tr>-->
-<!--                <th class="float-end"><span class="pi pi-money-bill"></span> Selling Price &nbsp;</th>-->
-<!--                <td><input type="number" step="0.01" min="0" class="form-control-dark" disabled-->
-<!--                           v-model.number="editProductData.sellingPrice"></td>-->
-<!--              </tr>-->
-
-<!--              <tr>-->
-<!--                <th class="float-end"><span class="pi pi-sort-numeric-up"></span> Quantity &nbsp;</th>-->
-<!--                <td><input type="number" class="form-control-dark" v-model.number="editProductData.quantity" disabled></td>-->
-<!--              </tr>-->
-
-              <tr>
-                <th class="float-end"><span class="pi pi-money-bill"></span> Tax &nbsp;</th>
-                <td>
-                  <select class="form-control-dark select" v-model="editProductData.tax">
-                    <option value="tax">Tax</option>
-                    <option value="non">Non</option>
-                  </select>
-                </td>
-              </tr>
-
-              <tr>
-                <th class="float-end"><span class="pi pi-list"></span> Description &nbsp;</th>
-                <td><textarea class="form-control-dark" cols="10" rows="3"
-                              v-model.trim="editProductData.description"></textarea></td>
-              </tr>
-
-              <tr>
-                <td></td>
-                <td colspan="2">
-                  <button name="addProductBtn" class="btn-secondary p-1 fw-bold" type="submit" style="width: 45%;">Save</button>&nbsp;
-                  <button name="addProductBtn" class="p-1 fw-bold" type="button" @click="editProductDialog.close()" style="width: 45%;">cancel</button>
-                </td>
-              </tr>
-
-            </table>
-          </form>
-        </div>
-      </div>
-    </div>
-  </dialog>
-
-<!--  Category Dialog -->
-  <dialog ref="categoryDialog" style="border: 2px solid #ccc;">
-
-      <button class="bg-danger text-white float-end" title="Close" @click="categoryDialog.close()"><b>X</b></button>
-
-   <div class="clearfix"></div>
-
-    <form @submit.prevent="addCategory" class="my-3">
-      <label><b>Category Name</b> <input type="text" class="form-control-dark p-1" v-model.trim="categoryName" id="catInput"></label>
-      &nbsp;
-      <button type="submit" name="submitBtn"><span class="pi pi-save px-2 py-1"></span><b>Save</b></button>
-    </form>
-  </dialog>
 
 </template>
 

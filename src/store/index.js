@@ -22,7 +22,10 @@ export default createStore({
     },
     setSettings: (state, payload) => {
       state.settings = payload;
-    }
+    },
+    logout: (state, payload) => {
+      state.user = null;
+    },
   },
 
                                 //ACTIONS
@@ -33,7 +36,12 @@ export default createStore({
 
     setSettings: ({commit}, payload) => { //set company settings
       commit('setSettings', payload);
-    }
+    },
+
+    logout: ({commit}, payload) => { //this will set user to null
+      commit('logout', payload);
+    },
+
   },
 
 

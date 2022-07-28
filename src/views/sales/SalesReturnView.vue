@@ -54,15 +54,24 @@
         </table>
       </div>
 
-        <button class="my-2 float-end p-1" :disabled="!anItemIsChecked" ref="returnBtn"
-                @click="returnItems" title="Return Item(s)">
-          <b><span class="pi pi-undo"></span> Return</b>
-        </button>
+        <div class="text-center">
+          <h5>Pay With</h5>
+          <label><input type="radio" id="cash" value="cash" v-model="paymentMethod" class="p-radiobutton"> Cash</label>
+          &nbsp; &nbsp;
+          <label><input type="radio" id="momo" value="momo" v-model="paymentMethod" class="p-radiobutton"> Momo</label>
+          <br>
+          <button class="p-1 mt-2" :disabled="!anItemIsChecked" ref="returnBtn"
+                  @click="returnItems" title="Return Item(s)" style="width: 100px">
+            <b><span class="pi pi-save"></span> Save</b>
+          </button>
+        </div>
+
+
       </div>
 
       <div class="text-center">
         <h5 v-if="discount">Discount: <b>-{{ formatNumber(discount) }}</b></h5>
-        <h5 v-if="tax">Tax: <b>-{{ formatNumber(tax) }}</b></h5>
+        <h5 v-if="tax">Tax: <b>{{ formatNumber(tax) }}</b></h5>
       <h3 class="text-danger" v-if="change">
         Change: <b>GHS {{ formatNumber(change) }}
       </b></h3>
@@ -71,6 +80,7 @@
     </div>
   </div>
 </div>
+
 </template>
 
 <script setup>
@@ -86,6 +96,7 @@ const change = ref(null);
 const discount = ref(null);
 const tax = ref(null);
 const returnBtn = ref(null);
+const paymentMethod = ref('cash');
 const store = useStore();
 
 const user = computed(() => store.getters.user);
@@ -96,6 +107,7 @@ const searchReceipt = async () => {
   change.value = null;
   tax.value = null;
   discount.value = null;
+  paymentMethod.value = 'cash';
 
   if (!search.value) return ipcRenderer.send('errorMessage', 'Please Enter Receipt number');
   try {
@@ -194,8 +206,8 @@ const returnItems = async () => {
         orderDate: date,
         numberOfItems: returningItems.value.length,
         type: 'return',
-        momo: 0,
-        total:  change.value - (change.value * 2), //Get a negative value
+        momo: paymentMethod.value === 'momo' ? -change.value : 0,
+        total:  -change.value, //Get a negative value
         tendered: 0,
         discount: discount.value,
         tax: tax.value,

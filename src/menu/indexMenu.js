@@ -35,9 +35,21 @@ const indexMenu = [
     {
         label: 'File',
         submenu: [
-            {label: 'App Settings',  click(){sendRouteEvent('settings')}},
+            {
+                id: 'home',
+                enabled: false,
+                label: 'Home',
+                click(){sendRouteEvent('home')}
+            },
+            {
+                id: 'appSettings',
+                enabled: false,
+                label: 'App Settings',
+                click(){sendRouteEvent('settings')}
+            },
              {
                  id: 'backup',
+                 enabled: false,
                  label: "Backup database",
                   async click(){
                     const {filePath} = await dialog.showSaveDialog(BrowserWindow.getAllWindows()[0], options)

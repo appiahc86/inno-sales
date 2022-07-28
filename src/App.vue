@@ -99,7 +99,9 @@
               </a>
               <ul class="dropdown-menu" aria-labelledby="purchasing" style="font-size: 0.9em !important;">
                 <li><a class="dropdown-item fw-bold"><span class="pi pi-lock"></span> Reset Password</a></li>
-                <li><a class="dropdown-item fw-bold"><span class="pi pi-power-off text-danger"></span> Logout</a></li>
+                <li><a class="dropdown-item fw-bold" @click="logout">
+                  <span class="pi pi-power-off text-danger"></span> Logout</a>
+                </li>
               </ul>
             </div>
           </li>
@@ -126,7 +128,7 @@
         <div class="col-12">
 
             <hr class="mt-0 fw-bold">
-            <h2 v-if="backup">Backing up database please wait...</h2>
+        <!--          Inject vies here-->
             <router-view/>
 
 
@@ -137,6 +139,12 @@
     </main>
 
   </div>
+
+
+
+  <dialog ref="backupDialog" style="border: 1px solid #ccc;">
+    <h5>Backing Up Database, Please Wait... <span class="spinner-grow"></span></h5>
+  </dialog>
 
 </template>
 
@@ -173,29 +181,18 @@ settings();
 
 
 const time = ref(null);
-const backup = ref(false)
 const store = useStore();
 const router = useRouter();
+const backupDialog = ref(null);
 
-
-      ipcRenderer.on('backing-up', (event, args) =>{
-        backup.value = true;
-      })
-      ipcRenderer.on('backup-complete', (event, args) =>{
-        backup.value = false;
-      })
 
 const insertUser = async () => {
   const data = { firstName: "Collins", lastName: "Appiah",username: "innocent",password: "pass123",role: 1,};
-  const users = await db('users').where('id', 1).first();
-  let user = null;
+  const user = await db('users').where('id', 1).first();
 
-  if (!users) {
-   const setUser =  await db('users').insert(data);
-    user = {...data, id: setUser[0]}
-  }else user = users
-
-  store.dispatch('setUser', user)
+  if (!user) {
+  await db('users').insert(data);
+  }
 
 }
 
@@ -209,13 +206,27 @@ const insertUser = async () => {
 
       })
 
+
+//Logout
+const logout = () => {
+  store.dispatch('logout', '');
+  ipcRenderer.send('logout');
+  router.push({name: 'login'})
+}
+
 // listen to route events and redirect to page
 ipcRenderer.on('routing', (event, args) => {
   router.push({name: args})
 })
 
-
-
+//backup database
+ipcRenderer.on('backing-up', (event, args) =>{
+  backupDialog.value.showModal();
+  backupDialog.value.addEventListener('cancel', e => e.preventDefault());
+})
+ipcRenderer.on('backup-complete', (event, args) =>{
+  backupDialog.value.close();
+})
 
 
                     //....................Handle sidebar toggle.............................
@@ -228,11 +239,6 @@ const collapseSidebar = () => {
   sidebarToggle.value.classList.remove('hideMe');
   main.value.classList.remove('main')
 
-  //Set margin left on tabs
-  const topNavs = root.value.querySelectorAll('.topNav');
-  for (const topNav of topNavs) {
-    topNav.classList.add('setMargin')
-  }
 }
 
 //restore sidebar
@@ -241,11 +247,6 @@ const restoreSidebar = () => {
   sidebarToggle.value.classList.add('hideMe');
   main.value.classList.add('main')
 
-  //Remove margin left on tabs
-  const topNavs = root.value.querySelectorAll('.topNav');
-  for (const topNav of topNavs) {
-    topNav.classList.remove('setMargin')
-  }
 }
 </script>
 

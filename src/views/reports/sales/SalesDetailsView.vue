@@ -90,7 +90,7 @@
             </Column>
           </DataTable>
         </div>
-        <h5 class="mt-2" v-if="records.length">Total: GHS {{ formatNumber(parseFloat(recordTotal)) }}</h5>
+        <h5 class="mt-2" v-if="records.length">Total: GH¢ {{ formatNumber(parseFloat(recordTotal)) }}</h5>
 
 
 
@@ -125,7 +125,7 @@
                     <td>&nbsp; {{ formatNumber(parseFloat(record.sellingPrice)) }}</td>
                     <td>&nbsp; {{ formatNumber(parseInt(record.quantity)) }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.tax)) }}</td>
-                    <td> {{ formatNumber(parseFloat(record.discount)) }}</td>
+                    <td>&nbsp; {{ formatNumber(parseFloat(record.discount)) }}</td>
                     <td>
                       &nbsp; {{formatNumber( ( (parseInt(record.quantity)*parseFloat(record.sellingPrice)) + parseFloat(record.tax) ) - parseFloat(record.discount) ) }}
                     </td>
@@ -134,7 +134,7 @@
                 </template>
 
               </table>
-              <div style="margin-top: 0;"><h5>Total: GHS {{ formatNumber(parseFloat(recordTotal)) }}</h5></div>
+              <div style="margin-top: 0;"><h5>Total: GH¢ {{ formatNumber(parseFloat(recordTotal)) }}</h5></div>
             </div>
 
           </div>

@@ -57,7 +57,7 @@
                 <div class="col justify-content-end"> <h6><span class="text-warning">Total: </span>{{ formatNumber(total) }}</h6></div>
               </div>
             </div>
-            <h5><span class="text-danger fw-bold">Amount Due: </span>GHS {{ formatNumber(total) }}</h5>
+            <h5><span class="text-danger fw-bold">Amount Due: </span>GH¢ {{ formatNumber(total) }}</h5>
           </div>
 
           <div class="container" v-if="cart.length">

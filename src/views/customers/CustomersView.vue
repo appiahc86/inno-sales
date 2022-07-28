@@ -1,170 +1,185 @@
 <template>
-  <nav id="customersNav" class="topNav">
-    <div class="nav nav-tabs" role="tablist">
-      <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-customer" type="button" role="tab" aria-controls="nav-add-customer" aria-selected="false">Add Customer</button>
-      <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-customers" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Customer List</button>
-    </div>
-  </nav>
-  <div class="tab-content" id="nav-tabContent">
 
-    <!--  Customer Form  -->
-    <div class="tab-pane mt-5 show active" id="add-customer" role="tabpanel" aria-labelledby="nav-add-customer-tab">
-      <div class=" py-4">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
 
-        <div class="container">
-          <div class="row justify-content-center">
-            <div class="col-md-9">
-              <form @submit.prevent="addCustomer">
-      <table class="w-100 myTable">
 
-        <tr>
-          <th></th>
-          <td>
-            <h4 style="width: 300px; text-align: center;">Add A New Customer</h4>
-          </td>
-        </tr>
+        <nav id="customersNav">
+          <div class="nav nav-tabs" role="tablist">
+            <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-customer" type="button" role="tab" aria-controls="nav-add-customer" aria-selected="false">Add Customer</button>
+            <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-customers" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Customer List</button>
+          </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
 
-        <tr>
-          <th class="float-end"><span class="pi pi-user"></span> Customer Name &nbsp;</th>
-          <td><input type="text" maxlength="40" class="form-control-dark" v-model.trim="customerData.name"></td>
-        </tr>
+          <!--  Customer Form  -->
+          <div class="tab-pane mt-5 show active" id="add-customer" role="tabpanel" aria-labelledby="nav-add-customer-tab">
+            <div class=" py-4">
 
-        <tr>
-          <th class="float-end"><span class="pi pi-home"></span> Company &nbsp;</th>
-          <td><input type="text" maxlength="60" class="form-control-dark" v-model.trim="customerData.company"></td>
-        </tr>
+              <div class="container">
+                <div class="row justify-content-center">
+                  <div class="col-md-9">
+                    <form @submit.prevent="addCustomer">
+                      <table class="w-100 myTable">
 
-        <tr>
-          <th class="float-end"><span class="pi pi-phone"></span> Phone &nbsp;</th>
-          <td><input type="text" maxlength="36" class="form-control-dark"  v-model.trim="customerData.phone"></td>
-        </tr>
+                        <tr>
+                          <th></th>
+                          <td>
+                            <h4 style="width: 300px; text-align: center;">Add A New Customer</h4>
+                          </td>
+                        </tr>
 
-        <tr>
-          <th class="float-end"><span class="pi pi-list"></span> Address &nbsp;</th>
-          <td><input type="text" maxlength="100" class="form-control-dark" v-model.trim="customerData.address"></td>
-        </tr>
+                        <tr>
+                          <th class="float-end"><span class="pi pi-user"></span> Customer Name &nbsp;</th>
+                          <td><input type="text" maxlength="40" class="form-control-dark" v-model.trim="customerData.name"></td>
+                        </tr>
 
-        <tr>
-          <th></th>
-          <td>
-            <button class=" mt-1 btn-secondary" type="submit" name="submitBtn" style="width: 300px;">
-              <span class="pi pi-save"></span>
-              <b style="font-size: 1.5em;"> Save</b>
-            </button>
-          </td>
-        </tr>
-      </table>
-    </form>
+                        <tr>
+                          <th class="float-end"><span class="pi pi-home"></span> Company &nbsp;</th>
+                          <td><input type="text" maxlength="60" class="form-control-dark" v-model.trim="customerData.company"></td>
+                        </tr>
+
+                        <tr>
+                          <th class="float-end"><span class="pi pi-phone"></span> Phone &nbsp;</th>
+                          <td><input type="text" maxlength="36" class="form-control-dark"  v-model.trim="customerData.phone"></td>
+                        </tr>
+
+                        <tr>
+                          <th class="float-end"><span class="pi pi-list"></span> Address &nbsp;</th>
+                          <td><input type="text" maxlength="100" class="form-control-dark" v-model.trim="customerData.address"></td>
+                        </tr>
+
+                        <tr>
+                          <th></th>
+                          <td>
+                            <button class=" mt-1 btn-secondary" type="submit" name="submitBtn" style="width: 300px;">
+                              <span class="pi pi-save"></span>
+                              <b style="font-size: 1.5em;"> Save</b>
+                            </button>
+                          </td>
+                        </tr>
+                      </table>
+                    </form>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
 
 
 
-    <!--  Customers Table  -->
-    <div class="tab-pane mt-2" id="all-customers" role="tabpanel" aria-labelledby="nav-all-customers-tab">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-12">
-            <div class="table-responsive">
-              <DataTable
-                  :value="customers" :paginator="true" dataKey="id"
-                  class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
-                  filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
-                  paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                  :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedCustomers"
-                  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                  :globalFilterFields="['name','company', 'phone', 'address']" responsiveLayout="scroll"
-              >
-                <template #header>
-                  <div class="d-flex justify-content-center align-items-center" style="height: 15px">
-                    <h6 class="px-3">Customers</h6>
-                    <span class="p-input-icon-left">
+          <!--  Customers Table  -->
+          <div class="tab-pane mt-2" id="all-customers" role="tabpanel" aria-labelledby="nav-all-customers-tab">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-12">
+                  <div class="table-responsive">
+                    <DataTable
+                        :value="customers" :paginator="true" dataKey="id"
+                        class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
+                        filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
+                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                        :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedCustomers"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                        :globalFilterFields="['name','company', 'phone', 'address']" responsiveLayout="scroll"
+                    >
+                      <template #header>
+                        <div class="d-flex justify-content-center align-items-center" style="height: 15px">
+                          <h6 class="px-3">Customers</h6>
+                          <span class="p-input-icon-left">
                         <i class="pi pi-search" />
                         <InputText v-model="filters['global'].value" placeholder="Keyword Search" style="height: 30px"/>
                     </span>
+                        </div>
+                      </template>
+                      <template #empty>
+                        No record found.
+                      </template>
+                      <template #loading>
+                        <h4 class="text-white"> Loading Customers data. Please wait.</h4>
+                      </template>
+
+                      <Column selection-mode="multiple"  style="font-size: 0.85em;"></Column>
+
+                      <Column field="name" header="Name" sortable  style="font-size: 0.85em;"></Column>
+                      <Column field="company" header="Company" sortable  style="font-size: 0.85em;"></Column>
+                      <Column field="phone" header="Contact" sortable  style="font-size: 0.85em;"></Column>
+                      <Column field="address" header="Address" sortable  style="font-size: 0.85em;"></Column>
+
+                      <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.85em;">
+                        <template #body="{data}">
+                          <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span> &nbsp;
+                          <span type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
+                        </template>
+                      </Column>
+                    </DataTable>
                   </div>
-                </template>
-                <template #empty>
-                  No record found.
-                </template>
-                <template #loading>
-                  <h4 class="text-white"> Loading Customers data. Please wait.</h4>
-                </template>
-
-                <Column selection-mode="multiple"  style="font-size: 0.85em;"></Column>
-
-                <Column field="name" header="Name" sortable  style="font-size: 0.85em;"></Column>
-                <Column field="company" header="Company" sortable  style="font-size: 0.85em;"></Column>
-                <Column field="phone" header="Contact" sortable  style="font-size: 0.85em;"></Column>
-                <Column field="address" header="Address" sortable  style="font-size: 0.85em;"></Column>
-
-                <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.85em;">
-                  <template #body="{data}">
-                    <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span> &nbsp;
-                    <span type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
-                  </template>
-                </Column>
-              </DataTable>
+                  <br>
+                  <button class="btn-secondary"  @click="confirm(selectedCustomers)" v-if="selectedCustomers.length">
+                    <span class="pi pi-trash"></span>
+                    Delete Selection
+                  </button>
+                </div>
+              </div>
             </div>
-            <br>
-            <button class="btn-secondary"  @click="confirm(selectedCustomers)" v-if="selectedCustomers.length">
-              <span class="pi pi-trash"></span>
-              Delete Selection
-            </button>
+
           </div>
+
         </div>
+
+        <!--  Edit Dialog-->
+        <dialog ref="editCustomerDialog" style="border: 2px solid #ccc;">
+          <h4>Edit Customer</h4>
+          <div class="container-fluid">
+            <div class="row justify-content-center">
+              <div class="col-md-12">
+                <form @submit.prevent="editCustomer">
+                  <table class="w-100 myTable" id="formTable">
+
+                    <tr>
+                      <th class="float-end">Customer Name &nbsp;</th>
+                      <td class="w-50"><input type="text" maxlength="40" class="form-control-dark w-100" v-model.trim="editCustomerData.name"></td>
+                    </tr>
+
+                    <tr>
+                      <th class="float-end">Company &nbsp;</th>
+                      <td class="w-50"><input type="text" maxlength="60" class="form-control-dark" v-model.trim="editCustomerData.company"></td>
+                    </tr>
+
+                    <tr>
+                      <th class="float-end">Phone &nbsp;</th>
+                      <td class="w-50"><input type="text" maxlength="36" class="form-control-dark"  v-model.trim="editCustomerData.phone"></td>
+                    </tr>
+
+                    <tr>
+                      <th class="float-end">Address &nbsp;</th>
+                      <td><input type="text" maxlength="100" class="form-control-dark" v-model.trim="editCustomerData.address"></td>
+                    </tr>
+
+                    <tr>
+                      <th class="float-end"></th>
+                      <td>
+                        <button class="mt-2 btn-secondary py-1" type="submit" style="width: 45%;">Update</button>&nbsp;
+                        <button type="button" @click="closeDialog" class="py-1" style="width: 45%;">Cancel</button>
+                      </td>
+                    </tr>
+                  </table>
+
+                </form>
+              </div>
+            </div>
+          </div>
+        </dialog>
+
+
       </div>
-
     </div>
-
   </div>
 
-  <!--  Edit Dialog-->
-  <dialog ref="editCustomerDialog" style="border: 2px solid #ccc;">
-    <h4>Edit Customer</h4>
-    <div class="container-fluid">
-      <div class="row justify-content-center">
-        <div class="col-md-12">
-          <form @submit.prevent="editCustomer">
-            <table class="w-100 myTable" id="formTable">
 
-              <tr>
-                <th class="float-end">Customer Name &nbsp;</th>
-                <td class="w-50"><input type="text" maxlength="40" class="form-control-dark w-100" v-model.trim="editCustomerData.name"></td>
-              </tr>
 
-              <tr>
-                <th class="float-end">Company &nbsp;</th>
-                <td class="w-50"><input type="text" maxlength="60" class="form-control-dark" v-model.trim="editCustomerData.company"></td>
-              </tr>
 
-              <tr>
-                <th class="float-end">Phone &nbsp;</th>
-                <td class="w-50"><input type="text" maxlength="36" class="form-control-dark"  v-model.trim="editCustomerData.phone"></td>
-              </tr>
-
-              <tr>
-                <th class="float-end">Address &nbsp;</th>
-                <td><input type="text" maxlength="100" class="form-control-dark" v-model.trim="editCustomerData.address"></td>
-              </tr>
-
-              <tr>
-                <th class="float-end"></th>
-                <td>
-                  <button class="mt-2 btn-secondary py-1" type="submit" style="width: 45%;">Update</button>&nbsp;
-                  <button type="button" @click="closeDialog" class="py-1" style="width: 45%;">Cancel</button>
-                </td>
-              </tr>
-            </table>
-
-          </form>
-        </div>
-      </div>
-    </div>
-  </dialog>
 </template>
 
 <script setup>

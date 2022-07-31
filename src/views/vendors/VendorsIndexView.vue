@@ -104,14 +104,14 @@
                   <h4 class="text-white"> Loading data. Please wait...</h4>
                 </template>
 
-                <Column selection-mode="multiple" style="font-size: 0.85em;"></Column>
+                <Column selection-mode="multiple" class="data-table-font-size"></Column>
 
-                <Column field="company" header="Company" sortable style="font-size: 0.85em;"></Column>
-                <Column field="address" header="Address" sortable  style="font-size: 0.85em;"></Column>
-                <Column field="contactPerson" header="Contact Person" sortable style="font-size: 0.85em;"></Column>
-                <Column field="phone" header="Address" sortable style="font-size: 0.85em;"></Column>
-                <Column field="accountNumber" header="Account#" sortable style="font-size: 0.85em;"></Column>
-                <Column field="notes" header="Notes" sortable style="font-size: 0.85em;">
+                <Column field="company" header="Company" sortable class="data-table-font-size"></Column>
+                <Column field="address" header="Address" sortable  class="data-table-font-size"></Column>
+                <Column field="contactPerson" header="Contact Person" sortable class="data-table-font-size"></Column>
+                <Column field="phone" header="Phone" sortable class="data-table-font-size"></Column>
+                <Column field="accountNumber" header="Account#" sortable class="data-table-font-size"></Column>
+                <Column field="notes" header="Notes" sortable class="data-table-font-size">
                   <template #body="{data}">
                     <td :title="data.notes">
                       {{ data.notes.length > 20 ? data.notes.substring(0, 20) + '...' : data.notes }}
@@ -119,9 +119,13 @@
                   </template>
                 </Column>
 
-                <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" style="font-size: 0.85em;">
+                <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
                   <template #body="{data}">
-                    <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span> &nbsp;
+                    <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span>
+                  </template>
+                </Column>
+                <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
+                  <template #body="{data}">
                     <span type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
                   </template>
                 </Column>

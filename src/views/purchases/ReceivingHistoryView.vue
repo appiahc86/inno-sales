@@ -30,39 +30,39 @@
 
 <!--          <Column selection-mode="multiple"  style="font-size: 0.85em;"></Column>-->
 
-          <Column field="company" header="Vendor" sortable style="font-size: 0.85em;"></Column>
-          <Column field="invoice" header="Invoice#" sortable style="font-size: 0.85em;"></Column>
-          <Column field="status" header="Status" sortable style="font-size: 0.85em;">
-            <template #body="{data}">
-              <span class="text-capitalize" :style="{color: data.status === 'returned' ? 'red' : 'green'}">
-                <b>{{ data.status }}</b>
-              </span>
-            </template>
-          </Column>
-          <Column field="billDate" header="Bill Date" sortable  style="font-size: 0.85em;">
+          <Column field="company" header="Vendor" sortable style="font-size: 0.75em;"></Column>
+          <Column field="invoice" header="Invoice#" sortable style="font-size: 0.75em;"></Column>
+<!--          <Column field="status" header="Status" sortable style="font-size: 0.75em;">-->
+<!--            <template #body="{data}">-->
+<!--              <span class="text-capitalize" :style="{color: data.status === 'returned' ? 'red' : 'green'}">-->
+<!--                <b>{{ data.status }}</b>-->
+<!--              </span>-->
+<!--            </template>-->
+<!--          </Column>-->
+          <Column field="billDate" header="Bill Date" sortable  style="font-size: 0.75em;">
             <template #body="{data}">
               <td>{{ new Date(data.billDate).toLocaleDateString() }}</td>
             </template>
           </Column>
-          <Column field="invoiceDue" header="Due Date" sortable  style="font-size: 0.85em;">
+          <Column field="invoiceDue" header="Due Date" sortable  style="font-size: 0.75em;">
             <template #body="{data}">
               <td>{{ new Date(data.invoiceDue).toLocaleDateString() }}</td>
             </template>
           </Column>
-          <Column field="numberOfItems" header="Total Items" sortable  style="font-size: 0.85em;"></Column>
-          <Column field="total" header="Total" sortable  style="font-size: 0.85em;">
+          <Column field="numberOfItems" header="Total Items" sortable  style="font-size: 0.75em;"></Column>
+          <Column field="total" header="Total" sortable  style="font-size: 0.75em;">
             <template #body="{data}">
               {{ formatNumber(data.total) }}
             </template>
           </Column>
-          <Column headerStyle="text-align: center" header="Return To Vendor" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.85em;">
+          <Column headerStyle="text-align: center" header="Return To Vendor" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.75em;">
             <template #body="{data}">
-              <span title="Return to Vendor" @click="openReturnDialog(data.id, data.company)" style="cursor: pointer;" v-if="data.status === 'received'">
+              <span title="Return to Vendor" @click="openReturnDialog(data.id, data.company)" style="cursor: pointer;">
                 <span class="pi pi-reply"></span>
               </span> &nbsp;
             </template>
           </Column>
-          <Column headerStyle="text-align: center" header="View" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.85em;">
+          <Column headerStyle="text-align: center" header="View" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.75em;">
             <template #body="{data}">
               <span title="View Details" @click="showDetails(data.id)" style="cursor: pointer;">&#128064;</span> &nbsp;
             </template>
@@ -122,7 +122,8 @@
             <h5>Return To <span class="text-primary">{{ returnData.vendor }}</span></h5>
             <p>
               This action will reverse the document's effect on inventory.<br>
-              Proceed if you are sure you want to reverse this document.
+              Proceed if you are sure you want to reverse this document. Also will clear any
+              payment made if available
             </p>
             <div class="d-flex mb-3">
               <label><b>Return Date</b> <input type="date" class="form-control-dark p-1" v-model="returnData.date"></label>
@@ -173,8 +174,7 @@ const getPurchases = async () => {
        .join('vendors', 'purchases.vendorId', '=', 'vendors.id')
        .leftJoin('billPayments', 'purchases.id', 'billPayments.purchaseId')
        .select('purchases.id', 'purchases.billDate', 'purchases.invoiceDue',
-           'purchases.numberOfItems','purchases.invoice', 'purchases.total',
-           'purchases.status', 'vendors.company')
+           'purchases.numberOfItems','purchases.invoice', 'purchases.total', 'vendors.company')
        .groupBy('purchases.id')
        .orderBy('purchases.id', 'DESC').limit(200);
 
@@ -245,11 +245,11 @@ const returnToVendor = async (e) => {
         await trx('purchases').where('id', returnData.id)
             .update({status: 'returned', returnedDate: new Date(returnData.date).setHours(0,0,0,0) });
 
+        //Delete purchase
+        await trx('purchases').where('id', returnData.id).del();
 
         // Update on front-end
-        purchases.value.map(purchase => {
-          if (purchase.id === returnData.id) purchase.status = "returned"
-        })
+        purchases.value = purchases.value.filter(purchase => purchase.id !== returnData.id)
 
         returnData.date = null;
         returnData.id = null;

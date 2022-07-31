@@ -14,6 +14,7 @@ import store from "@/store";
 //Reports
 import salesReportRouter from "@/router/reports/sales";
 import productsReportRouter from "@/router/reports/products";
+import purchasesReportRouter from "@/router/reports/purchases";
 
 const routes = [
   {
@@ -45,7 +46,8 @@ const routes = [
 
     //Report routes
     ...salesReportRouter,
-    ...productsReportRouter
+    ...productsReportRouter,
+    ...purchasesReportRouter
 ]
 
 const router = createRouter({

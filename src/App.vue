@@ -81,7 +81,7 @@
           </li>
         </ul>
 
-        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-2 mt-4 mb-1 text-white-50">
+        <h6 class="align-items-center px-2 mt-4 mb-1 text-white-50" style="font-size: 1em;">
           <span>Settings</span>
         </h6>
         <ul class="nav flex-column mb-2">
@@ -109,8 +109,8 @@
       </div>
 
       <div class="d-flex" style="position: absolute; bottom: 0">
-        <b class="text-white-50">Inno Sales 0.0.1</b>
-        <b><span class="pi pi-arrow-circle-left text-white" style="margin-left: 100px; font-size: 1.5em; cursor: pointer;"
+        <b class="text-white-50">Inno Sales 1.0.0</b>
+        <b><span class="pi pi-arrow-circle-left text-white" style="margin-left: 75px; font-size: 1.5em; cursor: pointer;"
                  @click="collapseSidebar" title="Collapse Sidebar"></span></b>
       </div>
 
@@ -220,11 +220,11 @@ ipcRenderer.on('routing', (event, args) => {
 })
 
 //backup database
-ipcRenderer.on('backing-up', (event, args) =>{
+ipcRenderer.on('backing-up', (event, args) => {
   backupDialog.value.showModal();
   backupDialog.value.addEventListener('cancel', e => e.preventDefault());
 })
-ipcRenderer.on('backup-complete', (event, args) =>{
+ipcRenderer.on('backup-complete', (event, args) => {
   backupDialog.value.close();
 })
 
@@ -238,7 +238,6 @@ const collapseSidebar = () => {
   sidebarMenu.value.classList.add('hideMe');
   sidebarToggle.value.classList.remove('hideMe');
   main.value.classList.remove('main')
-
 }
 
 //restore sidebar
@@ -246,7 +245,7 @@ const restoreSidebar = () => {
   sidebarMenu.value.classList.remove('hideMe')
   sidebarToggle.value.classList.add('hideMe');
   main.value.classList.add('main')
-
+  console.clear();
 }
 </script>
 

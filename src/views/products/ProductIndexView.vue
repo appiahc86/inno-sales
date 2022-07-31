@@ -62,7 +62,8 @@
 
                         <tr>
                           <th class="float-end"><span class="pi pi-sort-numeric-up"></span> Quantity &nbsp;</th>
-                          <td><input type="number" class="form-control-dark" v-model.number="productData.quantity"></td>
+                          <td><input type="number" step="1" min="0" class="form-control-dark"
+                                     v-model.number="productData.quantity" oninput="validity.valid || (value = 0)"></td>
                         </tr>
 
                         <tr>
@@ -134,31 +135,31 @@
                         <h4 class="text-white"> Loading data. Please wait.</h4>
                       </template>
 
-                      <Column selection-mode="multiple" style="font-size: 0.85em;"></Column>
+                      <Column selection-mode="multiple" class="data-table-font-size"></Column>
 
-                      <Column field="productName" header="Product" sortable style="font-size: 0.85em;">
+                      <Column field="productName" header="Product" sortable class="data-table-font-size">
                         <template #body="{data}">
                           <td :style="{color: data.quantity < 5 ? 'red' : '' }">{{ data.productName }}</td>
                         </template>
                       </Column>
-                      <Column field="category" header="Category" sortable style="font-size: 0.85em;">
+                      <Column field="category" header="Category" sortable class="data-table-font-size">
                         <template #body="{data}">
                           <td class="text-capitalize">{{ data.category }}</td>
                         </template>
                       </Column>
-                      <Column field="buyingPrice" header="Buy. Price" sortable style="font-size: 0.85em;">
+                      <Column field="buyingPrice" header="Buy. Price" sortable class="data-table-font-size">
                         <template #body="{data}">
                           <td>{{ formatNumber(parseFloat(data.buyingPrice)) }}</td>
                         </template>
                       </Column>
-                      <Column field="sellingPrice" header="Sel. Price" sortable style="font-size: 0.85em;">
+                      <Column field="sellingPrice" header="Sel. Price" sortable class="data-table-font-size">
                         <template #body="{data}">
                           <td>{{ formatNumber(parseFloat(data.sellingPrice)) }}</td>
                         </template>
                       </Column>
-                      <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" style="font-size: 0.85em;"></Column>
-                      <Column field="tax" header="Tax" sortable style="font-size: 0.85em;"></Column>
-                      <Column field="description" header="Desc" sortable style="font-size: 0.85em;">
+                      <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" class="data-table-font-size"></Column>
+                      <Column field="tax" header="Tax" sortable class="data-table-font-size"></Column>
+                      <Column field="description" header="Desc" sortable class="data-table-font-size">
                         <template #body="{data}">
                           <td :title="data.description">
                             {{ data.description.length > 20 ? data.description.substring(0, 20) + '...' : data.description }}
@@ -166,9 +167,13 @@
                         </template>
                       </Column>
 
-                      <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" style="font-size: 0.85em;">
+                      <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
                         <template #body="{data}">
-                          <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span> &nbsp;
+                          <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span>
+                        </template>
+                      </Column>
+                      <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
+                        <template #body="{data}">
                           <span type="button" title="Delete" @click="confirmDelete(data.id)">&#10060;</span>
                         </template>
                       </Column>

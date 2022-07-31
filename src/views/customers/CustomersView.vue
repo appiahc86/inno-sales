@@ -100,16 +100,20 @@
                         <h4 class="text-white"> Loading Customers data. Please wait.</h4>
                       </template>
 
-                      <Column selection-mode="multiple"  style="font-size: 0.85em;"></Column>
+                      <Column selection-mode="multiple" class="data-table-font-size"></Column>
 
-                      <Column field="name" header="Name" sortable  style="font-size: 0.85em;"></Column>
-                      <Column field="company" header="Company" sortable  style="font-size: 0.85em;"></Column>
-                      <Column field="phone" header="Contact" sortable  style="font-size: 0.85em;"></Column>
-                      <Column field="address" header="Address" sortable  style="font-size: 0.85em;"></Column>
+                      <Column field="name" header="Name" sortable  class="data-table-font-size"></Column>
+                      <Column field="company" header="Company" sortable  class="data-table-font-size"></Column>
+                      <Column field="phone" header="Contact" sortable  class="data-table-font-size"></Column>
+                      <Column field="address" header="Address" sortable class="data-table-font-size"></Column>
 
-                      <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.85em;">
+                      <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
                         <template #body="{data}">
-                          <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span> &nbsp;
+                          <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span>
+                        </template>
+                      </Column>
+                      <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
+                        <template #body="{data}">
                           <span type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
                         </template>
                       </Column>

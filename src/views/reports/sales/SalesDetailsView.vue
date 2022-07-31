@@ -47,41 +47,41 @@
               No record found.
             </template>
 
-            <Column field="date" header="Date" sortable style="font-size: 0.85em;">
+            <Column field="date" header="Date" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td>{{ new Date(data.date).toLocaleDateString() }}</td>
               </template>
             </Column>
 
-            <Column field="productName" header="Item" sortable style="font-size: 0.85em;"></Column>
+            <Column field="productName" header="Item" sortable class="data-table-font-size"></Column>
 
-            <Column field="buyingPrice" header="Cost" sortable style="font-size: 0.85em;">
+            <Column field="buyingPrice" header="Cost" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td>{{ formatNumber(parseFloat(data.buyingPrice)) }}</td>
               </template>
             </Column>
 
-            <Column field="sellingPrice" header="SellingPrice" sortable style="font-size: 0.85em;">
+            <Column field="sellingPrice" header="SellingPrice" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td>{{ formatNumber(parseFloat(data.sellingPrice)) }}</td>
               </template>
             </Column>
 
-            <Column field="quantity" header="Qty" sortable style="font-size: 0.85em;"></Column>
+            <Column field="quantity" header="Qty" sortable class="data-table-font-size"></Column>
 
-            <Column field="tax" header="Tax" sortable style="font-size: 0.85em;">
+            <Column field="tax" header="Tax" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td>{{ formatNumber(parseFloat(data.tax)) }}</td>
               </template>
             </Column>
 
-            <Column field="discount" header="Discount" sortable style="font-size: 0.85em;">
+            <Column field="discount" header="Discount" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td>{{ formatNumber(parseFloat(data.discount)) }}</td>
               </template>
             </Column>
 
-            <Column field="total" header="Total" sortable style="font-size: 0.85em;">
+            <Column field="total" header="Total" sortable class="data-table-font-size">
               <template #body="{data}">
   <td>
     {{ formatNumber( ( (parseInt(data.quantity) * parseFloat(data.sellingPrice)) + parseFloat(data.tax) ) - parseFloat(data.discount) ) }}

@@ -10,8 +10,8 @@ const sendRouteEvent = (routeName) => {
 
 // Copy database
 const copyDatabaseFile = async (filePath) => {
+    const win = BrowserWindow.getAllWindows()[0];
     try {
-        const win = BrowserWindow.getAllWindows()[0];
         win.webContents.send('backing-up', '')
 
         await fse.copy('./bk/sales.db', filePath);
@@ -19,6 +19,7 @@ const copyDatabaseFile = async (filePath) => {
 
         dialog.showMessageBox({type:'info', message: 'Backup was successful'});
     }catch (e) {
+        win.webContents.send('backup-complete', '')
         dialog.showMessageBox({type:'error', message: e.message});
     }
 }

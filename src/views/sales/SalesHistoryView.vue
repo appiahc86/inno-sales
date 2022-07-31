@@ -27,23 +27,23 @@
             No record found.
           </template>
 
-          <Column field="orderDate" header="Date" sortable style="font-size: 0.85em;">
+          <Column field="orderDate" header="Date" sortable class="data-table-font-size">
            <template #body="{data}">
              <td>{{ new Date(data.orderDate).toLocaleDateString() }}</td>
            </template>
           </Column>
-          <Column field="id" header="Receipt#" sortable  style="font-size: 0.85em;"></Column>
-          <Column field="firstName" header="Cashier" sortable style="font-size: 0.85em;"></Column>
-          <Column field="numberOfItems" header="No. Of Items" sortable style="font-size: 0.85em;"></Column>
-          <Column field="total" header="Total" sortable style="font-size: 0.85em;">
+          <Column field="id" header="Receipt#" sortable  class="data-table-font-size"></Column>
+          <Column field="firstName" header="Cashier" sortable class="data-table-font-size"></Column>
+          <Column field="numberOfItems" header="No. Of Items" sortable class="data-table-font-size"></Column>
+          <Column field="total" header="Total" sortable class="data-table-font-size">
             <template #body="{data}">
               <td>{{ formatNumber(data.total) }}</td>
             </template>
           </Column>
 
-          <Column header="View Details" headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" style="font-size: 0.85em;">
+          <Column header="View Details" headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
             <template #body="{data}">
-              <span type="button" title="View Details" @click="showDetails(data.id)" class="pi pi-eye-slash"></span> &nbsp;
+              <span type="button" title="View Details" @click="showDetails(data.id)" class="pi pi-eye-slash"></span>
             </template>
           </Column>
         </DataTable>

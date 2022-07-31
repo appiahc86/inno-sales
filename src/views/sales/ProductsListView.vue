@@ -32,24 +32,24 @@
 <!--              <h4 class="text-white"> Loading data. Please wait.</h4>-->
 <!--            </template>-->
 
-            <Column field="productName" header="Product" sortable style="font-size: 0.85em;">
+            <Column field="productName" header="Product" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td :style="{color: data.quantity < 5 ? 'red' : '' }">{{ data.productName }}</td>
               </template>
             </Column>
-            <Column field="category" header="Category" sortable style="font-size: 0.85em;">
+            <Column field="category" header="Category" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td class="text-capitalize">{{ data.category }}</td>
               </template>
             </Column>
-            <Column field="sellingPrice" header="Price" sortable style="font-size: 0.85em;">
+            <Column field="sellingPrice" header="Price" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td><b>{{ formatNumber(parseFloat(data.sellingPrice))}}</b></td>
               </template>
             </Column>
-            <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" style="font-size: 0.85em;"></Column>
-            <Column field="tax" header="Tax" sortable style="font-size: 0.85em;"></Column>
-            <Column field="description" header="Desc" sortable style="font-size: 0.85em;">
+            <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" class="data-table-font-size"></Column>
+            <Column field="tax" header="Tax" sortable class="data-table-font-size"></Column>
+            <Column field="description" header="Desc" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td :title="data.description">
                   {{ data.description.length > 20 ? data.description.substring(0, 20) + '...' : data.description }}

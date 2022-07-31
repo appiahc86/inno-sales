@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
 
-    <div class="row mb-5">
+    <div class="row mb-3">
 
       <h4 class="text-black-50 my-3"><b>HOME</b></h4>
 
@@ -77,37 +77,77 @@
     </div>
 
 
+      <!--    Chart area -->
+      <div class="row mt-4">
+        <div class="col-8 mt-4">
+          <div class="card shadow mb-1">
+            <div class="card-body">
+              <apexchart height="300" type="bar" :series="barChartSeries" :options="barChartOptions"></apexchart>
+            </div>
+            <div class="card-footer small text-muted">Top Selling Categories For Today</div>
+          </div>
+        </div>
+        <div class="col-4 mt-4">
+          <div class="card mb-1 shadow">
+            <div class="card-body">
+              <apexchart height="300" type="donut" :options="chartOptions" :series="pieChartSeries"></apexchart>
+            </div>
+            <div class="card-footer small text-muted">Today's Sales And Returns</div>
+          </div>
+        </div>
+      </div>
 
-<!--    Chart area -->
-    <div class="row mt-5">
-      <div class="col-lg-9 mt-4">
-        <div class="card shadow mb-1">
-          <div class="card-body">
-            <canvas id="myBarChart" width="100%" height="50"></canvas>
-          </div>
-          <div class="card-footer small text-muted">Top Selling Categories For Today</div>
-        </div>
-      </div>
-      <div class="col-lg-3 mt-4">
-        <div class="card mb-1 shadow">
-          <div class="card-body">
-            <canvas id="myPieChart" width="100%" height="100"></canvas>
-          </div>
-          <div class="card-footer small text-muted">Today's Sales And Returns</div>
-        </div>
-      </div>
-    </div>
 
   </div>
 </template>
 
 <script setup>
 
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, onMounted, reactive, ref, watch} from "vue";
 import {formatNumber} from "@/functions";
 import db from "@/dbConfig/db";
 const records = ref([]);
 const barChartRecords = ref([]);
+
+//Barchart data
+const barChartOptions = reactive({
+  chart: {
+    id: 'bar-chart',
+  },
+  plotOptions: {
+    bar: {
+      distributed: true
+    }
+  },
+  colors: [
+    "rgba(255,99,132,0.7)", "rgba(175, 159, 64, 0.7)", "rgba(255, 205, 86, 0.7)", "rgba(75, 192, 192, 0.7)",
+    "rgba(25, 119,132, 0.7)","rgba(125, 99,192, 0.7)", "rgba(67,87,215, 0.7)", "rgba(128, 12, 128, 0.7)",
+    "rgba(200,199,12,0.89)", "rgba(100, 110,152, 0.7)",
+  ],
+  dataLabels: {
+    enabled: false
+  },
+  xaxis: {
+    categories: []
+  }
+})
+const barChartSeries = reactive([
+  {
+    name: 'Category',
+    data: []
+
+  }
+])
+
+
+
+//PieChart data
+const chartOptions = reactive({
+  labels: ['Sales', 'Returns'],
+})
+const pieChartSeries = ref( []);
+
+
 
 
 //Get today's orders
@@ -116,6 +156,15 @@ const getTodaySales = async () => {
     records.value = await db('orders')
         .whereRaw('?? = ?', ['orderDate', new Date().setHours(0,0,0,0)])
         .select('orders.type', 'orders.momo', 'total');
+
+    let returns = 0;
+    let sales = 0;
+    for (const record of records.value) {
+      if (record.type === 'sale') sales += parseFloat(record.total)
+      else returns += parseFloat(-record.total)
+    }
+
+    pieChartSeries.value = [parseFloat(sales.toFixed(2)), parseFloat(returns.toFixed(2))];
 
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);
@@ -171,12 +220,21 @@ const getRecordsForChart = async () => {
   try {
     barChartRecords.value = await db('orderDetails')
         .innerJoin('categories', 'orderDetails.categoryId', 'categories.id')
+        .innerJoin('orders', 'orders.id', 'orderDetails.orderId')
         .select('categories.name')
         .sum('orderDetails.quantity as sum')
         .where('orderDetails.date', '=', new Date().setHours(0,0,0,0))
+        .where('orders.type', 'sale')
         .groupBy('categories.id')
         .orderBy('sum', 'desc')
         .limit(10);
+
+    if (barChartRecords.value.length){
+      for (const chartRecord of barChartRecords.value) {
+        barChartOptions.xaxis.categories.push(chartRecord.name);
+        barChartSeries[0].data .push(chartRecord.sum);
+      }
+    }
 
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);
@@ -184,118 +242,6 @@ const getRecordsForChart = async () => {
 }
 getRecordsForChart();
 
-
-            //......................Bar chart.........................
-onMounted(() => {
-
-// Bar Chart Example
-  const ctx = document.getElementById("myBarChart");
-  const myBarChart = new Chart(ctx, {
-
-
-    type: 'bar',
-    data: {
-      labels: [],
-      datasets: [{
-        maxBarThickness: 8,
-        label: "Category",
-        backgroundColor: [
-            "rgba(255,99,132,0.7)", "rgba(175, 159, 64, 0.7)", "rgba(255, 205, 86, 0.7)", "rgba(75, 192, 192, 0.7)",
-            "rgba(25, 119,132, 0.7)","rgba(125, 99,192, 0.7)", "rgba(67,87,215, 0.7)", "rgba(128, 12, 128, 0.7)",
-            "rgba(200, 199,12, 0.7)", "rgba(100, 110,152, 0.7)",
-        ],
-        borderColor: [
-          "rgb(255, 99,132)", "rgb(255, 159, 64)", "rgb(25, 105, 89)", "rgb(75, 192, 192)", "rgb(255, 99,132)",
-          "rgb(25, 119,132)", "rgb(125, 99,192)", "rgb(246,235,12)", "rgb(255, 12,115)", "rgb(255, 99,132)",
-        ],
-        data: [],
-      }],
-    },
-    options: {
-      scales: {
-        xAxes: [{
-          gridLines: {
-            display: true
-          },
-          ticks: {
-            maxTicksLimit: 5
-          }
-        }],
-        yAxes: [{
-          ticks: {
-            min: 0,
-            max: 1,
-            maxTicksLimit: 8
-          },
-          gridLines: {
-            display: true
-          }
-        }],
-      },
-      legend: {
-        display: false
-      }
-    }
-  });
-
-      //Set values for bar chart
-watch(
-    () => barChartRecords.value, (value) => {
-
-      if (barChartRecords.value.length){
-        let myLabels = [];
-        let myValues = [];
-        for (const chartRecord of barChartRecords.value) {
-          myLabels.push(chartRecord.name);
-          myValues.push(chartRecord.sum);
-        }
-        myBarChart.data.labels = myLabels;
-        myBarChart.data.datasets[0].data = myValues;
-        myBarChart.options.scales.yAxes[0].ticks.max = barChartRecords.value[0].sum || 0
-        myBarChart.update();
-      }
-
-    }
-)
-
-
-                      //............Doughnut Chart.............
-
-  const myPieChart = document.getElementById("myPieChart");
-  const myDoughnut = new Chart(myPieChart, {
-
-    type: 'doughnut',
-    data: {
-      labels: ["Returns", "Sales"],
-      datasets: [{
-        label: "Revenue",
-        backgroundColor:[ "rgba(25,78,215,0.73)", "rgba(255, 205, 86)"],
-       hoverOffset: 4,
-        data: [0, 0],
-      }],
-    }
-  });
-
-
-  //Set values for Doughnut chart
-  watch(
-      () => records.value, (value) => {
-        let returns = 0;
-        let sales = 0;
-        let data = [];
-        for (const record of records.value) {
-          if (record.type === 'sale') sales += parseFloat(record.total)
-          else returns += parseFloat(record.total)
-        }
-
-        myDoughnut.data.datasets[0].data = [returns.toFixed(2), sales.toFixed(2)];
-        myDoughnut.update();
-      }
-  )
-
-
-
-})
 </script>
 
 <style scoped>

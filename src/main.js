@@ -7,6 +7,7 @@ import Column from "primevue/column";
 import PrimeVue from "primevue/config";
 import InputText from "primevue/inputtext";
 import vSelect from "vue-select"
+import Vue3Apexcharts from "vue3-apexcharts";
 const app = createApp(App)
 
 import 'primevue/resources/themes/rhea/theme.css'
@@ -14,6 +15,7 @@ import 'primevue/resources/primevue.min.css'
 import 'primeicons/primeicons.css'
 
 app.use(PrimeVue);
+app.use(Vue3Apexcharts)
 app.component('DataTable', DataTable);
 app.component('Column', Column);
 app.component('InputText', InputText);

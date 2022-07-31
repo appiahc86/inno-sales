@@ -29,36 +29,36 @@
             No record found.
           </template>
 
-          <Column field="company" header="Vendor" sortable style="font-size: 0.85em;"></Column>
-          <Column field="invoice" header="Invoice#" sortable style="font-size: 0.85em;"></Column>
-          <Column field="billDate" header="Bill Date" sortable  style="font-size: 0.85em;">
+          <Column field="company" header="Vendor" sortable class="data-table-font-size"></Column>
+          <Column field="invoice" header="Invoice#" sortable class="data-table-font-size"></Column>
+          <Column field="billDate" header="Bill Date" sortable  class="data-table-font-size">
             <template #body="{data}">
               <td>{{ new Date(data.billDate).toLocaleDateString() }}</td>
             </template>
           </Column>
-          <Column field="invoiceDue" header="Due Date" sortable  style="font-size: 0.85em;">
+          <Column field="invoiceDue" header="Due Date" sortable  class="data-table-font-size">
             <template #body="{data}">
               <td>{{ new Date(data.invoiceDue).toLocaleDateString() }}</td>
             </template>
           </Column>
-          <Column field="total" header="Total" sortable  style="font-size: 0.85em;">
+          <Column field="total" header="Total" sortable  class="data-table-font-size">
             <template #body="{data}">
               <td>{{ formatNumber(data.total) }}</td>
             </template>
           </Column>
-          <Column header="Amount Due" sortable  style="font-size: 0.85em;">
+          <Column header="Amount Due" sortable  class="data-table-font-size">
             <template #body="{data}">
-              <b>{{ formatNumber(data.total - data.totalPaid) }}</b>
+              <b>{{ formatNumber(data.total - (data.totalPaid || 0)) }}</b>
             </template>
           </Column>
-          <Column headerStyle="text-align: center" header="View Payments" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.85em;">
+          <Column headerStyle="text-align: center" header="View Payments" bodyStyle="text-align: center; overflow: visible"  class="data-table-font-size">
             <template #body="{data}">
               <span title="View Payment History" @click="showHistory(data.id)" style="cursor: pointer;">
                 <span class="pi pi-eye-slash"></span>
               </span> &nbsp;
             </template>
           </Column>
-          <Column headerStyle="text-align: center" header="Pay Bill" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.85em;">
+          <Column headerStyle="text-align: center" header="Pay Bill" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
             <template #body="{data}">
               <span title="Make Payment" @click="goToPaymentPage(data)" style="cursor: pointer;">
                <span class="pi pi-money-bill"></span>

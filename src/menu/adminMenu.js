@@ -80,7 +80,7 @@ const adminMenu = [
         label: 'Reports',
         submenu: [
             {label: 'Dashboard'},
-            {label: 'Profit & Loss'},
+            {label: 'Profit And Loss'},
             {type: 'separator'},
 
             //Sales
@@ -89,26 +89,14 @@ const adminMenu = [
                 submenu: [
                     {label: 'Sales Summary', click(){sendRouteEvent('report-sales-summary')}},
                     {label: 'Sales Details', click(){sendRouteEvent('report-sales-details')}},
+                    {label: 'Sales Returns', click(){sendRouteEvent('report-sales-returns')}},
+                    {type: 'separator'},
                     {label: 'Customer Sales', click(){sendRouteEvent('report-customer-sales')}},
-                    {label: 'Sales Returns', click(){sendRouteEvent('report-sales-returns')}}
+                    {label: 'Customer List', click(){sendRouteEvent('report-customer-list')}},
+
                 ]
             },// ./Sales
 
-            //Payments
-            {
-                label: 'Payments',
-                submenu: [
-                    {label: 'Payment Summary'}
-                ]
-            }, // ./Payments
-
-            //Customers
-            {
-                label: 'Customers',id: 'products',
-                submenu: [
-                    {label: 'Customer List'}
-                ]
-            }, // ./Customers
 
             //Products
             {
@@ -124,11 +112,13 @@ const adminMenu = [
             {
                 label: 'Purchasing',
                 submenu: [
-                    {label: 'Receiving Summary'},
-                    {label: 'Receiving Details'},
+                    {label: 'Receiving Summary', click(){sendRouteEvent('report-receiving-summary')}},
+                    {label: 'Vendor List', click(){sendRouteEvent('report-vendor-list')}},
                     {type: 'separator'},
-                    {label: 'Outstanding Bills'},
-                    {label: 'Bills By Vendor'},
+                    {label: 'Outstanding Bills', click(){sendRouteEvent('report-outstanding-bills')}},
+                    {label: 'Bills By Vendor', click(){sendRouteEvent('report-vendor-bills')}},
+                    {type: 'separator'},
+                    {label: 'Bill Payment History', click(){sendRouteEvent('report-bill-payment-history')}},
                 ]
             }, // ./Purchasing
         ]

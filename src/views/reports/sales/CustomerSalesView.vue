@@ -33,7 +33,7 @@
         <button class="p-1 fw-bold bg-secondary text-white" v-if="records.length" @click="printReport">
           <span class="pi pi-print"></span> Print</button>
         <h5 v-if="customerName">Customer: <b> {{ customerName }}</b></h5>
-        <h6 v-if="records.length">{{ message }}</h6>
+        <h6>{{ message }}</h6>
         <div class="table-responsive">
 
           <DataTable
@@ -47,30 +47,30 @@
             <template #empty>
               No record found.
             </template>
-            <Column field="id" header="Receipt#" sortable style="font-size: 0.85em;"></Column>
+            <Column field="id" header="Receipt#" sortable class="data-table-font-size"></Column>
 
-            <Column field="orderDate" header="Date" sortable style="font-size: 0.85em;">
+            <Column field="orderDate" header="Date" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td>{{ new Date(data.orderDate).toLocaleDateString() }}</td>
               </template>
             </Column>
 
 
-            <Column field="numberOfItems" header="Number Of Items" sortable style="font-size: 0.85em;"></Column>
+            <Column field="numberOfItems" header="Number Of Items" sortable class="data-table-font-size"></Column>
 
-            <Column field="discount" header="Discount" sortable style="font-size: 0.85em;">
+            <Column field="discount" header="Discount" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td>{{ formatNumber(parseFloat(data.discount)) }}</td>
               </template>
             </Column>
 
-            <Column field="tax" header="Tax" sortable style="font-size: 0.85em;">
+            <Column field="tax" header="Tax" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td>{{ formatNumber(parseFloat(data.tax)) }}</td>
               </template>
             </Column>
 
-            <Column field="total" header="Total" sortable style="font-size: 0.85em;">
+            <Column field="total" header="Total" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td>{{ formatNumber(parseFloat(data.total)) }}</td>
               </template>
@@ -139,12 +139,12 @@ import db from "@/dbConfig/db";
 import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
 
-const loading = ref(false)
+const loading = ref(false);
 const message = ref(null);
 const customerName = ref(null);
 const records = ref([]);
 const customers = ref([]);
-const store = useStore()
+const store = useStore();
 
 const formData = reactive({
   from: null,
@@ -195,7 +195,7 @@ const search = async (e) => {
     if (dateFrom === dateTo) message.value = `Sales Report On ${new Date(dateFrom).toDateString()}`;
     else message.value = `Sales Report From ${new Date(dateFrom).toLocaleDateString()} To ${new Date(dateTo).toLocaleDateString()}`;
 
-    if (records.value.length) customerName.value = formData.selectedCustomer.name;
+    customerName.value = formData.selectedCustomer.name;
     resetForm();
 
   }catch (e) { ipcRenderer.send('errorMessage', e.message) }

@@ -47,30 +47,30 @@
           <template #empty>
             No record found.
           </template>
-          <Column field="id" header="Receipt#" sortable style="font-size: 0.85em;"></Column>
+          <Column field="id" header="Receipt#" sortable class="data-table-font-size"></Column>
 
-          <Column field="orderDate" header="Date" sortable style="font-size: 0.85em;">
+          <Column field="orderDate" header="Date" sortable class="data-table-font-size">
             <template #body="{data}">
               <td>{{ new Date(data.orderDate).toLocaleDateString() }}</td>
             </template>
           </Column>
 
 
-          <Column field="numberOfItems" header="Number Of Items" sortable style="font-size: 0.85em;"></Column>
+          <Column field="numberOfItems" header="Number Of Items" sortable class="data-table-font-size"></Column>
 
-          <Column field="discount" header="Discount" sortable style="font-size: 0.85em;">
+          <Column field="discount" header="Discount" sortable class="data-table-font-size">
             <template #body="{data}">
               <td>{{ formatNumber(parseFloat(data.discount)) }}</td>
             </template>
           </Column>
 
-          <Column field="tax" header="Tax" sortable style="font-size: 0.85em;">
+          <Column field="tax" header="Tax" sortable class="data-table-font-size">
             <template #body="{data}">
               <td>{{ formatNumber(parseFloat(data.tax)) }}</td>
             </template>
           </Column>
 
-          <Column field="total" header="Total" sortable style="font-size: 0.85em;">
+          <Column field="total" header="Total" sortable class="data-table-font-size">
             <template #body="{data}">
               <td>{{ formatNumber(parseFloat(data.total)) }}</td>
             </template>

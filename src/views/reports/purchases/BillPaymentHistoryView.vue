@@ -1,13 +1,14 @@
 
 <template>
   <div class="container-fluid">
+
     <div class="row justify-content-center mb-4">
       <div class="col-12">
         <div class="container">
           <div class="row justify-content-center">
             <div class="col-7" style="max-width: 600px">
               <form @submit.prevent="search">
-                <h5 class="text-center"><b>Sales Returns</b></h5>
+                <h5 class="text-center"><b>Bill Payment History</b></h5>
                 <div class="input-group">
                   <div class="input-group-text bg-dark text-white"><b>From</b></div>
                   <input type="date" class="form-control form-control-dark" v-model="from" onkeydown="return false">
@@ -19,7 +20,6 @@
                   </button>
                 </div>
               </form>
-
             </div>
           </div>
         </div>
@@ -27,52 +27,38 @@
     </div>
 
 
+
     <div class="row">
       <div class="col-12">
-        <!--   Table     -->
 
         <button class="p-1 fw-bold bg-secondary text-white" v-if="records.length" @click="printReport">
           <span class="pi pi-print"></span> Print</button>
         <h6>{{ message }}</h6>
         <div class="table-responsive">
-
+          <!--   Table     -->
           <DataTable
-              :value="records" :paginator="true"
-              class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines"
+              :value="records" :paginator="true" dataKey="id"
+              class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
               filterDisplay="menu" :rows="10"
               paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-              :rowsPerPageOptions="[10, 15, 25]"
-              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" responsiveLayout="scroll"
+              :rowsPerPageOptions="[10,25,50]" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+              responsiveLayout="scroll"
           >
+
             <template #empty>
               No record found.
             </template>
-            <Column field="id" header="Receipt#" sortable class="data-table-font-size"></Column>
 
-            <Column field="orderDate" header="Date" sortable class="data-table-font-size">
+            <Column field="company" header="Vendor" sortable class="data-table-font-size"></Column>
+            <Column field="invoice" header="Invoice#" sortable class="data-table-font-size"></Column>
+            <Column field="date" header="Date" sortable  class="data-table-font-size">
               <template #body="{data}">
-                <td>{{ new Date(data.orderDate).toLocaleDateString() }}</td>
+                <td>{{ new Date(data.date).toLocaleDateString() }}</td>
               </template>
             </Column>
-
-
-            <Column field="numberOfItems" header="Number Of Items" sortable class="data-table-font-size"></Column>
-
-            <Column field="discount" header="Discount" sortable class="data-table-font-size">
+            <Column field="amount" header="Amount Paid" sortable class="data-table-font-size">
               <template #body="{data}">
-                <td>{{ formatNumber(parseFloat(data.discount)) }}</td>
-              </template>
-            </Column>
-
-            <Column field="tax" header="Tax" sortable class="data-table-font-size">
-              <template #body="{data}">
-                <td>{{ formatNumber(parseFloat(data.tax)) }}</td>
-              </template>
-            </Column>
-
-            <Column field="total" header="Total" sortable class="data-table-font-size">
-              <template #body="{data}">
-                <td>{{ formatNumber(parseFloat(data.total)) }}</td>
+                <td>{{ formatNumber(parseFloat(data.amount)) }}</td>
               </template>
             </Column>
           </DataTable>
@@ -94,32 +80,26 @@
               </p>
               <table id="print-table">
                 <tr>
-                  <th>Receipt#</th>
+                  <th>Vendor</th>
+                  <th>Invoice#</th>
                   <th>Date</th>
-                  <th>Number Of Items</th>
-                  <th>Discount</th>
-                  <th>Tax</th>
-                  <th>Total</th>
+                  <th>Amount Paid</th>
                 </tr>
 
                 <template v-for="record in records" :key="record.id">
                   <tr>
-                    <td>&nbsp; {{ record.id }}</td>
-                    <td>&nbsp; {{ new Date(record.orderDate).toLocaleDateString() }}</td>
-                    <td>&nbsp; {{ record.numberOfItems }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.discount)) }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.tax)) }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.total)) }}</td>
+                    <td>&nbsp; {{ record.company }}</td>
+                    <td>&nbsp; {{ record.invoice }}</td>
+                    <td>&nbsp; {{ new Date(record.date).toLocaleDateString() }}</td>
+                    <td>&nbsp; {{ formatNumber(parseFloat(record.amount)) }}</td>
                   </tr>
                 </template>
 
               </table>
-              <div style="margin-top: 0;"><h5>Total: GH¢ {{ formatNumber(parseFloat(recordTotal)) }}</h5></div>
+              <h5 class="mt-2" v-if="records.length">Total: GH¢ {{ formatNumber(parseFloat(recordTotal)) }}</h5>
             </div>
-
           </div>
         </template>
-
 
 
       </div>
@@ -136,19 +116,16 @@ import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
 
 const loading = ref(false)
+const records = ref([]);
 const from = ref(null);
 const to = ref(null);
 const message = ref(null);
-const records = ref([]);
-
 const store = useStore();
 
 const settings = computed(() => store.getters.setting)
 
-//....................Search.......................
 
 const search = async (e) => {
-
   if (!from.value || !to.value) return ipcRenderer.send('errorMessage', 'Please Select Date');
   const dateFrom = new Date(from.value).setHours(0,0,0,0);
   const dateTo = new Date(to.value).setHours(0,0,0,0);
@@ -157,31 +134,40 @@ const search = async (e) => {
   try {
     e.target.submitBtn.disabled = true;
     loading.value = true;
-    records.value = await db('orders')
-        .whereRaw('?? >= ?', ['orderDate', dateFrom])
-        .andWhereRaw('?? <= ?', ['orderDate', dateTo])
-        .andWhereRaw('?? = ?', ['type', 'return'])
 
-    if (dateFrom === dateTo) message.value = `Sales Returns Report On ${new Date(dateFrom).toDateString()}`;
-    else message.value = `Sales Returns Report From ${new Date(dateFrom).toLocaleDateString()} To ${new Date(dateTo).toLocaleDateString()}`;
+    records.value = await db('billPayments')
+        .leftJoin('purchases', 'purchases.id', '=', 'billPayments.purchaseId')
+        .leftJoin('vendors', 'vendors.id', '=', 'purchases.vendorId')
+        .select('billPayments.id', 'vendors.company', 'purchases.invoice',
+            'billPayments.date', 'billPayments.amount')
+        .where('purchases.status', 'received')
+        .andWhereRaw('?? >= ?', ['billPayments.date', dateFrom])
+        .andWhereRaw('?? <= ?', ['billPayments.date', dateTo])
+
+
+    if (dateFrom === dateTo) message.value = `Bill Payments On ${new Date(dateFrom).toDateString()}`;
+    else message.value = `Bill Payments From ${new Date(dateFrom).toLocaleDateString()} To ${new Date(dateTo).toLocaleDateString()}`;
 
     from.value = null;
     to.value = null;
 
-  }catch (e) { ipcRenderer.send('errorMessage', e.message) }
+  }
+  catch (e){ ipcRenderer.send('errorMessage', e.message) }
   finally {
-    loading.value = false;
     e.target.submitBtn.disabled = false;
+    loading.value = false;
   }
 
 }
 
-//Get records total
+
+
+//Records total
 const recordTotal = computed(() => {
   let total = 0;
   if (records.value.length){
     for (const record of records.value) {
-      total += parseFloat(record.total)
+      total += parseFloat(record.amount)
     }
   }
   return total;

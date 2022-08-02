@@ -6,6 +6,7 @@ import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const path = require('path');
 
+
 //Import menus
 import indexMenu from "@/menu/indexMenu";
 import adminMenu from "@/menu/adminMenu";
@@ -75,6 +76,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
+
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) createWindow()
@@ -172,6 +174,8 @@ ipcMain.on('confirm', async (event, {id, type, message}) => {
       case 'customer': event.sender.send('deleteCustomer', id);
       break;
       case 'vendor': event.sender.send('deleteVendor', id);
+      break;
+      case 'user': event.sender.send('deleteUser', id);
       break;
       case 'undoBillPayment': event.sender.send('undoBillPayment', id); //thia will take 3 arguments
       break;

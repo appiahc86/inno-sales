@@ -215,7 +215,7 @@ const getOrders = async () => {
             'orders.numberOfItems', 'orders.total')
         .where('type', 'sale')
         .orderBy('orders.id', 'DESC')
-        .limit(150)
+        .limit(50)
   }catch (e) { ipcRenderer.send('errorMessage', e.message); }
   finally {
     loading.value = false;

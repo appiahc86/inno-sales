@@ -168,6 +168,7 @@ const search = async (e) => {
         .orderBy('products.productName','asc')
 
     if (records.value.length) message.value = `Products with Qty less than ${quantity.value}`
+    else message.value = `No Match Found`;
 
   }
   catch (e){ ipcRenderer.send('errorMessage', e.message) }

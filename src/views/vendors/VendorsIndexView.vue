@@ -75,7 +75,6 @@
           </div>
 
 
-
           <!--  Vendors Table  -->
           <div class="tab-pane mt-2" id="all-vendors" role="tabpanel" aria-labelledby="nav-all-vendors-tab">
             <div class="table-responsive">
@@ -362,8 +361,7 @@ const filters = ref({
   padding: 10px 0;
 }
 .myTable input, .myTable textarea{
-  width: 300px;
+  width: 22em;
   padding: 4px;
 }
-
 </style>

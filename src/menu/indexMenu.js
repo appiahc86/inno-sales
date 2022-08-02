@@ -45,8 +45,12 @@ const indexMenu = [
             {
                 id: 'appSettings',
                 enabled: false,
-                label: 'App Settings',
-                click(){sendRouteEvent('settings')}
+                label: 'Settings',
+                submenu: [
+                    { label: 'Company Settings', click(){sendRouteEvent('settings')}},
+                    { label: 'Manage Users', click(){sendRouteEvent('users')}}
+                ],
+
             },
              {
                  id: 'backup',

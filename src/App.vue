@@ -74,30 +74,48 @@
                 <li><router-link :to="{name: 'receiveItems'}" class="dropdown-item fw-bold">Receive Items</router-link></li>
                 <li><router-link :to="{name: 'receivingHistory'}" class="dropdown-item fw-bold">Receiving History</router-link></li>
                 <li class="dropdown-header">Bills</li>
-                <!--  <li class="dropdown-divider fw-bold"></li>  -->
                 <li><router-link :to="{name: 'bills'}" class="dropdown-item fw-bold">Outstanding Bills</router-link></li>
               </ul>
             </div>
           </li>
         </ul>
 
-        <h6 class="align-items-center px-2 mt-4 mb-1 text-white-50" style="font-size: 1em;">
+        <div class="align-items-center px-2 mt-4 mb-1 text-white-50" style="font-size: 1em;">
           <span>Settings</span>
-        </h6>
+        </div>
         <ul class="nav flex-column mb-2">
+
           <li class="nav-item">
-            <router-link :to="{name: 'settings'}" class="nav-link">
-              <span class="pi pi-cog"></span>
-              App Settings
-            </router-link>
+            <div class="dropdown">
+              <a class="dropdown-toggle nav-link" id="app-settings" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="pi pi-cog"></span>
+                App Settings
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="app-settings" style="font-size: 0.9em !important;">
+                <li>
+                  <router-link :to="{name: 'settings'}" class="dropdown-item fw-bold">
+                    Company Settings
+                  </router-link>
+                </li>
+                <li>
+                  <router-link :to="{name: 'users'}" class="dropdown-item fw-bold">
+                    Manage Users
+                  </router-link>
+                </li>
+              </ul>
+            </div>
           </li>
+
+
+
           <li class="nav-item">
             <div class="dropdown">
               <a class="dropdown-toggle nav-link" id="purchasing" data-bs-toggle="dropdown" aria-expanded="false">
                 <span class="pi pi-user"></span>
-                Appiah
+                {{ user ? user.firstName : '' }}
               </a>
               <ul class="dropdown-menu" aria-labelledby="purchasing" style="font-size: 0.9em !important;">
+                <li><router-link :to="{name: 'new-password'}" class="dropdown-item fw-bold"><span class="pi pi-lock"></span> New Password</router-link></li>
                 <li><a class="dropdown-item fw-bold"><span class="pi pi-lock"></span> Reset Password</a></li>
                 <li><a class="dropdown-item fw-bold" @click="logout">
                   <span class="pi pi-power-off text-danger"></span> Logout</a>
@@ -110,7 +128,7 @@
 
       <div class="d-flex" style="position: absolute; bottom: 0">
         <b class="text-white-50">Inno Sales 1.0.0</b>
-        <b><span class="pi pi-arrow-circle-left text-white" style="margin-left: 75px; font-size: 1.5em; cursor: pointer;"
+        <b><span class="pi pi-arrow-circle-left text-white" style="margin-left: 3.5em; font-size: 1.5em; cursor: pointer;"
                  @click="collapseSidebar" title="Collapse Sidebar"></span></b>
       </div>
 
@@ -156,7 +174,7 @@ runMigrations() //Run all migrations
 db.raw("VACUUM").then(()=>{})
 db.raw('PRAGMA foreign_keys = ON').then(()=>{});
 
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {useStore} from "vuex";
 import {useRouter} from "vue-router";
 
@@ -184,6 +202,7 @@ const time = ref(null);
 const store = useStore();
 const router = useRouter();
 const backupDialog = ref(null);
+const user = computed(() => store.getters.user);
 
 
 const insertUser = async () => {

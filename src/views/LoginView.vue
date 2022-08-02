@@ -14,8 +14,8 @@
             <div class="container">
               <div class="row justify-content-center">
 
-                <div class="col-5">
-                  <div class="card shadow-lg p-4 login-form-container">
+                <div class="col-5 center-div">
+                  <div class="card shadow-lg p-4">
                       <h3 class="text-center text-info">{{ companyName }}</h3>
                       <form @submit.prevent="login">
                         <table class="myTable">
@@ -61,6 +61,7 @@ import {computed, onMounted, ref} from "vue";
 import {useStore} from "vuex";
 import {onBeforeRouteLeave, useRouter} from "vue-router";
 import db from "@/dbConfig/db";
+import bcrypt from "bcryptjs";
 
 const router = useRouter();
 const username = ref('');
@@ -91,13 +92,30 @@ const login = async (e) => {
 
   e.target.submitBtn.disabled = true;
   try {
+    //Validation
+        if (!username.value) return  ipcRenderer.send('errorMessage', 'Username is required');
+        if (!password.value) return  ipcRenderer.send('errorMessage', 'Please Enter Password');
 
-    const user = await db('users').where('id', 1).first();
-    if (user) {
-      store.dispatch('setUser', user);
-      ipcRenderer.send('setMenu', 'admin');
-      router.push({name: 'home'})
-    }else  ipcRenderer.send('errorMessage', 'hellooooooooo');
+    const user = await db('users').where('username', username.value.toLowerCase()) //Search User
+        .where('isActive', true).first();
+
+    //If user not found
+    if (!user) return ipcRenderer.send('errorMessage', 'Sorry, User Not Found');
+
+    //compare Password
+    const isMatched = await bcrypt.compare(password.value, user.password);
+
+    //If password does not match
+    if (!isMatched) return ipcRenderer.send('errorMessage', 'Sorry, Incorrect Password');
+
+    await store.dispatch('setUser', user);
+    router.push({name: 'home'});
+
+    // if (user) {
+    //   store.dispatch('setUser', user);
+    //   ipcRenderer.send('setMenu', 'admin');
+    //   router.push({name: 'home'})
+    // }else  ipcRenderer.send('errorMessage', 'hellooooooooo');
 
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);
@@ -116,10 +134,6 @@ onBeforeRouteLeave( (to, from, next) => {
 
 <style scoped>
 
-.login-form-container{
-  top: 50%;
-  box-sizing: border-box;
-}
 .myTable th{
   padding: 15px;
   font-size: 1.3em;
@@ -143,13 +157,10 @@ onBeforeRouteLeave( (to, from, next) => {
 }
 
 .modal-body, .modal-body .card{
-  /*background-image: url("../assets/bg.jpg");*/
   background: linear-gradient(45deg, red, blue) !important;
   color: white;
 }
-.login-form-container{
-  max-width: 530px;
-}
+
 .card, .form-control-dark{
   border-radius: 50px;
 }

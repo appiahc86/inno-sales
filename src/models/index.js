@@ -19,7 +19,7 @@ const migrations =  [
     Vendor, Purchase, PurchaseDetails, BillPayment, QuantityAdjustment, PriceAdjustment
 ]
 
-  const runMigrations = ()=> {
+  const runMigrations = () => {
 
     for (const migration of migrations) {
         migration();

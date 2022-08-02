@@ -57,7 +57,7 @@
 
                         <tr>
                           <th class="float-end"><span class="pi pi-money-bill"></span> Selling Price &nbsp;</th>
-                          <td class="w-40"><input type="number" step="0.01" min="0" class="form-control-dark" v-model.number="productData.sellingPrice"></td>
+                          <td><input type="number" step="0.01" min="0" class="form-control-dark" v-model.number="productData.sellingPrice"></td>
                         </tr>
 
                         <tr>
@@ -84,7 +84,7 @@
                         <tr>
                           <th class="float-end"></th>
                           <td>
-                            <button class=" mt-1 btn-secondary" type="submit" style="width: 350px;" name="addProductBtn">
+                            <button class=" mt-1 btn-secondary" type="submit" style="width: 26em;" name="addProductBtn">
                               <span class="pi pi-save"></span>
                               <b style="font-size: 1.5em;"> Save</b>
                             </button>
@@ -550,7 +550,7 @@ const openCategoryDialog = (e) => {
 }
 
 .myTable input, .myTable textarea, .myTable .select{
-  width: 350px;
+  width: 26em;
   padding: 5px;
 }
 

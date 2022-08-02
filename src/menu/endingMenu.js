@@ -10,8 +10,7 @@ const endingMenu = [
                 click: async ()=>{
                     // await shell.openExternal('http://localhost/')
                     await dialog.showMessageBoxSync({tpye: 'question', detail: 'How are you' })
-                },
-                enabled: false
+                }
             }
         ]
     }

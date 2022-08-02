@@ -87,7 +87,7 @@ onMounted(() => {
  document.querySelector("#username").focus();
 
 })
-
+              //........................Login.....................
 const login = async (e) => {
 
   e.target.submitBtn.disabled = true;
@@ -109,13 +109,25 @@ const login = async (e) => {
     if (!isMatched) return ipcRenderer.send('errorMessage', 'Sorry, Incorrect Password');
 
     await store.dispatch('setUser', user);
+
+                              //Items to disable on menu
+    let itemsToBeDisabledOnMenu = [];
+
+    if (parseInt(user.role) === 2){ //if user is manager
+      itemsToBeDisabledOnMenu.push('backup', 'receiveItems', 'receivingHistory', 'outstandingBills')
+    }
+
+    if (parseInt(user.role) === 3){ //if user is Cashier
+      itemsToBeDisabledOnMenu.push('backup', 'settings');
+      if (!user.runSalesReport){
+        itemsToBeDisabledOnMenu.push('salesReport')
+      }
+    }
+
+    ipcRenderer.send('setMenu', {role: user.role, itemsToDisable: itemsToBeDisabledOnMenu});
     router.push({name: 'home'});
 
-    // if (user) {
-    //   store.dispatch('setUser', user);
-    //   ipcRenderer.send('setMenu', 'admin');
-    //   router.push({name: 'home'})
-    // }else  ipcRenderer.send('errorMessage', 'hellooooooooo');
+
 
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);

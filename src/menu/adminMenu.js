@@ -1,3 +1,8 @@
+/*
+list of menu IDs in this file
+........receiveItems, receivingHistory, outstandingBills.......
+*/
+
 import {BrowserWindow} from "electron";
 
 //Send Route event
@@ -44,10 +49,10 @@ const adminMenu = [
     {
         label: 'Purchasing',
         submenu: [
-            {label: 'Receive Items', click(){sendRouteEvent('receiveItems')}},
-            {label: 'Receiving History', click(){sendRouteEvent('receivingHistory')}},
+            {id: 'receiveItems', label: 'Receive Items', click(){sendRouteEvent('receiveItems')}},
+            {id: 'receivingHistory', label: 'Receiving History', click(){sendRouteEvent('receivingHistory')}},
             {type: 'separator'},
-            {label: 'Outstanding Bills', click(){sendRouteEvent('bills')}}
+            {id: 'outstandingBills', label: 'Outstanding Bills', click(){sendRouteEvent('bills')}}
         ]
     },
     //..........................Purchasing.........................

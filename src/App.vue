@@ -206,7 +206,11 @@ const user = computed(() => store.getters.user);
 
 
 const insertUser = async () => {
-  const data = { firstName: "Collins", lastName: "Appiah",username: "innocent",password: "pass123",role: 1,};
+  const data = {
+    firstName: "Admin", lastName: "Admin",username: "admin",
+    password: "$2a$10$N9sVJn6Nwxtm.PUmbRXLzOFNZfRAjTjNK3EfFu2qRjpnNHQrCbd6i", //@LogMeIn
+    role: 1, dateAdded: new Date().toLocaleDateString()
+  };
   const user = await db('users').where('id', 1).first();
 
   if (!user) {

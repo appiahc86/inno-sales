@@ -10,6 +10,7 @@ const path = require('path');
 //Import menus
 import indexMenu from "@/menu/indexMenu";
 import adminMenu from "@/menu/adminMenu";
+import cashierMenu from "@/menu/cashierMenu";
 import endingMenu from "@/menu/endingMenu";
 
 let template = indexMenu.concat(endingMenu);
@@ -124,14 +125,30 @@ if (isDevelopment) {
 
 
 //Set application menu base on user type
-ipcMain.on('setMenu', async (event, args) => {
-  const template = indexMenu.concat(adminMenu).concat(endingMenu);
+ipcMain.on('setMenu', async (event, {role, itemsToDisable}) => {
+
+  let template;
+  if (parseInt(role) === 1 || parseInt(role) === 2){ // if Admin or Manager
+    template = indexMenu.concat(adminMenu).concat(endingMenu);
+  }
+  else{ //If Cashier
+    template = indexMenu.concat(cashierMenu).concat(endingMenu);
+  }
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
 
+  //First enable file menu items
   Menu.getApplicationMenu().getMenuItemById('backup').enabled = true;
-  Menu.getApplicationMenu().getMenuItemById('appSettings').enabled = true;
+  Menu.getApplicationMenu().getMenuItemById('settings').enabled = true;
   Menu.getApplicationMenu().getMenuItemById('home').enabled = true;
+
+  //Disable menus based on argument passed
+  if (itemsToDisable.length){
+    for (const item of itemsToDisable) {
+      Menu.getApplicationMenu().getMenuItemById(item).enabled = false;
+    }
+  }
+
 })
 
 //when user logs out set application menu to default

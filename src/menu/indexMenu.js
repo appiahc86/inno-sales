@@ -1,3 +1,8 @@
+/*
+list of menu IDs in this file
+........settings, backup, home.......
+*/
+
 import {dialog, BrowserWindow} from "electron";
 import * as path from "path";
 const fse = require('fs-extra');
@@ -43,7 +48,7 @@ const indexMenu = [
                 click(){sendRouteEvent('home')}
             },
             {
-                id: 'appSettings',
+                id: 'settings',
                 enabled: false,
                 label: 'Settings',
                 submenu: [

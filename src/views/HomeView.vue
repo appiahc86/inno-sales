@@ -224,10 +224,12 @@ const getRecordsForChart = async () => {
         .select('categories.name')
         .sum('orderDetails.quantity as sum')
         .where('orderDetails.date', '=', new Date().setHours(0,0,0,0))
-        .where('orders.type', 'sale')
+        // .where('orders.type', 'sale')
         .groupBy('categories.id')
         .orderBy('sum', 'desc')
         .limit(10);
+
+    barChartRecords.value =  barChartRecords.value.filter(item => item.sum > 0)
 
     if (barChartRecords.value.length){
       for (const chartRecord of barChartRecords.value) {

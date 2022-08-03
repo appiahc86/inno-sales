@@ -4,6 +4,7 @@ import AddUserView from "@/views/users/AddUserView";
 import EditUserView from "@/views/users/EditUserView";
 import UsersIndexView from "@/views/users/UsersIndexView";
 import InactiveUsersView from "@/views/users/InactiveUsersView";
+import ResetPasswordView from "@/views/users/ResetPasswordView";
 
 const userRouter = [
     {
@@ -12,7 +13,7 @@ const userRouter = [
         component: LoginView
     },
     {
-        path: '/users/new-password',
+        path: '/users/new-password/:data',
         name: 'new-password',
         component: NewPasswordView
     },
@@ -35,6 +36,11 @@ const userRouter = [
         path: '/users/inactive-users',
         name: 'inactive-users',
         component: InactiveUsersView
+    },
+    {
+        path: '/users/reset-password',
+        name: 'reset-password',
+        component: ResetPasswordView
     }
 
 ]

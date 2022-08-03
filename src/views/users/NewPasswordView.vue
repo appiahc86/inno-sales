@@ -17,16 +17,16 @@
                 <div class="col-5 center-div">
                   <div class="card shadow-lg p-4">
                     <h3 class="text-center text-info">Create A New Password</h3>
-                    <form @submit.prevent="">
+                    <form @submit.prevent="login">
                       <table class="myTable">
                         <tr>
                           <th>Password</th>
-                          <td><input :type="showPass ? 'text' : 'password'" v-model.trim="password"
+                          <td><input :type="showPass ? 'text' : 'password'" v-model="formData.password"
                                      class="form-control-dark py-1 px-3" id="password"></td>
                         </tr>
                         <tr>
                           <th>Confirm</th>
-                          <td><input :type="showPass ? 'text' : 'password'" v-model="confirm" class="form-control-dark py-1 px-3"></td>
+                          <td><input :type="showPass ? 'text' : 'password'" v-model="formData.password_confirmation" class="form-control-dark py-1 px-3"></td>
                         </tr>
                         <tr>
                           <th></th>
@@ -58,26 +58,32 @@
 
 <script setup>
 
-import {computed, onMounted, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import {useStore} from "vuex";
-import {onBeforeRouteLeave, useRouter} from "vue-router";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import db from "@/dbConfig/db";
+import * as Validator from "validatorjs";
+import bcrypt from "bcryptjs";
 
 const router = useRouter();
-const confirm = ref(null);
-const password = ref(null);
 const myModal = ref(null);
 const showPass = ref(false);
 const store = useStore();
 const closeModal = ref(null);
+const route = useRoute();
+let routeData = reactive({});
 
+const formData = reactive({
+  password: null,
+  password_confirmation: null
+})
 
 
 
 onMounted(() => {
   myModal.value.click();
   document.querySelector("#password").focus();
-
+  routeData.data = JSON.parse(route.params.data)
 })
 
 
@@ -86,6 +92,55 @@ onBeforeRouteLeave( (to, from, next) => {
   closeModal.value.click();
   next();
 })
+
+              //...................Login........................
+const login = async (e) => {
+  try {
+    // validation
+    let validation = new Validator(formData,{
+      password: 'required|string|min:6|confirmed',
+    })
+
+    if (validation.passes()){ // If validation passes
+      e.target.submitBtn.disabled = true;
+
+      //Hash Password
+      const salt = await bcrypt.genSaltSync(10);
+      const hashedPassword = await bcrypt.hashSync(formData.password, salt);
+
+      //Update Password in DB
+      await db('users').where('id', routeData.data.id)
+          .update({password: hashedPassword, resetPassword: false});
+
+
+      await store.dispatch('setUser', { ...routeData.data, password: hashedPassword });
+
+                   //.............Items to disable on menu...........
+      let itemsToBeDisabledOnMenu = [];
+
+      if (parseInt(routeData.data.role) === 2){ //if user is manager
+        itemsToBeDisabledOnMenu.push('backup', 'receiveItems', 'receivingHistory', 'outstandingBills')
+      }
+
+      if (parseInt(routeData.data.role) === 3){ //if user is Cashier
+        itemsToBeDisabledOnMenu.push('backup', 'settings');
+        if (!routeData.data.runSalesReport){
+          itemsToBeDisabledOnMenu.push('salesReport')
+        }
+      }
+
+
+      ipcRenderer.send('setMenu', {role: routeData.data.role, itemsToDisable: itemsToBeDisabledOnMenu});
+      router.push({name: 'home'});
+
+
+    }else ipcRenderer.send('errorMessage', `${Object.values(validation.errors.all())[0]}`)
+  }catch (e) { ipcRenderer.send('errorMessage', e.message) }
+  finally {    e.target.submitBtn.disabled = false }
+}
+
+
+
 
 </script>
 

@@ -108,6 +108,15 @@ const login = async (e) => {
     //If password does not match
     if (!isMatched) return ipcRenderer.send('errorMessage', 'Sorry, Incorrect Password');
 
+    //If Reset password is true
+    if (!!user.resetPassword){
+      return router.push({
+        name: 'new-password',
+        params: {data: JSON.stringify(user)}
+      })
+    }
+
+
     await store.dispatch('setUser', user);
 
                               //Items to disable on menu

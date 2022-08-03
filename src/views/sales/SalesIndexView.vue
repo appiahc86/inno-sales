@@ -222,7 +222,8 @@
             <input type="number" class="form-control-dark" min="1" v-model="editData.qty">
           </div>
           <div class="col">
-            <input type="number" class="form-control-dark" min="0" step="0.01" v-model="editData.sellingPrice">
+            <input type="number" class="form-control-dark" min="0" step="0.01"
+                   v-model="editData.sellingPrice" :disabled="user && !user.changePrice">
           </div>
         </div>
 
@@ -237,10 +238,12 @@
 
         <div class="row">
           <div class="col">
-            <input type="number" ref="discountInput" class="form-control-dark" min="0" step="any" v-model.number="editData.discount">
+            <input type="number" ref="discountInput" class="form-control-dark" min="0" step="any"
+                v-model.number="editData.discount" :disabled="user && !user.giveDiscount">
           </div>
           <div class="col">
-            <input type="number" ref="discountInPercentageInput" class="form-control-dark" min="0" max="100" step="any" v-model.number="editData.discountInPercentage">
+            <input type="number" ref="discountInPercentageInput" class="form-control-dark" min="0" max="100"
+               step="any" v-model.number="editData.discountInPercentage" :disabled="user && !user.giveDiscount">
           </div>
         </div>
 
@@ -275,6 +278,7 @@ const barcode = ref(1); //For barcode
 const loading = ref(false);
 const printReceipt = ref(true);
 const companySettings = computed(() => store.getters.setting); //get company settings
+const user = computed(() => store.getters.user); //Grt loggedIn user
 
 
 const discountInput = ref(null) // will watch and check if its focused
@@ -491,7 +495,6 @@ const checkout = async (e) => {
    e.target.submitBtn.disabled = true;
   const receipt = document.querySelector("#printTable");
   const date = new Date().setHours(0,0,0,0);
-  const user = computed(() => store.getters.user);
   const customerId = selectedCustomer.value ? selectedCustomer.value.id : '';
   const getTax = computed(() => store.getters["cartModule/getTax"]);
 

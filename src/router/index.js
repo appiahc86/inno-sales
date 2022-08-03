@@ -56,6 +56,7 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
   if (to.meta.requiresAuth && !store.state.user){
+    ipcRenderer.send('logout'); //This will set menu items to default
     return {
       name: 'login',
       //

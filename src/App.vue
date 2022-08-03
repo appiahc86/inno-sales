@@ -1,6 +1,6 @@
 <template>
-
   <div ref="root">
+
     <nav id="sidebarMenu" class="d-md-block sidebar" ref="sidebarMenu">
       <div class="position-sticky">
 
@@ -22,7 +22,6 @@
               </a>
               <ul class="dropdown-menu" aria-labelledby="sales" style="font-size: 0.9em !important;">
                 <li><router-link :to="{name: 'sales'}" class="dropdown-item fw-bold">New Sales Receipt</router-link></li>
-
                 <li><router-link :to="{name: 'held-items'}" class="dropdown-item fw-bold">Held Receipts</router-link></li>
                 <li><router-link :to="{name: 'sales-history'}" class="dropdown-item fw-bold">Sales History</router-link></li>
                 <li class="dropdown-divider fw-bold"></li>
@@ -32,6 +31,13 @@
             </div>
           </li>
 
+
+            <!--   Set Permissions       -->
+          <template v-if="user">
+          <template v-if="parseInt(user.role) === 1 || parseInt(user.role) === 2">
+
+
+          <!-- Inventory -->
           <li class="nav-item">
             <div class="dropdown">
               <a class="dropdown-toggle nav-link" id="purchasing" data-bs-toggle="dropdown" aria-expanded="false">
@@ -52,18 +58,24 @@
             </div>
           </li>
 
+          <!-- Customers -->
           <li class="nav-item">
             <router-link :to="{name: 'customers'}" class="nav-link">
               <span class="pi pi-users"> </span>
               Customers
             </router-link>
           </li>
+
+          <!-- Vendors -->
           <li class="nav-item">
             <router-link :to="{name: 'vendors'}" class="nav-link">
               <span class="pi pi-users"></span>
               Vendors
             </router-link>
           </li>
+
+          <!-- Purchasing -->
+        <template v-if="parseInt(user.role) === 1">
           <li class="nav-item">
             <div class="dropdown">
               <a class="dropdown-toggle nav-link" id="purchasing" data-bs-toggle="dropdown" aria-expanded="false">
@@ -78,36 +90,41 @@
               </ul>
             </div>
           </li>
-        </ul>
+        </template>
 
-        <div class="align-items-center px-2 mt-4 mb-1 text-white-50" style="font-size: 1em;">
-          <span>Settings</span>
-        </div>
-        <ul class="nav flex-column mb-2">
-
-          <li class="nav-item">
-            <div class="dropdown">
-              <a class="dropdown-toggle nav-link" id="app-settings" data-bs-toggle="dropdown" aria-expanded="false">
-                <span class="pi pi-cog"></span>
-                App Settings
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="app-settings" style="font-size: 0.9em !important;">
-                <li>
-                  <router-link :to="{name: 'settings'}" class="dropdown-item fw-bold">
-                    Company Settings
-                  </router-link>
-                </li>
-                <li>
-                  <router-link :to="{name: 'users'}" class="dropdown-item fw-bold">
-                    Manage Users
-                  </router-link>
-                </li>
-              </ul>
+            <!-- Settings -->
+            <div class="align-items-center px-2 mt-4 mb-1 text-white-50" style="font-size: 1em;">
+              <span>Settings</span>
             </div>
-          </li>
+            <li class="nav-item">
+              <div class="dropdown">
+                <a class="dropdown-toggle nav-link" id="app-settings" data-bs-toggle="dropdown" aria-expanded="false">
+                  <span class="pi pi-cog"></span>
+                  App Settings
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="app-settings" style="font-size: 0.9em !important;">
+                  <li>
+                    <router-link :to="{name: 'settings'}" class="dropdown-item fw-bold">
+                      Company Settings
+                    </router-link>
+                  </li>
+                  <li>
+                    <router-link :to="{name: 'users'}" class="dropdown-item fw-bold">
+                      Manage Users
+                    </router-link>
+                  </li>
+                </ul>
+              </div>
+            </li>
+
+          </template>
+          </template>
+        </ul>  <!-- ./ permissions -->
 
 
-
+        <!-- User -->
+        <br v-if="user && parseInt(user.role) === 3">
+        <ul class="nav flex-column mb-2">
           <li class="nav-item">
             <div class="dropdown">
               <a class="dropdown-toggle nav-link" id="purchasing" data-bs-toggle="dropdown" aria-expanded="false">
@@ -115,8 +132,7 @@
                 {{ user ? user.firstName : '' }}
               </a>
               <ul class="dropdown-menu" aria-labelledby="purchasing" style="font-size: 0.9em !important;">
-                <li><router-link :to="{name: 'new-password'}" class="dropdown-item fw-bold"><span class="pi pi-lock"></span> New Password</router-link></li>
-                <li><a class="dropdown-item fw-bold"><span class="pi pi-lock"></span> Reset Password</a></li>
+                <li><router-link :to="{name: 'reset-password'}" class="dropdown-item fw-bold"><span class="pi pi-lock"></span> Reset Password</router-link></li>
                 <li><a class="dropdown-item fw-bold" @click="logout">
                   <span class="pi pi-power-off text-danger"></span> Logout</a>
                 </li>
@@ -124,6 +140,8 @@
             </div>
           </li>
         </ul>
+
+
       </div>
 
       <div class="d-flex" style="position: absolute; bottom: 0">
@@ -133,6 +151,11 @@
       </div>
 
     </nav>
+
+
+
+
+
 
     <div class="sidebar-toggle hideMe" title="Click To Expand" ref="sidebarToggle" @click="restoreSidebar">
       <div class="top text-center"><span class="pi pi-arrow-circle-right text-white" style="margin-top: 3px;"></span></div>
@@ -146,10 +169,8 @@
         <div class="col-12">
 
             <hr class="mt-0 fw-bold">
-        <!--          Inject vies here-->
+        <!--          Inject views here-->
             <router-view/>
-
-
 
         </div>
       </div>
@@ -205,15 +226,17 @@ const backupDialog = ref(null);
 const user = computed(() => store.getters.user);
 
 
+              //............If no user in users table, Create admin user ...................
 const insertUser = async () => {
-  const data = {
-    firstName: "Admin", lastName: "Admin",username: "admin",
-    password: "$2a$10$N9sVJn6Nwxtm.PUmbRXLzOFNZfRAjTjNK3EfFu2qRjpnNHQrCbd6i", //@LogMeIn
-    role: 1, dateAdded: new Date().toLocaleDateString()
-  };
-  const user = await db('users').where('id', 1).first();
 
-  if (!user) {
+  const user = await db('users').first(); //Find one user
+
+  if (!user) { //if No user found in table
+    const data = {
+      firstName: "Admin", lastName: "Admin",username: "admin",
+      password: "$2a$10$N9sVJn6Nwxtm.PUmbRXLzOFNZfRAjTjNK3EfFu2qRjpnNHQrCbd6i", //@LogMeIn
+      role: 1, dateAdded: new Date().toLocaleDateString()
+    };
   await db('users').insert(data);
   }
 

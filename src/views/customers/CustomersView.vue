@@ -4,13 +4,13 @@
     <div class="row">
       <div class="col-12">
 
-
         <nav id="customersNav">
           <div class="nav nav-tabs" role="tablist">
             <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-customer" type="button" role="tab" aria-controls="nav-add-customer" aria-selected="false">Add Customer</button>
             <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-customers" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Customer List</button>
           </div>
         </nav>
+
         <div class="tab-content" id="nav-tabContent">
 
           <!--  Customer Form  -->

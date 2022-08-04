@@ -20,17 +20,17 @@
 
             <tr>
               <th class="float-end">Current Password &nbsp;</th>
-              <td><input type="text" class="form-control-dark" v-model.trim="formData.currentPassword"></td>
+              <td><input type="password" class="form-control-dark" v-model.trim="formData.currentPassword"></td>
             </tr>
 
             <tr>
               <th class="float-end">New Password &nbsp;</th>
-              <td><input type="text" class="form-control-dark" v-model.trim="formData.password"></td>
+              <td><input type="password" class="form-control-dark" v-model.trim="formData.password"></td>
             </tr>
 
             <tr>
               <th class="float-end"><span class="pi pi-user"></span> Confirm Password &nbsp;</th>
-              <td><input type="text" class="form-control-dark" v-model.trim="formData.password_confirmation"></td>
+              <td><input type="password" class="form-control-dark" v-model.trim="formData.password_confirmation"></td>
             </tr>
 
             <tr>
@@ -77,6 +77,7 @@ const goBack = () => router.back();
 //.......................Reset Password.........................
 const resetPassword = async (e) => {
   try {
+
     // validation
     let validation = new Validator(formData,{
       currentPassword: 'required|string',

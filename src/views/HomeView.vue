@@ -84,7 +84,6 @@
             <div class="card-body">
               <apexchart height="300" type="bar" :series="barChartSeries" :options="barChartOptions"></apexchart>
             </div>
-            <div class="card-footer small text-muted">Top Selling Categories For Today</div>
           </div>
         </div>
         <div class="col-4 mt-4">
@@ -92,7 +91,6 @@
             <div class="card-body">
               <apexchart height="300" type="donut" :options="chartOptions" :series="pieChartSeries"></apexchart>
             </div>
-            <div class="card-footer small text-muted">Today's Sales And Returns</div>
           </div>
         </div>
       </div>
@@ -127,6 +125,10 @@ const barChartOptions = reactive({
   dataLabels: {
     enabled: false
   },
+  title: {
+    text: 'Top Selling Categories For Today',
+    align: 'left'
+  },
   xaxis: {
     categories: []
   }
@@ -144,6 +146,10 @@ const barChartSeries = reactive([
 //PieChart data
 const chartOptions = reactive({
   labels: ['Sales', 'Returns'],
+  title: {
+    text: 'Today\'s Sales And Returns',
+    align: 'left'
+  },
 })
 const pieChartSeries = ref( []);
 

@@ -3,15 +3,14 @@
     <div class="row">
       <div class="col-12">
 
-
         <nav id="productsNav">
           <div class="nav nav-tabs" role="tablist">
-            <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-product" type="button" role="tab" aria-controls="nav-add-product" aria-selected="false">Add Product</button>
-            <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-products" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Products List</button>
+            <button ref="clickMe" class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-product" type="button" role="tab" aria-controls="nav-add-product" aria-selected="true">Add Product</button>
+            <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-products" type="button" role="tab" aria-controls="nav-home" aria-selected="false">Products List</button>
           </div>
         </nav>
-        <div class="tab-content" id="nav-tabContent">
 
+        <div class="tab-content" id="nav-tabContent">
           <!--  product Form  -->
           <div class="tab-pane mt-5 show active" id="add-product" role="tabpanel" aria-labelledby="nav-add-product-tab">
             <div class="py-4">
@@ -289,7 +288,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
+import {onMounted, reactive, ref} from "vue";
 import * as Validator from "validatorjs";
 import db from "@/dbConfig/db";
 import { FilterMatchMode } from "primevue/api";
@@ -300,7 +299,7 @@ import { formatNumber } from "@/functions";
       global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     });
 
-
+    const clickMe = ref(null);
     const selectedProducts = ref([]);
 
     const loading = ref(false);
@@ -318,6 +317,8 @@ import { formatNumber } from "@/functions";
       category: null,
       tax: 'tax'
     })
+
+onMounted(() => clickMe.value.click())
 
     const editProductData = reactive({
       id: '',

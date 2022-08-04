@@ -48,7 +48,7 @@
                     <option value=""></option>
                     <option value="3">Cashier</option>
                     <option value="2">Manager</option>
-                    <option value="1" v-if="parseInt(user.role) === 1">Admin</option>
+                    <option value="1" v-if="user && parseInt(user.role) === 1">Admin</option>
                   </select>
                   <div class="input-group-text" v-if="parseInt(formData.role) === 3">
                       <span class="pi pi-user-edit" title="Set Permissions"

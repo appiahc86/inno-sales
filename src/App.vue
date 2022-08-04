@@ -205,7 +205,7 @@ const settings = async () => { // insert data into company settings table
     let data = await db('settings').first();
 
     if (!data){
-      data = { companyName: '', storeName: '', address: '', contact: '', tax: 0 }
+      data = { companyName: 'Demo Company Name', storeName: '', address: '', contact: '', tax: 0 }
       await db('settings').insert(data)
     }
     store.dispatch('cartModule/setTax', data.tax ? parseFloat(data.tax) : 0);
@@ -235,7 +235,7 @@ const insertUser = async () => {
     const data = {
       firstName: "Admin", lastName: "Admin",username: "admin",
       password: "$2a$10$N9sVJn6Nwxtm.PUmbRXLzOFNZfRAjTjNK3EfFu2qRjpnNHQrCbd6i", //@LogMeIn
-      role: 1, dateAdded: new Date().toLocaleDateString()
+      role: 1, dateAdded: new Date().setHours(0,0,0,0)
     };
   await db('users').insert(data);
   }

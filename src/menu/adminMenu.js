@@ -84,8 +84,8 @@ const adminMenu = [
     {
         label: 'Reports',
         submenu: [
-            {label: 'Dashboard'},
-            {label: 'Profit And Loss'},
+            {label: 'Dashboard', click(){sendRouteEvent('report-dashboard')}},
+            {label: 'Profit And Loss', click(){sendRouteEvent('report-profit-and-loss')}},
             {type: 'separator'},
 
             //Sales

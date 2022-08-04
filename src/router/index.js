@@ -11,11 +11,13 @@ import billsRouter from "@/router/bills";
 import userRouter from "@/router/users";
 
 //Reports
+import indexReportRouter from "@/router/reports";
 import salesReportRouter from "@/router/reports/sales";
 import productsReportRouter from "@/router/reports/products";
 import purchasesReportRouter from "@/router/reports/purchases";
 
 import store from "@/store";
+
 
 const routes = [
   {
@@ -43,9 +45,10 @@ const routes = [
     ...billsRouter,
 
     //Report routes
+    ...indexReportRouter,
     ...salesReportRouter,
     ...productsReportRouter,
-    ...purchasesReportRouter
+    ...purchasesReportRouter,
 ]
 
 const router = createRouter({

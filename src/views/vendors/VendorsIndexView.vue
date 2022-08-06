@@ -3,141 +3,141 @@
     <div class="row">
       <div class="col-12">
 
-        <nav id="vendorsNav">
-          <div class="nav nav-tabs" role="tablist">
-            <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-vendor" type="button" role="tab" aria-controls="nav-add-vendor" aria-selected="false">Add Vendor</button>
-            <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-vendors" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Vendors List</button>
-          </div>
-        </nav>
+        <div class="myTabs-container">
+          <button class="px-3 myTabs" :class="{ active: firstActive}"
+                  type="button" @click="secondActive = false; firstActive = true">Add Vendor
+          </button>
 
-        <div class="tab-content" id="nav-tabContent">
+          <button class="px-3 myTabs mx-2" :class="{ active: secondActive}"
+                  type="button" @click="firstActive = false; secondActive = true">
+            Vendors List</button>
+        </div>
 
-          <!--  Vendor Form  -->
-          <div class="tab-pane mt-5 show active" id="add-vendor" role="tabpanel" aria-labelledby="nav-add-vendor-tab">
-            <div class="py-4">
-              <div class="container">
-                <div class="row justify-content-center">
-                  <div class="col-md-9">
-                    <form @submit.prevent="addVendor">
-                      <table class="w-100 myTable">
-                        <tr>
-                          <th></th>
-                          <td>
-                            <h4 style="width: 300px; text-align: center;">Add A New Vendor</h4>
-                          </td>
-                        </tr>
-                        <tr>
-                          <th class="float-end"><span class="pi pi-home"></span> Company &nbsp;&nbsp;</th>
-                          <td><input type="text" class="form-control-dark" v-model.trim="vendorData.company"></td>
-                        </tr>
+            <!--   Add Vendor       -->
 
-                        <tr>
-                          <th class="float-end">Address &nbsp;&nbsp;</th>
-                          <td><input type="text" class="form-control-dark" v-model.trim="vendorData.address"></td>
-                        </tr>
+          <div v-if="firstActive" style="margin-top: 10vh">
+            <div class="container">
+              <div class="row justify-content-center">
+                <div class="col-md-9">
+                  <form @submit.prevent="addVendor">
+                    <table class="w-100 myTable">
+                      <tr>
+                        <th></th>
+                        <td>
+                          <h4>Add A New Vendor</h4>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th class="float-end"><span class="pi pi-home"></span> Company &nbsp;&nbsp;</th>
+                        <td><input type="text" class="form-control-dark" v-model.trim="vendorData.company"></td>
+                      </tr>
 
-                        <tr>
-                          <th class="float-end"><span class="pi pi-user"></span> Contact Person &nbsp;&nbsp;</th>
-                          <td><input type="text" class="form-control-dark" v-model.trim="vendorData.contactPerson"></td>
-                        </tr>
+                      <tr>
+                        <th class="float-end">Address &nbsp;&nbsp;</th>
+                        <td><input type="text" class="form-control-dark" v-model.trim="vendorData.address"></td>
+                      </tr>
 
-                        <tr>
-                          <th class="float-end"><span class="pi pi-phone"></span> Phone &nbsp;&nbsp;</th>
-                          <td><input type="text" class="form-control-dark" v-model.trim="vendorData.phone"></td>
-                        </tr>
+                      <tr>
+                        <th class="float-end"><span class="pi pi-user"></span> Contact Person &nbsp;&nbsp;</th>
+                        <td><input type="text" class="form-control-dark" v-model.trim="vendorData.contactPerson"></td>
+                      </tr>
 
-                        <tr>
-                          <th class="float-end">Account# &nbsp;&nbsp;</th>
-                          <td><input type="text" class="form-control-dark" v-model.trim="vendorData.accountNumber"></td>
-                        </tr>
+                      <tr>
+                        <th class="float-end"><span class="pi pi-phone"></span> Phone &nbsp;&nbsp;</th>
+                        <td><input type="text" class="form-control-dark" v-model.trim="vendorData.phone"></td>
+                      </tr>
 
-                        <tr>
-                          <th class="float-end"><span class="pi pi-list"></span> Notes &nbsp;&nbsp;</th>
-                          <td><textarea rows="4" class="form-control-dark" v-model.trim="vendorData.notes"></textarea></td>
-                        </tr>
+                      <tr>
+                        <th class="float-end">Account# &nbsp;&nbsp;</th>
+                        <td><input type="text" class="form-control-dark" v-model.trim="vendorData.accountNumber"></td>
+                      </tr>
 
-                        <tr>
-                          <th class="float-end"></th>
-                          <td>
-                            <button class=" mt-1 btn-secondary" type="submit" name="submitBtn" style="width: 300px;">
-                              <span class="pi pi-save"></span>
-                              <b style="font-size: 1.5em;"> Save</b>
-                            </button>
-                          </td>
-                        </tr>
-                      </table>
+                      <tr>
+                        <th class="float-end"><span class="pi pi-list"></span> Notes &nbsp;&nbsp;</th>
+                        <td><textarea rows="4" class="form-control-dark" v-model.trim="vendorData.notes"></textarea></td>
+                      </tr>
 
-                    </form>
-                  </div>
+                      <tr>
+                        <th class="float-end"></th>
+                        <td>
+                          <button class=" mt-1 btn-secondary" type="submit" name="submitBtn" style="width: 22em;">
+                            <span class="pi pi-save"></span>
+                            <b style="font-size: 1.5em;"> Save</b>
+                          </button>
+                        </td>
+                      </tr>
+                    </table>
+
+                  </form>
                 </div>
               </div>
             </div>
-          </div>
+          </div >
 
 
-          <!--  Vendors Table  -->
-          <div class="tab-pane mt-2" id="all-vendors" role="tabpanel" aria-labelledby="nav-all-vendors-tab">
-            <div class="table-responsive">
-              <DataTable
-                  :value="vendors" :paginator="true" dataKey="id"
-                  class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
-                  filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
-                  paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                  :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedVendors"
-                  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                  :globalFilterFields="['company', 'phone', 'address', 'contactPerson']" responsiveLayout="scroll"
-              >
-                <template #header>
-                  <div class="d-flex justify-content-center align-items-center" style="height: 15px">
-                    <h5 class="px-3">Vendors</h5>
-                    <span class="p-input-icon-left">
+          <!--   Vendors Table       -->
+        <div v-if="secondActive">
+          <div class="table-responsive mt-3">
+            <DataTable
+                :value="vendors" :paginator="true" dataKey="id"
+                class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
+                filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
+                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedVendors"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                :globalFilterFields="['company', 'phone', 'address', 'contactPerson']" responsiveLayout="scroll"
+            >
+              <template #header>
+                <div class="d-flex justify-content-center align-items-center" style="height: 15px">
+                  <h5 class="px-3">Vendors</h5>
+                  <span class="p-input-icon-left">
                         <i class="pi pi-search" />
                         <InputText v-model="filters['global'].value" placeholder="Keyword Search" style="height: 30px"/>
                     </span>
-                  </div>
-                </template>
-                <template #empty>
-                  No record found.
-                </template>
-                <template #loading>
-                  <h4 class="text-white"> Loading data. Please wait...</h4>
-                </template>
+                </div>
+              </template>
+              <template #empty>
+                No record found.
+              </template>
+              <template #loading>
+                <h4 class="text-white"> Loading data. Please wait...</h4>
+              </template>
 
-                <Column selection-mode="multiple" class="data-table-font-size"></Column>
+              <Column selection-mode="multiple" class="data-table-font-size"></Column>
 
-                <Column field="company" header="Company" sortable class="data-table-font-size"></Column>
-                <Column field="address" header="Address" sortable  class="data-table-font-size"></Column>
-                <Column field="contactPerson" header="Contact Person" sortable class="data-table-font-size"></Column>
-                <Column field="phone" header="Phone" sortable class="data-table-font-size"></Column>
-                <Column field="accountNumber" header="Account#" sortable class="data-table-font-size"></Column>
-                <Column field="notes" header="Notes" sortable class="data-table-font-size">
-                  <template #body="{data}">
-                    <td :title="data.notes">
-                      {{ data.notes.length > 20 ? data.notes.substring(0, 20) + '...' : data.notes }}
-                    </td>
-                  </template>
-                </Column>
+              <Column field="company" header="Company" sortable class="data-table-font-size"></Column>
+              <Column field="address" header="Address" sortable  class="data-table-font-size"></Column>
+              <Column field="contactPerson" header="Contact Person" sortable class="data-table-font-size"></Column>
+              <Column field="phone" header="Phone" sortable class="data-table-font-size"></Column>
+              <Column field="accountNumber" header="Account#" sortable class="data-table-font-size"></Column>
+              <Column field="notes" header="Notes" sortable class="data-table-font-size">
+                <template #body="{data}">
+                  <td :title="data.notes">
+                    {{ data.notes.length > 20 ? data.notes.substring(0, 20) + '...' : data.notes }}
+                  </td>
+                </template>
+              </Column>
 
-                <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
-                  <template #body="{data}">
-                    <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span>
-                  </template>
-                </Column>
-                <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
-                  <template #body="{data}">
-                    <span type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
-                  </template>
-                </Column>
-              </DataTable>
-            </div>
-            <br>
-            <button class="btn-secondary" v-if="selectedVendors.length" @click="confirm(selectedVendors)">
-              <span class="pi pi-trash"></span>
-              Delete Selection
-            </button>
+              <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
+                <template #body="{data}">
+                  <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span>
+                </template>
+              </Column>
+              <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
+                <template #body="{data}">
+                  <span type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
+                </template>
+              </Column>
+            </DataTable>
           </div>
-
+          <br>
+          <button class="btn-secondary" v-if="selectedVendors.length" @click="confirm(selectedVendors)">
+            <span class="pi pi-trash"></span>
+            Delete Selection
+          </button>
         </div>
+
+
 
         <!--  Edit Dialog-->
         <dialog ref="editDialog" style="border: 2px solid #ccc;">
@@ -208,17 +208,22 @@
 
 <script setup>
 
+const click3 = ref(null);
 import {reactive, ref} from "vue";
 import { FilterMatchMode } from "primevue/api";
 import * as Validator from "validatorjs";
 import db from "@/dbConfig/db";
 import errorMessages from "@/errorMessages";
 
+
 const selectedVendors = ref([]);
 const vendors = ref([])
 const loading = ref(false);
 const editDialog = ref(null);
 const vendorId = ref(null)
+const firstActive = ref(true);
+const secondActive = ref(false);
+
 const vendorData = reactive({
   company: '', address: '', contactPerson: '', phone: '', accountNumber: '', notes: ''
 })
@@ -230,6 +235,8 @@ const resetVendorData = () => {
   vendorData.company = ''; vendorData.address = ''; vendorData.contactPerson = ''; vendorData.phone = '';
   vendorData.accountNumber = ''; vendorData.notes = '';
 }
+
+
 
             //........................Get all vendors ...........................
 const getVendors = async () => {

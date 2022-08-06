@@ -3,8 +3,8 @@
   <div class="row">
     <div class="col-12">
 
-      <h5 class="text-center" v-if="loading">Loading Data Please Wait... <span class="spinner-grow"></span></h5>
-      <h4 class="text-center" v-else>List Of Outstanding Bills</h4>
+      <h5 class="text-center" v-if="loading">Loading Data Please Wait... <span class="spinner-grow spinner-grow-sm"></span></h5>
+      <h4 class="text-center" v-else>Outstanding Bills</h4>
 
       <div class="table-responsive">
         <DataTable

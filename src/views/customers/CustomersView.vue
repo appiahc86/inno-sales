@@ -4,18 +4,20 @@
     <div class="row">
       <div class="col-12">
 
-        <nav id="customersNav">
-          <div class="nav nav-tabs" role="tablist">
-            <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-customer" type="button" role="tab" aria-controls="nav-add-customer" aria-selected="false">Add Customer</button>
-            <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-customers" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Customer List</button>
-          </div>
-        </nav>
 
-        <div class="tab-content" id="nav-tabContent">
+        <div class="myTabs-container">
+          <button class="px-3 myTabs" :class="{ active: firstActive}"
+                  type="button" @click="secondActive = false; firstActive = true">Add Customer
+          </button>
 
-          <!--  Customer Form  -->
-          <div class="tab-pane mt-5 show active" id="add-customer" role="tabpanel" aria-labelledby="nav-add-customer-tab">
-            <div class=" py-4">
+          <button class="px-3 myTabs mx-2" :class="{ active: secondActive}"
+                  type="button" @click="firstActive = false; secondActive = true">
+            Customers List</button>
+        </div>
+
+
+            <!--  Customer Form  -->
+            <div v-if="firstActive" style="margin-top: 10vh">
 
               <div class="container">
                 <div class="row justify-content-center">
@@ -26,7 +28,7 @@
                         <tr>
                           <th></th>
                           <td>
-                            <h4 style="width: 300px; text-align: center;">Add A New Customer</h4>
+                            <h4>Add A New Customer</h4>
                           </td>
                         </tr>
 
@@ -65,16 +67,11 @@
                 </div>
               </div>
             </div>
-          </div>
 
 
-
-          <!--  Customers Table  -->
-          <div class="tab-pane mt-2" id="all-customers" role="tabpanel" aria-labelledby="nav-all-customers-tab">
-            <div class="container-fluid">
-              <div class="row">
-                <div class="col-12">
-                  <div class="table-responsive">
+            <!--  Customers Table  -->
+        <div v-if="secondActive">
+                  <div class="table-responsive mt-4">
                     <DataTable
                         :value="customers" :paginator="true" dataKey="id"
                         class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
@@ -124,13 +121,8 @@
                     <span class="pi pi-trash"></span>
                     Delete Selection
                   </button>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
         </div>
+
 
         <!--  Edit Dialog-->
         <dialog ref="editCustomerDialog" style="border: 2px solid #ccc;">
@@ -193,11 +185,15 @@ import * as Validator from "validatorjs";
 import db from "@/dbConfig/db";
 import {FilterMatchMode} from "primevue/api";
 
+
 const loading = ref(false);
 const customers = ref([]);
 const selectedCustomers = ref([]);
 const editCustomerDialog = ref(null);
 const customerId = ref(null);
+const firstActive = ref(true);
+const secondActive = ref(false);
+
 const customerData = reactive({
   name: "",
   company: "",
@@ -214,6 +210,7 @@ const editCustomerData = reactive({
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
+
 
     //.............Get all Customers .........................
 const getCustomers = async () => {

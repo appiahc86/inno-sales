@@ -6,9 +6,6 @@ const categoryRouter = [
         path: '/categories',
         name: 'categories',
         component: CategoryIndexView,
-        meta:{
-            requiresAuth: false
-        }
     }
 
 ]

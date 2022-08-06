@@ -132,7 +132,7 @@
   <span>{{ new Date().toLocaleString() }}</span>
   <b style="float: right;">Receipt #{{ barcode }}</b>
 </div>
-       <div  style="font-size: 12px;">Store: {{ companySettings.storeName }}</div>
+       <div  style="font-size: 12px;">Store: {{ 'Demo V Company' }}</div>
 
        <div style="text-align: center;">
          <div style="font-size: 13px"><b>{{ companySettings.companyName }}</b></div>

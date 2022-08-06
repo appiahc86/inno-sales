@@ -24,9 +24,6 @@ const routes = [
     path: '/',
     name: 'home',
     component: HomeView,
-    meta:{
-      requiresAuth: true
-    }
   },
   {
     path: '/settings',
@@ -51,10 +48,20 @@ const routes = [
     ...purchasesReportRouter,
 ]
 
+
+// Add auth
+for (let route of routes) {
+  if (route.name === 'login' || route.name === 'new-password') continue;
+  route = Object.assign(route,  {meta: {requiresAuth: true} })
+}
+
+
 const router = createRouter({
   history: process.env.IS_ELECTRON ? createWebHashHistory() : createWebHistory(),
   routes
 })
+
+
 
 
 router.beforeEach((to, from) => {

@@ -15,7 +15,8 @@ body {
   left: 0;
   padding: 0 0 30px 0; /* Height of navbar */
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-  background: linear-gradient(75deg, #1a3250, #15509d);
+  /*background: linear-gradient(75deg, #1a3250, #15509d);*/
+  background: linear-gradient(65deg, #40a191, #1a3250);
   /*width: 200px;*/
   width: 12.5rem;
   overflow: auto;
@@ -103,4 +104,18 @@ body {
   top: 25vh;
   margin: auto;
   max-width: 42em !important;
+}
+
+.myTabs{
+  font-weight: bold;
+  font-size: 1em;
+  color: white;
+  background: #858585;
+  padding: 0.2em;
+}
+
+.myTabs.active{
+  font-weight: bold;
+  background: #c0e8d1;
+  color: rgba(7, 7, 7, 0.71);
 }

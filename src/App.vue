@@ -145,16 +145,12 @@
       </div>
 
       <div class="d-flex" style="position: absolute; bottom: 0">
-        <b class="text-white-50">Inno Sales 1.0.0</b>
+        <b class="text-light">Inno Sales 1.0.0</b>
         <b><span class="pi pi-arrow-circle-left text-white" style="margin-left: 3.5em; font-size: 1.5em; cursor: pointer;"
                  @click="collapseSidebar" title="Collapse Sidebar"></span></b>
       </div>
 
     </nav>
-
-
-
-
 
 
     <div class="sidebar-toggle hideMe" title="Click To Expand" ref="sidebarToggle" @click="restoreSidebar">
@@ -189,9 +185,9 @@
 
 <script setup>
 
-import runMigrations from "@/models";
+// import runMigrations from "@/models";
 import db from "./dbConfig/db";
-runMigrations() //Run all migrations
+// runMigrations() //Run all migrations
 db.raw("VACUUM").then(()=>{})
 db.raw('PRAGMA foreign_keys = ON').then(()=>{});
 
@@ -244,7 +240,7 @@ const insertUser = async () => {
 
       onMounted(async () => {
 
-        insertUser();
+        // insertUser();
 
         setInterval(()=>{
           if(time.value) time.value.innerHTML = new Date().toLocaleTimeString();

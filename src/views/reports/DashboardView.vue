@@ -48,7 +48,9 @@
           <div class="row no-gutters align-items-center">
             <div class="col mr-2">
               <div class="text-xs fw-bold text-danger mb-1" style="font-size: 0.9em;">OUTSTANDING BILLS</div>
-              <div class="h6 mb-0 fw-bold">GH¢ {{ formatNumber(outstandingBillsTotal) }}</div>
+              <div class="h6 mb-0 fw-bold" v-if="loading">
+                <span class="spinner-border spinner-border-sm"></span> loading...</div>
+              <div class="h6 mb-0 fw-bold" v-else>GH¢ {{ formatNumber(outstandingBillsTotal) }}</div>
             </div>
             <div class="col-auto">
               <span style="font-size: 250%">&#128176;</span>
@@ -240,7 +242,7 @@ const startDate = () => { //This will set date to January 1 of the current year
   return new Date(begin).setHours(0, 0, 0, 0)
 }
 
-const endDate = () => {//This will set date to December 31 of the current year
+const endDate = () => { //This will set date to December 31 of the current year
   const begin = new Date().setMonth(11,31);
   return new Date(begin).setHours(0, 0, 0, 0)
 }
@@ -340,8 +342,7 @@ const getData = async () => {
       lineChartSeries[0].data[8] = sep;  lineChartSeries[0].data[9] = oct;
       lineChartSeries[0].data[10] = nov;  lineChartSeries[0].data[11] = dec;
 
-
-    }/////////////////////////////////////////
+    }////////////////////////////////////////
 
   }catch (e) { ipcRenderer.send('errorMessage', e.message) }
   finally { loading.value = false }

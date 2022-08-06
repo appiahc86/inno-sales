@@ -1,43 +1,46 @@
 <template>
 <div class="container-fluid mt-5">
   <form @submit.prevent="save">
-  <div class="row shadow shadow p-3">
+  <div class="row p-3 justify-content-center">
 
     <div class="col-6">
-      <h4 class="w-100 p-1 text-center text-dark" >Company Settings</h4>
+
+      <div class="float-md-start">
+        <h4 class="w-100 p-1 text-center text-dark" >Company Settings</h4>
 
         <table class="myTable w-100">
           <tr>
-            <th>Company Name</th>
+            <th class="float-end">Company Name</th>
             <td> <input type="text" class="form-control-dark w-100" v-model.trim="settings.companyName"></td>
           </tr>
           <tr>
-            <th>Store Name</th>
+            <th class="float-end">Store Name</th>
             <td> <input type="text" class="form-control-dark w-100" v-model.trim="settings.storeName"></td>
           </tr>
           <tr>
-            <th>Address</th>
+            <th class="float-end">Address</th>
             <td> <input type="text" class="form-control-dark w-100" v-model.trim="settings.address"></td>
           </tr>
           <tr>
-            <th>Contact</th>
+            <th class="float-end">Contact</th>
             <td> <input type="text" class="form-control-dark w-100" v-model.trim="settings.contact"></td>
           </tr>
+          <tr>
+            <th class="float-end">Tax(%)</th>
+            <td>
+              <input type="number" class="form-control-dark w-100" step="any" min="0" max="99" v-model.number="settings.tax">
+            </td>
+          </tr>
+          <tr>
+            <th></th>
+            <td>
+              <button class="w-100 btn-dark p-2 mt-2" type="submit"><span class="pi pi-save"></span> Save</button>
+            </td>
+          </tr>
         </table>
+      </div>
 
     </div>
-
-    <div class="col-3">
-      <h4 class="w-100 p-1 text-center text-dark">Tax Settings</h4>
-      <table class="myTable w-100">
-        <tr>
-          <th>Tax(%)</th>
-          <td> <input type="number" class="form-control-dark w-100" step="any" min="0" max="99" v-model.number="settings.tax"></td>
-        </tr>
-      </table>
-      <button class="w-50 btn-dark p-1 mt-2 float-end" type="submit"><span class="pi pi-save"></span> Save</button>
-    </div>
-
 
   </div>
   </form>

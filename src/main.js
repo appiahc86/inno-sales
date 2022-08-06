@@ -11,6 +11,7 @@ import Vue3Apexcharts from "vue3-apexcharts";
 const app = createApp(App)
 
 import 'primevue/resources/themes/rhea/theme.css'
+// import 'primevue/resources/themes/nova-vue/theme.css'
 import 'primevue/resources/primevue.min.css'
 import 'primeicons/primeicons.css'
 

@@ -3,17 +3,23 @@
     <div class="row">
       <div class="col-12">
 
-        <nav id="productsNav">
-          <div class="nav nav-tabs" role="tablist">
-            <button ref="clickMe" class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#add-product" type="button" role="tab" aria-controls="nav-add-product" aria-selected="true">Add Product</button>
-            <button class="nav-link" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#all-products" type="button" role="tab" aria-controls="nav-home" aria-selected="false">Products List</button>
-          </div>
-        </nav>
 
-        <div class="tab-content" id="nav-tabContent">
-          <!--  product Form  -->
-          <div class="tab-pane mt-5 show active" id="add-product" role="tabpanel" aria-labelledby="nav-add-product-tab">
-            <div class="py-4">
+
+        <div class="myTabs-container">
+          <button class="px-3 myTabs" :class="{ active: firstActive}"
+                  type="button" @click="secondActive = false; firstActive = true">Add Product
+          </button>
+
+          <button class="px-3 myTabs mx-2" :class="{ active: secondActive}"
+                  type="button" @click="firstActive = false; secondActive = true">
+            Products List</button>
+        </div>
+
+
+
+
+            <!-- Add Product -->
+            <div v-if="firstActive" style="margin-top: 10vh">
               <div class="container">
                 <div class="row justify-content-center">
                   <div class="col-md-10">
@@ -23,7 +29,7 @@
                         <tr>
                           <th></th>
                           <td>
-                            <h4 style="width: 350px; text-align: center;">Add A New Product</h4>
+                            <h4>Add A New Product</h4>
                           </td>
                         </tr>
                         <tr>
@@ -34,6 +40,8 @@
                               <v-select :options="categories" label="name"
                                         v-model="productData.category" class="form-control-dark select">
                               </v-select>
+
+
                               <div class="input-group-text text-success">
                           <span class="pi pi-plus-circle" title="Add New Category"
                                 style="cursor: pointer; font-size: 1.3em;"
@@ -91,105 +99,94 @@
                         </tr>
                       </table>
 
-
-
                     </form>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
 
-
-          <!--  Products Table  -->
-          <div class="tab-pane mt-2" id="all-products" role="tabpanel" aria-labelledby="nav-all-products-tab">
-            <div class="container-fluid">
-              <div class="row">
-                <div class="col-12">
-                  <div class="table-responsive">
-                    <DataTable
-                        :value="products" :paginator="true" dataKey="id"
-                        class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
-                        filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
-                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedProducts"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                        :globalFilterFields="['productName','category', 'description']" responsiveLayout="scroll"
-                    >
-                      <template #header>
-                        <div class="d-flex justify-content-center align-items-center" style="height: 15px">
-                          <h6 class="px-3">Products</h6>
-                          <span class="p-input-icon-left">
+        <!-- Products Table  -->
+          <div v-if="secondActive">
+            <div class="table-responsive mt-3">
+              <DataTable
+                  :value="products" :paginator="true" dataKey="id"
+                  class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
+                  filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
+                  paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                  :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedProducts"
+                  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                  :globalFilterFields="['productName','category', 'description']" responsiveLayout="scroll"
+              >
+                <template #header>
+                  <div class="d-flex justify-content-center align-items-center" style="height: 15px">
+                    <h6 class="px-3">Products</h6>
+                    <span class="p-input-icon-left">
                         <i class="pi pi-search" />
                         <InputText v-model="filters['global'].value"
                                    placeholder="Keyword Search" style="height: 30px;"/>
                     </span>
-                        </div>
-                      </template>
-                      <template #empty>
-                        No product found.
-                      </template>
-                      <template #loading>
-                        <h4 class="text-white"> Loading data. Please wait.</h4>
-                      </template>
-
-                      <Column selection-mode="multiple" class="data-table-font-size"></Column>
-
-                      <Column field="productName" header="Product" sortable class="data-table-font-size">
-                        <template #body="{data}">
-                          <td :style="{color: data.quantity < 5 ? 'red' : '' }">{{ data.productName }}</td>
-                        </template>
-                      </Column>
-                      <Column field="category" header="Category" sortable class="data-table-font-size">
-                        <template #body="{data}">
-                          <td class="text-capitalize">{{ data.category }}</td>
-                        </template>
-                      </Column>
-                      <Column field="buyingPrice" header="Buy. Price" sortable class="data-table-font-size">
-                        <template #body="{data}">
-                          <td>{{ formatNumber(parseFloat(data.buyingPrice)) }}</td>
-                        </template>
-                      </Column>
-                      <Column field="sellingPrice" header="Sel. Price" sortable class="data-table-font-size">
-                        <template #body="{data}">
-                          <td>{{ formatNumber(parseFloat(data.sellingPrice)) }}</td>
-                        </template>
-                      </Column>
-                      <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" class="data-table-font-size"></Column>
-                      <Column field="tax" header="Tax" sortable class="data-table-font-size"></Column>
-                      <Column field="description" header="Desc" sortable class="data-table-font-size">
-                        <template #body="{data}">
-                          <td :title="data.description">
-                            {{ data.description.length > 20 ? data.description.substring(0, 20) + '...' : data.description }}
-                          </td>
-                        </template>
-                      </Column>
-
-                      <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
-                        <template #body="{data}">
-                          <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span>
-                        </template>
-                      </Column>
-                      <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
-                        <template #body="{data}">
-                          <span type="button" title="Delete" @click="confirmDelete(data.id)">&#10060;</span>
-                        </template>
-                      </Column>
-                    </DataTable>
                   </div>
-                  <br>
-                  <button class="btn-secondary" v-if="selectedProducts.length" @click="confirmDelete(selectedProducts)">
-                    <span class="pi pi-trash"></span>
-                    Delete Selection
-                  </button>
-                </div>
-              </div>
-            </div>
+                </template>
+                <template #empty>
+                  No product found.
+                </template>
+                <template #loading>
+                  <h4 class="text-white"> Loading data. Please wait.</h4>
+                </template>
 
+                <Column selection-mode="multiple" class="data-table-font-size"></Column>
+
+                <Column field="productName" header="Product" sortable class="data-table-font-size">
+                  <template #body="{data}">
+                    <td :style="{color: data.quantity < 5 ? 'red' : '' }">{{ data.productName }}</td>
+                  </template>
+                </Column>
+                <Column field="category" header="Category" sortable class="data-table-font-size">
+                  <template #body="{data}">
+                    <td class="text-capitalize">{{ data.category }}</td>
+                  </template>
+                </Column>
+                <Column field="buyingPrice" header="Buy. Price" sortable class="data-table-font-size">
+                  <template #body="{data}">
+                    <td>{{ formatNumber(parseFloat(data.buyingPrice)) }}</td>
+                  </template>
+                </Column>
+                <Column field="sellingPrice" header="Sel. Price" sortable class="data-table-font-size">
+                  <template #body="{data}">
+                    <td>{{ formatNumber(parseFloat(data.sellingPrice)) }}</td>
+                  </template>
+                </Column>
+                <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" class="data-table-font-size"></Column>
+                <Column field="tax" header="Tax" sortable class="data-table-font-size"></Column>
+                <Column field="description" header="Desc" sortable class="data-table-font-size">
+                  <template #body="{data}">
+                    <td :title="data.description">
+                      {{ data.description.length > 20 ? data.description.substring(0, 20) + '...' : data.description }}
+                    </td>
+                  </template>
+                </Column>
+
+                <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
+                  <template #body="{data}">
+                    <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span>
+                  </template>
+                </Column>
+                <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
+                  <template #body="{data}">
+                    <span type="button" title="Delete" @click="confirmDelete(data.id)">&#10060;</span>
+                  </template>
+                </Column>
+              </DataTable>
+            </div>
+            <br>
+            <button class="btn-secondary" v-if="selectedProducts.length" @click="confirmDelete(selectedProducts)">
+              <span class="pi pi-trash"></span>
+              Delete Selection
+            </button>
           </div>
 
-        </div>
+
 
         <!--  Edit Dialog-->
         <dialog ref="editProductDialog" style="border: 2px solid #ccc;" name="dialog">
@@ -278,8 +275,6 @@
           </form>
         </dialog>
 
-
-
       </div>
     </div>
   </div>
@@ -288,20 +283,22 @@
 </template>
 
 <script setup>
-import {onMounted, reactive, ref} from "vue";
+import {reactive, ref} from "vue";
 import * as Validator from "validatorjs";
 import db from "@/dbConfig/db";
 import { FilterMatchMode } from "primevue/api";
 import { formatNumber } from "@/functions";
+const firstActive = ref(true);
+const secondActive = ref(false);
 
 
     const filters = ref({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     });
 
-    const clickMe = ref(null);
     const selectedProducts = ref([]);
 
+    const tabview1 = ref(null);
     const loading = ref(false);
     const categories = ref([]);
     const products = ref([]);
@@ -318,7 +315,6 @@ import { formatNumber } from "@/functions";
       tax: 'tax'
     })
 
-onMounted(() => clickMe.value.click())
 
     const editProductData = reactive({
       id: '',
@@ -331,8 +327,6 @@ onMounted(() => clickMe.value.click())
       categoryName: '',
       tax: ''
     })
-
-
 
 
     //Get all categories

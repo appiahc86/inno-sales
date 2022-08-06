@@ -7,9 +7,6 @@ const billsRouter = [
         path: '/bills',
         name: 'bills',
         component: BillsIndexView,
-        meta:{
-            requiresAuth: false
-        }
     },
 
     {
@@ -19,6 +16,5 @@ const billsRouter = [
     }
 
 ]
-
 
 export default billsRouter;

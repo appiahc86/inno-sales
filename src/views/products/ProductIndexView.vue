@@ -74,6 +74,14 @@
                         </tr>
 
                         <tr>
+                          <th class="float-end"><span class="pi pi-clock"></span> Expiration Date &nbsp;</th>
+                          <td>
+                            <input type="date" class="form-control-dark"
+                                  v-model="productData.expiration" onkeydown="return false">
+                          </td>
+                        </tr>
+
+                        <tr>
                           <th class="float-end"><span class="pi pi-money-bill"></span> Tax &nbsp;</th>
                           <td>
                             <select class="form-control-dark select" v-model="productData.tax">
@@ -107,7 +115,7 @@
 
 
         <!-- Products Table  -->
-          <div v-if="secondActive">
+          <div :style="{ display: secondActive ? 'block' : 'none'}">
             <div class="table-responsive mt-3">
               <DataTable
                   :value="products" :paginator="true" dataKey="id"
@@ -147,6 +155,11 @@
                     <td class="text-capitalize">{{ data.category }}</td>
                   </template>
                 </Column>
+                <Column header="Exp" sortable class="data-table-font-size">
+                  <template #body="{data}">
+                    <td >{{ data.expiration ? new Date(data.expiration).toLocaleDateString() : '' }}</td>
+                  </template>
+                </Column>
                 <Column field="buyingPrice" header="Buy. Price" sortable class="data-table-font-size">
                   <template #body="{data}">
                     <td>{{ formatNumber(parseFloat(data.buyingPrice)) }}</td>
@@ -154,15 +167,19 @@
                 </Column>
                 <Column field="sellingPrice" header="Sel. Price" sortable class="data-table-font-size">
                   <template #body="{data}">
-                    <td>{{ formatNumber(parseFloat(data.sellingPrice)) }}</td>
+                    <td><b>{{ formatNumber(parseFloat(data.sellingPrice)) }}</b></td>
                   </template>
                 </Column>
                 <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" class="data-table-font-size"></Column>
-                <Column field="tax" header="Tax" sortable class="data-table-font-size"></Column>
+                <Column field="tax" header="Tax" sortable class="data-table-font-size">
+                  <template #body="{data}">
+                    <td class="text-capitalize">{{ data.tax }}</td>
+                  </template>
+                </Column>
                 <Column field="description" header="Desc" sortable class="data-table-font-size">
                   <template #body="{data}">
                     <td :title="data.description">
-                      {{ data.description.length > 20 ? data.description.substring(0, 20) + '...' : data.description }}
+                      {{ data.description && data.description.length > 15 ? data.description.substring(0, 15) + '...' : data.description }}
                     </td>
                   </template>
                 </Column>
@@ -241,6 +258,14 @@
                     </tr>
 
                     <tr>
+                      <th class="float-end"><span class="pi pi-clock"></span> Expiration Date &nbsp;</th>
+                      <td>
+                        <input type="date" class="form-control-dark"
+                               v-model="editProductData.expiration" onkeydown="return false">
+                      </td>
+                    </tr>
+
+                    <tr>
                       <th class="float-end"><span class="pi pi-list"></span> Description &nbsp;</th>
                       <td><textarea class="form-control-dark" cols="10" rows="3"
                                     v-model.trim="editProductData.description"></textarea></td>
@@ -288,6 +313,7 @@ import * as Validator from "validatorjs";
 import db from "@/dbConfig/db";
 import { FilterMatchMode } from "primevue/api";
 import { formatNumber } from "@/functions";
+import {useStore} from "vuex";
 const firstActive = ref(true);
 const secondActive = ref(false);
 
@@ -297,14 +323,14 @@ const secondActive = ref(false);
     });
 
     const selectedProducts = ref([]);
-
-    const tabview1 = ref(null);
+    const store = useStore();
     const loading = ref(false);
     const categories = ref([]);
-    const products = ref([]);
+    const products = ref([])
     const categoryDialog = ref(null);
     const editProductDialog = ref(null);
-    const categoryName = ref('')
+    const categoryName = ref('');
+
     const productData = reactive({
       productName: '',
       quantity: '',
@@ -312,15 +338,16 @@ const secondActive = ref(false);
       buyingPrice: '',
       sellingPrice: '',
       category: null,
-      tax: 'tax'
+      tax: 'tax',
+      expiration: null
     })
-
 
     const editProductData = reactive({
       id: '',
       productName: '',
       // quantity: '',
       description: '',
+      expiration: null,
       // buyingPrice: '',
       // sellingPrice: '',
       category: '',
@@ -328,16 +355,13 @@ const secondActive = ref(false);
       tax: ''
     })
 
-
-    //Get all categories
-    const getAllCategories = async () => {
-      try {
-        categories.value = await db.select().from('categories').orderBy('name', 'asc');
-      }catch (e){
-        ipcRenderer.send('errorMessage', e.message)
-      }
-    }
-    getAllCategories(); // ./get all categories
+//Get all Categories
+const getCategories = async () => {
+  try {
+    categories.value =  await db.select().from('categories').orderBy('name', 'asc');
+  }catch (e) { ipcRenderer.send('errorMessage', e.message) }
+}
+getCategories();
 
     //get all products
     const getAllProducts = async () => {
@@ -345,7 +369,6 @@ const secondActive = ref(false);
       try {
 
         loading.value = true;
-
 
           products.value = await db('products')
               .leftJoin('categories', 'products.category', '=','categories.id')
@@ -356,6 +379,7 @@ const secondActive = ref(false);
                   'products.quantity',
                   'products.tax',
                   'products.description',
+                  'products.expiration',
                   'categories.name as category',
                   'categories.id as categoryId'
               )
@@ -373,7 +397,7 @@ const secondActive = ref(false);
     const resetProductData = () => {
       productData.productName = ''; productData.quantity = ''; productData.description = '';
       productData.buyingPrice = ''; productData.sellingPrice = ''; productData.category = null;
-      productData.tax = 'tax';
+      productData.tax = 'tax'; productData.expiration = null
     }
 
 
@@ -398,12 +422,20 @@ const secondActive = ref(false);
           productData.category = productData.category.id;
 
           const product = await db('products')
-              .insert({...productData, dateAdded:   new Date().setHours(0,0,0,0)});
+              .insert({
+                ...productData,
+                dateAdded:   new Date().setHours(0,0,0,0),
+                expiration:   new Date(productData.expiration).setHours(0,0,0,0)
+              });
 
           //Update on front-end
           const cat = categories.value.filter(c => c.id.toString() === productData.category.toString());
-
           products.value.push({ ...productData, id: product[0], categoryId: productData.category, category: cat[0].name })
+
+          //push to vuex store products
+          store.dispatch("productsModule/addProduct", {
+            ...productData, id: product[0], categoryId: productData.category
+          })
           resetProductData();
 
         }else ipcRenderer.send('errorMessage', `${Object.values(validation.errors.all())[0]}`)
@@ -432,8 +464,17 @@ const secondActive = ref(false);
         })
 
         if (validation.passes()){ // If validation passes
-          await db('products').where('id', editProductData.id).first().update({...editProductData, id: undefined, categoryName: undefined});
+          await db('products')
+              .where('id', editProductData.id)
+              .first()
+              .update({
+                ...editProductData,
+                id: undefined,
+                categoryName: undefined,
+                expiration: editProductData.expiration ? new Date(editProductData.expiration).setHours(0,0,0,0) : undefined
+              });
           editProductDialog.value.close(); // Close edit dialog
+
           products.value.map(product => { //Update data in front end without reloading from database
             if (product.id === editProductData.id){
               const cat = categories.value.filter(c => c.id.toString() === editProductData.category.toString());
@@ -444,10 +485,19 @@ const secondActive = ref(false);
               product.tax = editProductData.tax;
               product.id = editProductData.id;
               product.productName = editProductData.productName;
+              product.expiration = editProductData.expiration ? new Date(editProductData.expiration).setHours(0,0,0,0) : product.expiration;
               // product.quantity = editProductData.quantity;
               // product.sellingPrice = parseFloat(editProductData.sellingPrice);
             }
           })
+
+          //Update product expiration date in vuex store
+          if (editProductData.expiration){
+            store.dispatch("productsModule/modifyDate", {
+              id: editProductData.id,
+              date: editProductData.expiration
+            })
+          }
 
         }else ipcRenderer.send('errorMessage', `${ Object.values(validation.errors.all())[0] }`)
       }catch (e) { ipcRenderer.send('errorMessage', e.message) }
@@ -482,6 +532,9 @@ const secondActive = ref(false);
 
         products.value = newPros;
 
+        //Update in vuex store
+        store.dispatch("productsModule/deleteProduct", args);
+
       }catch (e){
         ipcRenderer.send('errorMessage', e.message);
       }
@@ -489,6 +542,13 @@ const secondActive = ref(false);
 
     // open dialog for editing product
     const openDialog = (data) => {
+
+      if (data.expiration){
+        let yyyy = new Date(data.expiration).getFullYear();
+        let mm = ( new Date(data.expiration).getMonth() + 1) < 10 ? '0' + ( new Date(data.expiration).getMonth() + 1) : new Date(data.expiration).getMonth() + 1;
+        let dd = (new Date(data.expiration).getDate()) < 10 ? '0' + (new Date(data.expiration).getDate()) : (new Date(data.expiration).getDate());
+        editProductData.expiration = `${yyyy}-${mm}-${dd}`;
+      }else editProductData.expiration = null;
 
           editProductData.id = data.id;
 
@@ -520,7 +580,7 @@ const openCategoryDialog = (e) => {
 
         //Save record
         const newCat =  await db('categories').insert({ name: cat });
-        categories.value.push({ id: newCat[0], name: cat });
+        categories.value.push({ id: newCat[0], name: cat })
         categoryDialog.value.close();
         categoryName.value = '';
 

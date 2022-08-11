@@ -29,7 +29,7 @@
             </tr>
 
             <tr>
-              <th class="float-end"><span class="pi pi-user"></span> Confirm Password &nbsp;</th>
+              <th class="float-end">Confirm Password &nbsp;</th>
               <td><input type="password" class="form-control-dark" v-model.trim="formData.password_confirmation"></td>
             </tr>
 

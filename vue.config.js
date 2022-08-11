@@ -22,20 +22,25 @@ module.exports = {
         ],
 
         appId: 'com.innosales.app',
+        productName: 'Inno Sales',
         win: {
           target: 'nsis',
+          // requestedExecutionLevel: "requireAdministrator",
           icon: ''
         },
         nsis: {
           uninstallDisplayName: 'Inno Sales',
-          // deleteAppDataOnUninstall: true,
-          oneClick: false,
+          deleteAppDataOnUninstall: true,
+          oneClick: true,
           license: 'license.txt',
-          allowToChangeInstallationDirectory: true,
-          allowElevation: true,
           createDesktopShortcut: true,
           shortcutName: 'Inno Sales',
-        }
+        },
+        linux: {
+          target: 'deb',
+          icon: ''
+        },
+        deb: {}
 
       }
     }

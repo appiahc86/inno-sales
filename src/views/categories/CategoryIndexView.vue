@@ -73,9 +73,11 @@ import db from "@/dbConfig/db";
 import {ref} from "vue";
 import {FilterMatchMode} from "primevue/api";
 import errorMessages from "@/errorMessages";
+import {useStore} from "vuex";
 
+    const store = useStore();
     const name = ref('');
-    const  categories = ref([]);
+    const  categories = ref([])
     const saveButton = ref(null);
     const editName = ref('');
     let editId = null;
@@ -85,17 +87,13 @@ import errorMessages from "@/errorMessages";
       global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     });
 
-
-    // Get all categories
-  const getAllCategories = async () => {
-
-    try {
-      categories.value = await db.select().from('categories');
-    }catch (e){
-      ipcRenderer.send('errorMessage', e.message)
+    //Get all Categories
+    const getCategories = async () => {
+      try {
+        categories.value =  await db.select().from('categories').orderBy('name', 'asc');
+      }catch (e) { ipcRenderer.send('errorMessage', e.message) }
     }
-  }
-    getAllCategories();
+    getCategories();
 
 
     //Save category
@@ -109,7 +107,7 @@ import errorMessages from "@/errorMessages";
           //Save record
          const newCat =  await db('categories').insert({ name: categoryName });
           name.value = '';
-          categories.value.push({ id: newCat[0], name: categoryName })
+          categories.value.push({ id: newCat[0], name: categoryName });
 
       }catch (e){
         if(e.code === "SQLITE_CONSTRAINT") return ipcRenderer.send('errorMessage', 'Record already exists')
@@ -121,17 +119,19 @@ import errorMessages from "@/errorMessages";
     } // ./save category
 
 
-
     //Edit Category
     const editCategory = async () => {
       try {
         //Validation
         if (!editName.value) return ipcRenderer.send('errorMessage', "Category name cannot be empty");
+
         //Save data
         await db('categories').where({id: editId } ).update({ name:editName.value.toLowerCase() });
         editDialog.value.close()
+
+        //edit in front end
         for (const cat of categories.value) {
-          if (cat.id.toString() === editId.toString()){
+          if (cat.id.toString() === editId.toString()) {
             cat.name = editName.value.toLowerCase();
             break;
           }
@@ -145,14 +145,13 @@ import errorMessages from "@/errorMessages";
     } // ./Edit Category
 
 
-
     //Delete Category
     const confirm = (id) => ipcRenderer.send('confirm', {id:id, type: 'category', message: 'Are you sure you want to delete this item?' } )
 
     ipcRenderer.on('deleteCategory', async (event, id ) => {
       try {
           await db('categories').where({id}).del();
-          categories.value = categories.value.filter(cat => parseInt(cat.id) !== parseInt(id));
+        categories.value = categories.value.filter(cat => parseInt(cat.id) !== parseInt(id));
       }catch (e){
         if (e.code === "SQLITE_CONSTRAINT")
           ipcRenderer.send('errorMessage', errorMessages.sqlConstraint);

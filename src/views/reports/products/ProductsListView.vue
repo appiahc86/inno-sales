@@ -33,6 +33,11 @@
                 <td class="text-capitalize">{{ data.category }}</td>
               </template>
             </Column>
+            <Column header="Exp" sortable class="data-table-font-size">
+              <template #body="{data}">
+                <td >{{ data.expiration ? new Date(data.expiration).toLocaleDateString() : '' }}</td>
+              </template>
+            </Column>
             <Column field="dateAdded" header="Date Added" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td class="text-capitalize">{{ new Date(data.dateAdded).toLocaleDateString() }}</td>
@@ -53,7 +58,7 @@
             <Column field="description" header="Desc" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td :title="data.description">
-                  {{ data.description.length > 20 ? data.description.substring(0, 20) + '...' : data.description }}
+                  {{ data.description && data.description.length > 20 ? data.description.substring(0, 20) + '...' : data.description }}
                 </td>
               </template>
             </Column>
@@ -77,6 +82,7 @@
                   <th>#</th>
                   <th>Product</th>
                   <th>Category</th>
+                  <th>Exp</th>
                   <th>Date Added</th>
                   <th>Tax</th>
                   <th>Qty</th>
@@ -90,6 +96,7 @@
                     <th>{{ index + 1 }}</th>
                     <td>&nbsp; {{ record.productName }}</td>
                     <td style="text-transform: capitalize;">&nbsp; {{ record.category }}</td>
+                    <td>&nbsp;{{ record.expiration ? new Date(record.expiration).toLocaleDateString() : '' }}</td>
                     <td>&nbsp; {{ new Date(record.dateAdded).toLocaleDateString() }}</td>
                     <td style="text-transform: capitalize;">&nbsp; {{ record.tax }}</td>
                     <td>&nbsp; {{ record.quantity }}</td>
@@ -114,14 +121,14 @@
 </template>
 
 <script setup>
-import {computed, ref} from "vue";
 import db from "@/dbConfig/db";
+import {computed, ref} from "vue";
 import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
 
 const loading = ref(false)
-const records = ref([]);
 const store = useStore();
+const records = ref([]);
 
 const settings = computed(() => store.getters.setting)
 
@@ -131,7 +138,6 @@ const getAllProducts = async () => {
   try {
 
     loading.value = true;
-
 
     records.value = await db('products')
         .leftJoin('categories', 'products.category', '=','categories.id')
@@ -143,6 +149,7 @@ const getAllProducts = async () => {
             'products.dateAdded',
             'products.tax',
             'products.description',
+            'products.expiration',
             'categories.name as category'
         ).orderBy('products.productName','asc')
 

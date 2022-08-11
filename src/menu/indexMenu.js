@@ -1,11 +1,18 @@
 /*
 list of menu IDs in this file
-........settings, backup, home.......
+........settings, backup, home, rebuildDb.......
 */
 
-import {dialog, BrowserWindow} from "electron";
+import {dialog, BrowserWindow, app} from "electron";
 import * as path from "path";
 const fse = require('fs-extra');
+
+//Format database name
+function getDbName() {
+    let dbName = new Date().toLocaleDateString().replaceAll('/','-');
+    return 'inno-sales-' + dbName;
+}
+
 
 //Send route event
 const sendRouteEvent = (routeName) => {
@@ -33,7 +40,8 @@ const copyDatabaseFile = async (filePath) => {
 const options = {
     title: 'Save database to..',
     buttonLabel: 'Save',
-    defaultPath: path.join(__dirname, '../../bk/sales.db'),
+    // defaultPath: path.join(__dirname, `../../${getDbName()}`),
+    defaultPath: app.getPath('documents') + '/' + getDbName(),
     filters: [{name: 'backup', extensions: ['db']}]
 }
 
@@ -53,19 +61,36 @@ const indexMenu = [
                 label: 'Settings',
                 submenu: [
                     { label: 'Company Settings', click(){sendRouteEvent('settings')}},
-                    { label: 'Manage Users', click(){sendRouteEvent('users')}}
+                    { label: 'Manage Users', click(){sendRouteEvent('users')}},
+                    { type: 'separator'},
+                    { //Backup database
+                        id: 'backup',
+                        enabled: false,
+                        label: "Backup database",
+                        async click(){
+                            const {filePath} = await dialog.showSaveDialog(BrowserWindow.getAllWindows()[0], options)
+                            if (filePath) copyDatabaseFile(filePath)
+                        }
+                    },
+                    { //Rebuild Database
+                        id: 'rebuildDb',
+                        enabled: false,
+                        label: "Rebuild database",
+                        async click(){
+                            let confirm = await dialog.showMessageBox(
+                                BrowserWindow.getAllWindows()[0],
+                                {type: 'question',
+                                    message: `This action rebuilds the database file, repacking into a minimal amount of disk space. It\'s a good Practice to perform this operation at least twice a month.
+                                        \n Do you want to continue?`,
+                                    buttons: ['No','Yes']
+                                }
+                            )
+                            if (confirm.response)  BrowserWindow.getAllWindows()[0].webContents.send('rebuild-db', '')
+                        }
+                    }
                 ],
 
             },
-             {
-                 id: 'backup',
-                 enabled: false,
-                 label: "Backup database",
-                  async click(){
-                    const {filePath} = await dialog.showSaveDialog(BrowserWindow.getAllWindows()[0], options)
-                     if (filePath) copyDatabaseFile(filePath)
-                   }
-              },
             {role: 'quit'}
         ]
     },

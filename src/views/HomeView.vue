@@ -209,7 +209,7 @@ const returns = computed(() => {
   return total;
 })
 
-//Get returns
+//Get sales count
 const salesCount = computed(() => {
   let total = 0;
   for (const record of records.value) {
@@ -234,6 +234,7 @@ const getRecordsForChart = async () => {
         .groupBy('categories.id')
         .orderBy('sum', 'desc')
         .limit(10);
+
 
     barChartRecords.value =  barChartRecords.value.filter(item => item.sum > 0)
 

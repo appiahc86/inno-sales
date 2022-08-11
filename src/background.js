@@ -139,6 +139,7 @@ ipcMain.on('setMenu', async (event, {role, itemsToDisable}) => {
 
   //First enable file menu items
   Menu.getApplicationMenu().getMenuItemById('backup').enabled = true;
+  Menu.getApplicationMenu().getMenuItemById('rebuildDb').enabled = true;
   Menu.getApplicationMenu().getMenuItemById('settings').enabled = true;
   Menu.getApplicationMenu().getMenuItemById('home').enabled = true;
 

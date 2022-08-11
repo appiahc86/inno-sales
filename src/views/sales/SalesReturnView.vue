@@ -70,7 +70,7 @@
       </div>
 
       <div class="text-center">
-        <h5 v-if="discount">Discount: <b>-{{ formatNumber(discount) }}</b></h5>
+        <h5 v-if="discount">Discount: <b>{{ formatNumber(discount) }}</b></h5>
         <h5 v-if="tax">Tax: <b>{{ formatNumber(tax) }}</b></h5>
       <h3 class="text-danger" v-if="change">
         Change: <b>GHS {{ formatNumber(change) }}
@@ -186,8 +186,8 @@ const calculateChange = async () => {
   }
 
   change.value = calc;
-  discount.value = disc;
-  tax.value = tx;
+  discount.value = disc ? -disc : 0;
+  tax.value = tx ? -tx : 0;
 }
 
           //...................... Return Items ........................
@@ -204,7 +204,7 @@ const returnItems = async () => {
             // Save to Orders table
       const data = {
         orderDate: date,
-        numberOfItems: returningItems.value.length,
+        numberOfItems: -returningItems.value.length,
         type: 'return',
         momo: paymentMethod.value === 'momo' ? -change.value : 0,
         total:  -change.value, //Get a negative value
@@ -246,8 +246,18 @@ const returnItems = async () => {
         await trx('products').where('id', ret.productId).increment('quantity', ret.returnQty);
       }
 
+      //Update quantity in vuex store
+      for (const ret of returningItems.value) {
+        store.dispatch("productsModule/modifyQty", {id: ret.productId, qty: ret.returnQty, type: 'increment'})
+      }
+
+
     })
 
+    //dispatch qty to vuex store products
+    for (const ret of returningItems.value) {
+      store.dispatch("productsModule/modifyQty", {id: ret.productId, qty: ret.returnQty, type: 'increment'});
+    }
     returningItems.value = [];
     items.value = [];
 

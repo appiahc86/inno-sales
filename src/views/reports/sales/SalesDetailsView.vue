@@ -36,7 +36,7 @@
         <div class="table-responsive">
 
           <DataTable
-              :value="records" :paginator="true"
+              :value="records" :paginator="true" dataKey="id"
               class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines"
               filterDisplay="menu" :rows="10"
               paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -50,6 +50,12 @@
             <Column field="date" header="Date" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td>{{ new Date(data.date).toLocaleDateString() }}</td>
+              </template>
+            </Column>
+
+            <Column field="user" header="Cashier" sortable class="data-table-font-size">
+              <template #body="{data}">
+                <td>{{ data.user }}</td>
               </template>
             </Column>
 
@@ -108,6 +114,7 @@
               <table id="print-table">
                 <tr>
                   <th>Date</th>
+                  <th>Cashier</th>
                   <th>Item</th>
                   <th>Cost</th>
                   <th>Selling Price</th>
@@ -120,6 +127,7 @@
                 <template v-for="record in records" :key="record.id">
                   <tr>
                     <td>&nbsp; {{ new Date(record.date).toLocaleDateString() }}</td>
+                    <td>&nbsp; {{ record.user }}</td>
                     <td>&nbsp; {{ record.productName }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.buyingPrice)) }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.sellingPrice)) }}</td>
@@ -152,7 +160,7 @@
 <script setup>
 import {computed, ref} from "vue";
 import db from "@/dbConfig/db";
-import {formatNumber} from "@/functions";
+import {diffInDays, formatNumber} from "@/functions";
 import {useStore} from "vuex";
 
 const loading = ref(false)
@@ -172,15 +180,23 @@ const search = async (e) => {
   if (!from.value || !to.value) return ipcRenderer.send('errorMessage', 'Please Select Date');
   const dateFrom = new Date(from.value).setHours(0,0,0,0);
   const dateTo = new Date(to.value).setHours(0,0,0,0);
+  if (dateFrom > dateTo) return ipcRenderer.send('errorMessage', 'Sorry, (Date from) cannot be greater than (Date to)');
+
+  // check if date difference is more than 5 months (155 days)
+  const chk =  diffInDays(dateTo, dateFrom)
+  if (chk > 155) return ipcRenderer.send('errorMessage', 'Sorry, For performance sake, date difference shouldn\'t be more than five months')
+
   message.value = null;
 
   try {
     e.target.submitBtn.disabled = true;
     loading.value = true;
     records.value = await db('orderDetails')
-        .select('orderDetails.productName', 'orderDetails.buyingPrice', 'orderDetails.sellingPrice',
-            'orderDetails.tax','orderDetails.discount', 'orderDetails.quantity', 'orderDetails.date'
-        )
+        .leftJoin('orders', 'orders.id', '=', 'orderDetails.orderId')
+        .leftJoin('users', 'users.id', '=', 'orders.userId')
+        .select('orderDetails.id','orderDetails.productName', 'orderDetails.buyingPrice',
+            'orderDetails.sellingPrice','orderDetails.tax','orderDetails.discount',
+            'orderDetails.quantity', 'orderDetails.date', 'users.firstName as user')
         .whereRaw('?? >= ?', ['date', dateFrom])
         .andWhereRaw('?? <= ?', ['date', dateTo])
 

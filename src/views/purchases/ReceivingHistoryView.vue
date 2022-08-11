@@ -32,13 +32,11 @@
 
           <Column field="company" header="Vendor" sortable style="font-size: 0.75em;"></Column>
           <Column field="invoice" header="Invoice#" sortable style="font-size: 0.75em;"></Column>
-<!--          <Column field="status" header="Status" sortable style="font-size: 0.75em;">-->
-<!--            <template #body="{data}">-->
-<!--              <span class="text-capitalize" :style="{color: data.status === 'returned' ? 'red' : 'green'}">-->
-<!--                <b>{{ data.status }}</b>-->
-<!--              </span>-->
-<!--            </template>-->
-<!--          </Column>-->
+          <Column field="user" header="User" sortable style="font-size: 0.75em;">
+            <template #body="{data}">
+              <td class="text-capitalize">{{ data.user }}</td>
+            </template>
+          </Column>
           <Column field="billDate" header="Bill Date" sortable  style="font-size: 0.75em;">
             <template #body="{data}">
               <td>{{ new Date(data.billDate).toLocaleDateString() }}</td>
@@ -146,7 +144,9 @@ import db from "@/dbConfig/db";
 import {FilterMatchMode} from "primevue/api";
 import {formatNumber} from "@/functions";
 import * as Validator from "validatorjs";
+import {useStore} from "vuex";
 
+const store = useStore();
 const purchases = ref([]);
 const loading = ref(false);
 const details = ref([]);
@@ -173,8 +173,10 @@ const getPurchases = async () => {
    purchases.value = await db('purchases')
        .join('vendors', 'purchases.vendorId', '=', 'vendors.id')
        .leftJoin('billPayments', 'purchases.id', 'billPayments.purchaseId')
+       .leftJoin('users', 'users.id', '=', 'purchases.userId')
        .select('purchases.id', 'purchases.billDate', 'purchases.invoiceDue',
-           'purchases.numberOfItems','purchases.invoice', 'purchases.total', 'vendors.company')
+           'purchases.numberOfItems','purchases.invoice', 'purchases.total',
+           'vendors.company', 'users.firstName as user')
        .groupBy('purchases.id')
        .orderBy('purchases.id', 'DESC').limit(200);
 
@@ -239,6 +241,11 @@ const returnToVendor = async (e) => {
         //Batch update  products quantity
         for (const purchase of records) {
           await trx('products').where('id', purchase.productId).decrement('quantity', purchase.quantity)
+        }
+
+        //Update qty in vuex store
+        for (const purchase of records) {
+          store.dispatch("productsModule/modifyQty", {id: purchase.productId, qty: purchase.quantity, type: 'decrement'})
         }
 
         // Set purchase status to returned

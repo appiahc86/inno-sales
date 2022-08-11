@@ -10,7 +10,7 @@
         <div class="card-body">
           <div class="row no-gutters align-items-center">
             <div class="col mr-2">
-              <div class="text-xs fw-bold text-primary mb-1" style="font-size: 0.9em;">TOTAL PRODUCTS</div>
+              <div class="text-xs fw-bold text-primary mb-1" style="font-size: 0.9em;">PRODUCTS COUNT</div>
               <div class="h6 mb-0 fw-bold" v-if="loading">
                 <span class="spinner-border spinner-border-sm"></span> loading...</div>
               <div class="h6 mb-0 fw-bold" v-else>&nbsp; {{ totalProducts.toLocaleString() }}</div>
@@ -255,9 +255,11 @@ const getData = async () => {
 
       //Get orders
       orders.value = await trx('orders')
-          .select('orders.id', 'orders.orderDate', 'orders.total')
           .whereRaw('?? >= ?', ['orderDate', startDate()])
-          .whereRaw('?? <= ?', ['orderDate', endDate()]);
+          .whereRaw('?? <= ?', ['orderDate', endDate()])
+          .select('orderDate')
+          .sum('total as total')
+          .groupBy('orderDate')
 
       //Get purchases
       const purchases = await trx('purchases').where('status', 'received')
@@ -275,7 +277,7 @@ const getData = async () => {
       outstandingBills.value = await trx('purchases')
           .innerJoin('vendors', 'purchases.vendorId', '=', 'vendors.id')
           .leftJoin('billPayments', 'purchases.id', 'billPayments.purchaseId')
-          .select('purchases.id','purchases.invoiceDue','purchases.total', )
+          .select('purchases.total', )
           .sum('billPayments.amount as totalPaid')
           .where('purchases.status', 'received')
           .havingRaw('?? > ?', ['purchases.total',  db.raw('coalesce(sum(billPayments.amount), 0)'  )] )

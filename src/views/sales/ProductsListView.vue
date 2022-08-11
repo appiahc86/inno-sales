@@ -42,17 +42,26 @@
                 <td class="text-capitalize">{{ data.category }}</td>
               </template>
             </Column>
+            <Column header="Exp" sortable class="data-table-font-size">
+              <template #body="{data}">
+                <td >{{ data.expiration ? new Date(data.expiration).toLocaleDateString() : '' }}</td>
+              </template>
+            </Column>
             <Column field="sellingPrice" header="Price" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td><b>{{ formatNumber(parseFloat(data.sellingPrice))}}</b></td>
               </template>
             </Column>
             <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" class="data-table-font-size"></Column>
-            <Column field="tax" header="Tax" sortable class="data-table-font-size"></Column>
+            <Column field="tax" header="Tax" sortable class="data-table-font-size">
+              <template #body="{data}">
+                <td class="text-capitalize">{{ data.tax }}</td>
+              </template>
+            </Column>
             <Column field="description" header="Desc" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td :title="data.description">
-                  {{ data.description.length > 20 ? data.description.substring(0, 20) + '...' : data.description }}
+                  {{ data.description && data.description.length > 20 ? data.description.substring(0, 20) + '...' : data.description }}
                 </td>
               </template>
             </Column>
@@ -95,6 +104,7 @@ const getAllProducts = async () => {
               'products.tax',
               'products.description',
               'categories.name as category',
+              'products.expiration'
           )
 
   }

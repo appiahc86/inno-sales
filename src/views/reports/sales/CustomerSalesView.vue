@@ -181,6 +181,7 @@ const search = async (e) => {
 
   const dateFrom = new Date(formData.from).setHours(0,0,0,0);
   const dateTo = new Date(formData.to).setHours(0,0,0,0);
+  if (dateFrom > dateTo) return ipcRenderer.send('errorMessage', 'Sorry, (Date from) cannot be greater than (Date to)');
   message.value = null;
   customerName.value = null;
 

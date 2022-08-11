@@ -132,7 +132,7 @@
   <span>{{ new Date().toLocaleString() }}</span>
   <b style="float: right;">Receipt #{{ barcode }}</b>
 </div>
-       <div  style="font-size: 12px;">Store: {{ 'Demo V Company' }}</div>
+       <div  style="font-size: 12px;">Store: {{ companySettings.storeName }}</div>
 
        <div style="text-align: center;">
          <div style="font-size: 13px"><b>{{ companySettings.companyName }}</b></div>
@@ -552,6 +552,11 @@ const checkout = async (e) => {
 
          barcode.value = order[0]; //Set barcode number for invoice printing
        })
+
+    //dispatch quantities to vuex store products
+    for (const item of cart.value) {
+      store.dispatch("productsModule/modifyQty", {id: item.id, qty: item.qty, type: 'decrement'})
+    }
 
     //Clear cart and reset payment form
     clearCart();

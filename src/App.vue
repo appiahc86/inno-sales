@@ -142,6 +142,7 @@
         </ul>
 
 
+
       </div>
 
       <div class="d-flex" style="position: absolute; bottom: 0">
@@ -165,7 +166,55 @@
         <div class="col-12">
 
             <hr class="mt-0 fw-bold">
-        <!--          Inject views here-->
+
+          <!--       Notification Area         -->
+          <ul class="nav flex-column" style="position: absolute; right: 5%;"
+              v-if="(lowQuantityProducts && lowQuantityProducts.length)
+               || (getExpiringProducts && getExpiringProducts.length)
+               || (getAlreadyExpiredProducts && getAlreadyExpiredProducts.length)">
+            <li class="nav-item">
+              <div class="dropdown">
+
+                <a class="dropdown-toggle position-relative" id="purchasing" data-bs-toggle="dropdown"
+                   aria-expanded="false" style="cursor: pointer;" title="Notifications">
+                  <span class="pi pi-bell" style="font-size: 1.5em;"></span>
+                  <sup class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.9em;">
+                    <span class="pi pi-envelope blink"></span>
+                  </sup>
+                </a>
+
+                <div class="dropdown-menu dropdown-menu-right">
+                  <span class="dropdown-item dropdown-header">Notifications</span>
+                  <!--       Low Quantity products         -->
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" v-if="getExpiringProducts && getExpiringProducts.length">
+                    <i class="pi pi-envelope"></i>&nbsp;
+                    <b>{{ getExpiringProducts.length }}</b>
+                     product(s) expiring
+                  </a>
+                  <!--       Expiring products         -->
+                  <div class="dropdown-divider"></div>
+                  <router-link :to="{name: 'low-stock'}" class="dropdown-item" v-if="lowQuantityProducts && lowQuantityProducts.length">
+                    <i class="pi pi-envelope"></i>
+                    <b>&nbsp; {{ lowQuantityProducts.length }}</b>
+                    product(s) below qty of 5
+                  </router-link>
+                  <!--       Already Expired products      -->
+                  <div class="dropdown-divider"></div>
+                  <router-link :to="{name: 'report-products-expired'}" class="dropdown-item text-danger"
+                               v-if="getAlreadyExpiredProducts && getAlreadyExpiredProducts.length">
+                    <i class="pi pi-envelope"></i>
+                    <b>&nbsp; {{ getAlreadyExpiredProducts.length }} </b>
+                    product(s) already expired
+                  </router-link>
+                </div>
+
+              </div>
+            </li>
+          </ul>
+
+
+              <!--   Inject views here   -->
             <router-view/>
 
         </div>
@@ -181,15 +230,41 @@
     <h5>Backing Up Database, Please Wait... <span class="spinner-grow"></span></h5>
   </dialog>
 
+  <dialog ref="rebuildDialog" style="border: 1px solid #ccc;">
+    <h5>Rebuilding Database... <span class="spinner-border"></span></h5>
+    <h6 class="text-danger">Please do not close this application or shut down the computer.</h6>
+  </dialog>
+
 </template>
 
 <script setup>
 
-// import runMigrations from "@/models";
+import runMigrations from "@/models";
 import db from "./dbConfig/db";
-// runMigrations() //Run all migrations
-db.raw("VACUUM").then(()=>{})
+runMigrations() //Run all migrations
 db.raw('PRAGMA foreign_keys = ON').then(()=>{});
+
+// const boom = [];
+// for (let i = 0; i < 3000; i++) {
+  // boom.push({
+  //   name: 'Akwasi Mensah', company: 'Boom company limited', phone: '09897652334', address: 'gsdgmj sjkdgkkjs dkfkjhkjhs dsdfgjksd'
+  // })
+
+  // boom.push({
+  //   orderDate: 1659830400000, type: 'sale', momo:0, total:1200.00, tendered:1200.00, discount:0, tax:0, userId:1
+  // })
+//   boom.push({
+//     productName: 'Itel pro', quantity: 10, buyingPrice: 200, sellingPrice:400, category: 1, tax: 'tax'
+//   })
+// }
+
+// db.batchInsert('customers', boom, 30).then(()=> console.log('data in bulk'))
+// db('customers').del().then(() => console.log('deleted'));
+// db.batchInsert('orders', boom, 30).then(()=> console.log('orders created'))
+// db.batchInsert('products', boom, 30).then(()=> console.log('products created'))
+
+
+
 
 import {computed, onMounted, ref} from "vue";
 import {useStore} from "vuex";
@@ -214,16 +289,20 @@ const settings = async () => { // insert data into company settings table
 settings();
 
 
-
 const time = ref(null);
 const store = useStore();
 const router = useRouter();
 const backupDialog = ref(null);
+const rebuildDialog = ref(null);
 const user = computed(() => store.getters.user);
+const lowQuantityProducts = computed(() => store.getters["productsModule/getLowQty"]); //Low qty Products
+const getExpiringProducts =  computed(() => store.getters["productsModule/getExpiringProducts"]); //Expired Products
+const getAlreadyExpiredProducts = computed(()=> store.getters["productsModule/getAlreadyExpiredProducts"]) //Already expired products
+
 
 
               //............If no user in users table, Create admin user ...................
-const insertUser = async () => {
+const insertAdminUser = async () => {
 
   const user = await db('users').first(); //Find one user
 
@@ -240,11 +319,32 @@ const insertUser = async () => {
 
       onMounted(async () => {
 
-        // insertUser();
+        insertAdminUser();
 
-        setInterval(()=>{
+        setInterval(()=>{ //Display Time
           if(time.value) time.value.innerHTML = new Date().toLocaleTimeString();
         },500)
+
+
+        try {
+          const products = await db('products')
+              .leftJoin('categories', 'products.category', '=','categories.id')
+              .select('products.id',
+                  'products.productName',
+                  'products.buyingPrice',
+                  'products.sellingPrice',
+                  'products.quantity',
+                  'products.tax',
+                  'products.description',
+                  'products.expiration',
+                  'categories.name as category',
+                  'categories.id as categoryId'
+              )
+          store.dispatch("productsModule/setProducts", products)
+        }catch (e) {
+          console.log(e.message);
+          ipcRenderer.send('errorMessage', 'Sorry, error occurred. Please try restarting this application');
+        }
 
       })
 
@@ -270,6 +370,16 @@ ipcRenderer.on('backup-complete', (event, args) => {
   backupDialog.value.close();
 })
 
+//Rebuild Database
+ipcRenderer.on('rebuild-db', async (event, args) => {
+  rebuildDialog.value.showModal();
+  rebuildDialog.value.addEventListener('cancel', e => e.preventDefault());
+  try {
+    await db.raw("VACUUM");
+    ipcRenderer.send('successMessage', 'Congrats!!!, Database Rebuild was successful')
+  }catch (e) { ipcRenderer.send('errorMessage', e.message) }
+  finally { rebuildDialog.value.close() }
+})
 
                     //....................Handle sidebar toggle.............................
 const root = ref(null);

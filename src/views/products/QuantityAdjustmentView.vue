@@ -76,7 +76,6 @@
 <script setup>
 
 import {reactive, ref, watch, computed} from "vue";
-import { formatNumber } from "@/functions";
 import db from "@/dbConfig/db";
 import {useStore} from "vuex";
 
@@ -160,11 +159,12 @@ const updateQuantity = async (e) => {
 
       //Modify Quantity in products table
       if (type.value === 'increment'){
-        await trx('products').where('id', data.id).increment('quantity', data.newQuantity)
+        await trx('products').where('id', data.id).increment('quantity', data.newQuantity);
+        store.dispatch("productsModule/modifyQty", {id: data.id, qty: data.newQuantity, type: 'increment'})
       }else {
-        await trx('products').where('id', data.id).decrement('quantity', data.newQuantity)
+        await trx('products').where('id', data.id).decrement('quantity', data.newQuantity);
+        store.dispatch("productsModule/modifyQty", {id: data.id, qty: data.newQuantity, type: 'decrement'})
       }
-
     })
 
     selectedProduct.value = null;

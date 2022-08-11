@@ -123,7 +123,7 @@ const login = async (e) => {
     let itemsToBeDisabledOnMenu = [];
 
     if (parseInt(user.role) === 2){ //if user is manager
-      itemsToBeDisabledOnMenu.push('backup', 'receiveItems', 'receivingHistory', 'outstandingBills')
+      itemsToBeDisabledOnMenu.push('backup', 'receiveItems', 'receivingHistory', 'outstandingBills', 'rebuildDb')
     }
 
     if (parseInt(user.role) === 3){ //if user is Cashier

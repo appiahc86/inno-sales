@@ -3,7 +3,7 @@
     <div class="row mt-4">
 
       <!--   CART -->
-      <div class="col-8">
+      <div class="col-8 mt-4">
         <div class="card shadow p-2" style="height: 500px;">
           <template v-if="loading">
             <v-select placeholder="Loading data. please wait......"
@@ -72,7 +72,7 @@
       </div>
 
       <!--      Payments -->
-      <div class="col-4">
+      <div class="col-4 mt-4">
         <div class="card shadow-lg ">
           <div class="card-body">
 
@@ -255,6 +255,7 @@ const dialog = ref(null);
 const selectedProduct = ref(null)
 const store = useStore();
 const companySettings = computed(() => store.getters.setting); //get company settings
+const user = computed(() => store.getters.user)
 
 const editData = reactive({
   id: '',
@@ -377,6 +378,7 @@ const savePurchase = async (e) => {
 
       await db.transaction( async trx => {
       const purchase = await trx('purchases').insert({ //Save to purchase table
+        userId: user.value.id,
         billDate: new Date(paymentData.billDate).setHours(0,0,0,0),
         invoiceDue: new Date(paymentData.invoiceDue).setHours(0,0,0,0),
         vendorId: paymentData.vendor.id,
@@ -426,6 +428,11 @@ const savePurchase = async (e) => {
       if (paymentData.printInvoice){
         printTiny(receipt, {scanStyles: false, scanHTML: true});
         console.clear();
+      }
+
+      //Update qty in vuex store
+      for (const item of cart.value) {
+        store.dispatch("productsModule/modifyQty", {id: item.id, qty: item.qty, type: 'increment'})
       }
 
       clearCart();

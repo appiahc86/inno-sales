@@ -37,7 +37,7 @@
         <div class="table-responsive">
 
           <DataTable
-              :value="records" :paginator="true"
+              :value="records" :paginator="true" dataKey="id"
               class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines"
               filterDisplay="menu" :rows="10"
               paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -47,26 +47,15 @@
             <template #empty>
               No record found.
             </template>
-            <Column field="id" header="Receipt#" sortable class="data-table-font-size"></Column>
+            <Column header="#" sortable class="data-table-font-size">
+              <template #body="{data}">
+                <td>{{ records.indexOf(data) + 1 }}</td>
+              </template>
+            </Column>
 
             <Column field="orderDate" header="Date" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td>{{ new Date(data.orderDate).toLocaleDateString() }}</td>
-              </template>
-            </Column>
-
-
-            <Column field="numberOfItems" header="Number Of Items" sortable class="data-table-font-size"></Column>
-
-            <Column field="discount" header="Discount" sortable class="data-table-font-size">
-              <template #body="{data}">
-                <td>{{ formatNumber(parseFloat(data.discount)) }}</td>
-              </template>
-            </Column>
-
-            <Column field="tax" header="Tax" sortable class="data-table-font-size">
-              <template #body="{data}">
-                <td>{{ formatNumber(parseFloat(data.tax)) }}</td>
               </template>
             </Column>
 
@@ -94,21 +83,15 @@
               </p>
               <table id="print-table">
                 <tr>
-                  <th>Receipt#</th>
+                  <th>#</th>
                   <th>Date</th>
-                  <th>Number Of Items</th>
-                  <th>Discount</th>
-                  <th>Tax</th>
                   <th>Total</th>
                 </tr>
 
-                <template v-for="record in records" :key="record.id">
+                <template v-for="(record, index) in records" :key="record.id">
                   <tr>
-                    <td>&nbsp; {{ record.id }}</td>
+                    <td>&nbsp; {{ index + 1 }}</td>
                     <td>&nbsp; {{ new Date(record.orderDate).toLocaleDateString() }}</td>
-                    <td>&nbsp; {{ record.numberOfItems }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.discount)) }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.tax)) }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.total)) }}</td>
                   </tr>
                 </template>
@@ -152,15 +135,20 @@ const search = async (e) => {
   if (!from.value || !to.value) return ipcRenderer.send('errorMessage', 'Please Select Date');
   const dateFrom = new Date(from.value).setHours(0,0,0,0);
   const dateTo = new Date(to.value).setHours(0,0,0,0);
+  if (dateFrom > dateTo) return ipcRenderer.send('errorMessage', 'Sorry, (Date from) cannot be greater than (Date to)');
+
   message.value = null;
 
   try {
     e.target.submitBtn.disabled = true;
     loading.value = true;
     records.value = await db('orders')
+        .select('orders.id', 'orders.orderDate')
+        .sum('orders.total as total')
         .whereRaw('?? >= ?', ['orderDate', dateFrom])
         .andWhereRaw('?? <= ?', ['orderDate', dateTo])
         .andWhereRaw('?? = ?', ['type', 'return'])
+        .groupBy('orders.orderDate')
 
     if (dateFrom === dateTo) message.value = `Sales Returns Report On ${new Date(dateFrom).toDateString()}`;
     else message.value = `Sales Returns Report From ${new Date(dateFrom).toLocaleDateString()} To ${new Date(dateTo).toLocaleDateString()}`;

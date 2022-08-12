@@ -28,7 +28,8 @@
           <tr>
             <th class="float-end">Tax(%)</th>
             <td>
-              <input type="number" class="form-control-dark w-100" step="any" min="0" max="99" v-model.number="settings.tax">
+              <input type="number" class="form-control-dark w-100" step="any" min="0" max="99"
+                     v-model.number="settings.tax"  oninput="validity.valid || (value = 0)">
             </td>
           </tr>
           <tr>

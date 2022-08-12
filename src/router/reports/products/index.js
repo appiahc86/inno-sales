@@ -1,7 +1,8 @@
 
 import ProductsListView from "@/views/reports/products/ProductsListView";
 import LowStockView from "@/views/reports/products/LowStockView";
-import expiredProductsView from "@/views/reports/products/expiredProductsView";
+import ExpiringProductsView from "@/views/reports/products/ExpiringProductsView";
+import ExpiredProductsView from "@/views/reports/products/ExpiredProductsView";
 
 const productsReportRouter = [
     {
@@ -15,10 +16,15 @@ const productsReportRouter = [
         component: LowStockView
     },
     {
+        path: '/report/products/products-expiring',
+        name: 'report-products-expiring',
+        component: ExpiringProductsView
+    },
+    {
         path: '/report/products/products-expired',
         name: 'report-products-expired',
-        component: expiredProductsView
-    }
+        component: ExpiredProductsView
+    },
 ]
 
 export default productsReportRouter;

@@ -6,7 +6,7 @@
         <form @submit.prevent="saveCategory">
               <label>
                 <span class="fw-bold" id="label">Enter Category</span>
-                <input type="text" v-model.trim="name" maxlength="20" class="form-control form-control-dark">
+                <input type="text" v-model.trim="name" maxlength="100" class="form-control form-control-dark">
               </label>&nbsp;
           <button ref="saveButton" class="btn-secondary p-1 px-3">
           <span class="pi pi-save"></span><b> Save</b>

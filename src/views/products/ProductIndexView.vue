@@ -59,12 +59,14 @@
 
                         <tr>
                           <th class="float-end"><span class="pi pi-money-bill"></span> Buying Price &nbsp;</th>
-                          <td><input type="number" step="0.01" min="0" class="form-control-dark" v-model.number="productData.buyingPrice"></td>
+                          <td><input type="number" step="any" min="0" class="form-control-dark"
+                               v-model.number="productData.buyingPrice" oninput="validity.valid || (value = '')"></td>
                         </tr>
 
                         <tr>
                           <th class="float-end"><span class="pi pi-money-bill"></span> Selling Price &nbsp;</th>
-                          <td><input type="number" step="0.01" min="0" class="form-control-dark" v-model.number="productData.sellingPrice"></td>
+                          <td><input type="number" step="any" min="0" class="form-control-dark"
+                               v-model.number="productData.sellingPrice"  oninput="validity.valid || (value = '')"></td>
                         </tr>
 
                         <tr>
@@ -333,7 +335,7 @@ const secondActive = ref(false);
 
     const productData = reactive({
       productName: '',
-      quantity: '',
+      quantity: 0,
       description: '',
       buyingPrice: '',
       sellingPrice: '',
@@ -395,7 +397,7 @@ getCategories();
 
     //Reset Product from data
     const resetProductData = () => {
-      productData.productName = ''; productData.quantity = ''; productData.description = '';
+      productData.productName = ''; productData.quantity = 0; productData.description = '';
       productData.buyingPrice = ''; productData.sellingPrice = ''; productData.category = null;
       productData.tax = 'tax'; productData.expiration = null
     }
@@ -425,7 +427,7 @@ getCategories();
               .insert({
                 ...productData,
                 dateAdded:   new Date().setHours(0,0,0,0),
-                expiration:   new Date(productData.expiration).setHours(0,0,0,0)
+                expiration:   productData.expiration ? new Date(productData.expiration).setHours(0,0,0,0) : ''
               });
 
           //Update on front-end
@@ -434,7 +436,7 @@ getCategories();
 
           //push to vuex store products
           store.dispatch("productsModule/addProduct", {
-            ...productData, id: product[0], categoryId: productData.category
+            ...productData, id: product[0]
           })
           resetProductData();
 

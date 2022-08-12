@@ -43,7 +43,7 @@
                   <input type="text" class="form-control"
                          v-model="data.oldQuantity" disabled>&nbsp;
                   <input type="number" step="1" class="form-control" min="1"
-                         v-model.number="data.newQuantity">
+                         v-model.number="data.newQuantity" oninput="validity.valid || (value = '')">
                 </div>
 
                 <textarea cols="30" rows="4" class="form-control mt-2" placeholder="Reason"

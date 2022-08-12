@@ -185,28 +185,37 @@
 
                 <div class="dropdown-menu dropdown-menu-right">
                   <span class="dropdown-item dropdown-header">Notifications</span>
+
                   <!--       Low Quantity products         -->
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" v-if="getExpiringProducts && getExpiringProducts.length">
-                    <i class="pi pi-envelope"></i>&nbsp;
-                    <b>{{ getExpiringProducts.length }}</b>
-                     product(s) expiring
-                  </a>
+                  <template v-if="getExpiringProducts && getExpiringProducts.length">
+                    <div class="dropdown-divider"></div>
+                    <router-link :to="{name: 'report-products-expiring'}" class="dropdown-item">
+                      <i class="pi pi-envelope"></i>&nbsp;
+                      <b>{{ getExpiringProducts.length }}</b>
+                      product(s) expiring
+                    </router-link>
+                  </template>
+
                   <!--       Expiring products         -->
-                  <div class="dropdown-divider"></div>
-                  <router-link :to="{name: 'low-stock'}" class="dropdown-item" v-if="lowQuantityProducts && lowQuantityProducts.length">
-                    <i class="pi pi-envelope"></i>
-                    <b>&nbsp; {{ lowQuantityProducts.length }}</b>
-                    product(s) below qty of 5
-                  </router-link>
+                  <template v-if="lowQuantityProducts && lowQuantityProducts.length">
+                    <div class="dropdown-divider"></div>
+                    <router-link :to="{name: 'low-stock'}" class="dropdown-item">
+                      <i class="pi pi-envelope"></i>
+                      <b>&nbsp; {{ lowQuantityProducts.length }}</b>
+                      product(s) below qty of 5
+                    </router-link>
+                  </template>
+
                   <!--       Already Expired products      -->
-                  <div class="dropdown-divider"></div>
-                  <router-link :to="{name: 'report-products-expired'}" class="dropdown-item text-danger"
-                               v-if="getAlreadyExpiredProducts && getAlreadyExpiredProducts.length">
-                    <i class="pi pi-envelope"></i>
-                    <b>&nbsp; {{ getAlreadyExpiredProducts.length }} </b>
-                    product(s) already expired
-                  </router-link>
+                  <template v-if="getAlreadyExpiredProducts && getAlreadyExpiredProducts.length">
+                    <div class="dropdown-divider"></div>
+                    <router-link :to="{name: 'report-products-expired'}" class="dropdown-item text-danger">
+                      <i class="pi pi-envelope"></i>
+                      <b>&nbsp; {{ getAlreadyExpiredProducts.length }} </b>
+                      product(s) already expired
+                    </router-link>
+                  </template>
+
                 </div>
 
               </div>
@@ -239,9 +248,9 @@
 
 <script setup>
 
-import runMigrations from "@/models";
+// import runMigrations from "@/models";
 import db from "./dbConfig/db";
-runMigrations() //Run all migrations
+// runMigrations() //Run all migrations
 db.raw('PRAGMA foreign_keys = ON').then(()=>{});
 
 // const boom = [];
@@ -319,7 +328,7 @@ const insertAdminUser = async () => {
 
       onMounted(async () => {
 
-        insertAdminUser();
+        // insertAdminUser();
 
         setInterval(()=>{ //Display Time
           if(time.value) time.value.innerHTML = new Date().toLocaleTimeString();
@@ -328,17 +337,9 @@ const insertAdminUser = async () => {
 
         try {
           const products = await db('products')
-              .leftJoin('categories', 'products.category', '=','categories.id')
               .select('products.id',
-                  'products.productName',
-                  'products.buyingPrice',
-                  'products.sellingPrice',
                   'products.quantity',
-                  'products.tax',
-                  'products.description',
                   'products.expiration',
-                  'categories.name as category',
-                  'categories.id as categoryId'
               )
           store.dispatch("productsModule/setProducts", products)
         }catch (e) {

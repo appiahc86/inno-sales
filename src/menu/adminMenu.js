@@ -110,6 +110,8 @@ const adminMenu = [
                 submenu: [
                     {label: 'Products List', click(){sendRouteEvent('report-products-list')}},
                     {label: 'Low Stock', click(){sendRouteEvent('report-products-low-stock')}},
+                    {type: 'separator'},
+                    {label: 'Expiring Products', click(){sendRouteEvent('report-products-expiring')}},
                     {label: 'Expired Products', click(){sendRouteEvent('report-products-expired')}}
                 ]
             }, // ./products

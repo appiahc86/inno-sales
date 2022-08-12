@@ -62,7 +62,9 @@ const productsModule = {
 
         //  Add product
         addProduct: (state, payload) => {
-            state.products.push(payload);
+            state.products.push({
+                id: payload.id, quantity: payload.quantity, expiration: payload.expiration
+            });
         },
 
         //Modify Quantity
@@ -96,9 +98,7 @@ const productsModule = {
                     p.expiration = date ? new Date(date).setHours(0,0,0,0) : p.expiration;
                     break;
                 }
-
             }
-
         },
 
     },

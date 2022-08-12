@@ -571,11 +571,12 @@ const checkout = async (e) => {
       })
 
       printTiny(receipt, {scanStyles: false, scanHTML: true});
+      console.clear();
     }
 
     printReceipt.value = true;
     selectedCustomer.value = null; //clear selected customer
-    console.clear();
+
 
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message)

@@ -44,9 +44,9 @@
                 </div>
                 <div class="d-flex">
                   <input type="number" step="any" min="0" class="form-control"
-                         v-model.number="data.newBuyingPrice">&nbsp;
+                         v-model.number="data.newBuyingPrice" oninput="validity.valid || (value = 0)">&nbsp;
                   <input type="number" step="any" class="form-control" min="0"
-                         v-model.number="data.newSellingPrice">
+                         v-model.number="data.newSellingPrice" oninput="validity.valid || (value = 0)">
                 </div>
 
                 <textarea cols="30" rows="4" class="form-control mt-2" placeholder="Reason"

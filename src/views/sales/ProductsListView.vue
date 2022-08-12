@@ -1,7 +1,7 @@
 <template>
 <div class="container-fluid">
   <h4 class="text-center" v-if="loading">Loading Data Please Wait... <span class="spinner-grow"></span></h4>
-  <h4 class="text-center" v-else>Item List</h4>
+  <h4 class="text-center" v-else>Products List</h4>
   <div class="row">
     <div class="col">
       <!--  Products Table  -->

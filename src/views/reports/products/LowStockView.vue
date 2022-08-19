@@ -14,7 +14,7 @@
                    oninput="validity.valid || (value = 5)"
             >
             <button class="bg-primary text-white px-3" title="Search" name="submitBtn" style="border: none;">
-              <span class="spinner-border" v-if="loading"></span>
+              <span class="spinner-border spinner-border-sm" v-if="loading"></span>
               <span class="pi pi-search" v-else></span>
             </button>
           </div>

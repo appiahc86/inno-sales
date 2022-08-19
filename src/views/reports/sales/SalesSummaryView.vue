@@ -14,7 +14,7 @@
                 <div class="input-group-text bg-dark text-white"><b>To</b></div>
                 <input type="date" class="form-control form-control-dark" v-model="to" onkeydown="return false">
                 <button class="bg-primary text-white px-3" title="Search" name="submitBtn" style="border: none;">
-                  <span class="spinner-border" v-if="loading"></span>
+                  <span class="spinner-border spinner-border-sm" v-if="loading"></span>
                   <span class="pi pi-search" v-else></span>
                 </button>
               </div>
@@ -125,7 +125,6 @@ import {computed, ref} from "vue";
 import db from "@/dbConfig/db";
 import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
-import {onBeforeRouteLeave} from "vue-router";
 
 const loading = ref(false);
 const from = ref(null);
@@ -137,11 +136,6 @@ const store = useStore();
 
 const settings = computed(() => store.getters.setting);
 
-
-onBeforeRouteLeave( (to, from, next) => {
-  delete records.value
-  next();
-})
 
 
         //....................Search.......................
@@ -158,7 +152,7 @@ const search = async (e) => {
   try {
     e.target.submitBtn.disabled = true;
     loading.value = true;
-    records.value = await db('orders')
+    await db('orders')
         // .leftJoin('users', 'users.id', '=', 'orders.userId')
         .select('orders.id', 'orders.orderDate')
         .sum('orders.total as total')
@@ -167,6 +161,28 @@ const search = async (e) => {
         .whereRaw('?? >= ?', ['orderDate', dateFrom])
         .andWhereRaw('?? <= ?', ['orderDate', dateTo])
         .groupBy('orders.orderDate')
+        .stream((stream) => {
+
+          stream.on('data', (row) => {
+            records.value.push(row);
+            if (records.value.length > 500) { //If records are more than 500
+              stream.destroy();
+              records.value = [] //clear all record
+              ipcRenderer.send(
+                  'errorMessage',
+                  `You tried to display more than 500 records on screen.\nFor performance sake, please load records in batches`
+              )
+            }
+          })
+
+        });
+
+
+    //If records from streaming
+    if (records.value.length){
+      from.value = null;
+      to.value = null;
+    }
 
     if (dateFrom === dateTo) message.value = `Sales Report On ${new Date(dateFrom).toDateString()}`;
     else message.value = `Sales Report From ${new Date(dateFrom).toLocaleDateString()} To ${new Date(dateTo).toLocaleDateString()}`;

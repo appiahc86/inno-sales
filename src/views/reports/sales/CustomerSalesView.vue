@@ -18,7 +18,7 @@
                   <div class="input-group-text bg-dark text-white"><b>To</b></div>
                   <input type="date" class=" form-control form-control-dark" v-model="formData.to" onkeydown="return false" >
                   <button class="bg-primary text-white px-3" title="Search" name="submitBtn" style="border: none;">
-                    <span class="spinner-border" v-if="loading"></span>
+                    <span class="spinner-border spinner-border-sm" v-if="loading"></span>
                     <span class="pi pi-search" v-else></span>
                   </button>
                 </div>
@@ -188,10 +188,26 @@ const search = async (e) => {
   try {
     e.target.submitBtn.disabled = true;
 
-    records.value = await db('orders')
+    await db('orders')
         .where('customerId', formData.selectedCustomer.id)
         .andWhereRaw("?? >= ?", ['orderDate', dateFrom])
         .andWhereRaw("?? <= ?", ['orderDate', dateTo])
+        .stream((stream) => {
+
+          stream.on('data', (row) => {
+            records.value.push(row);
+            if (records.value.length > 500) { //If records are more than 500
+              stream.destroy();
+              records.value = [] //clear all record
+              ipcRenderer.send(
+                  'errorMessage',
+                  `You tried to display more than 500 records on screen.\nFor performance sake, please load records in batches`
+              )
+            }
+          })
+
+        });
+
 
     if (dateFrom === dateTo) message.value = `Sales Report On ${new Date(dateFrom).toDateString()}`;
     else message.value = `Sales Report From ${new Date(dateFrom).toLocaleDateString()} To ${new Date(dateTo).toLocaleDateString()}`;

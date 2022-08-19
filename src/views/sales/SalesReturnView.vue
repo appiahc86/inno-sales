@@ -73,7 +73,7 @@
         <h5 v-if="discount">Discount: <b>{{ formatNumber(discount) }}</b></h5>
         <h5 v-if="tax">Tax: <b>{{ formatNumber(tax) }}</b></h5>
       <h3 class="text-danger" v-if="change">
-        Change: <b>GHS {{ formatNumber(change) }}
+        Change: <b>GH¢ {{ formatNumber(change) }}
       </b></h3>
     </div>
 

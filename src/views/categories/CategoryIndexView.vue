@@ -4,7 +4,7 @@
     <div class="row">
       <div class="col-6 mt-4">
         <form @submit.prevent="saveCategory">
-              <label>
+              <label class="w-50">
                 <span class="fw-bold" id="label">Enter Category</span>
                 <input type="text" v-model.trim="name" maxlength="100" class="form-control form-control-dark">
               </label>&nbsp;

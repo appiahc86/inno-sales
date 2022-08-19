@@ -14,7 +14,7 @@
                   <div class="input-group-text bg-dark text-white"><b>To</b></div>
                   <input type="date" class="form-control form-control-dark" v-model="to" onkeydown="return false">
                   <button class="bg-primary text-white px-3" title="Search" name="submitBtn" style="border: none;">
-                    <span class="spinner-border" v-if="loading"></span>
+                    <span class="spinner-border spinner-border-sm" v-if="loading"></span>
                     <span class="pi pi-search" v-else></span>
                   </button>
                 </div>
@@ -160,7 +160,7 @@
 <script setup>
 import {computed, ref} from "vue";
 import db from "@/dbConfig/db";
-import {diffInDays, formatNumber} from "@/functions";
+import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
 
 const loading = ref(false)
@@ -182,16 +182,12 @@ const search = async (e) => {
   const dateTo = new Date(to.value).setHours(0,0,0,0);
   if (dateFrom > dateTo) return ipcRenderer.send('errorMessage', 'Sorry, (Date from) cannot be greater than (Date to)');
 
-  // check if date difference is more than 5 months (155 days)
-  const chk =  diffInDays(dateTo, dateFrom)
-  if (chk > 155) return ipcRenderer.send('errorMessage', 'Sorry, For performance sake, date difference shouldn\'t be more than five months')
-
   message.value = null;
 
   try {
     e.target.submitBtn.disabled = true;
     loading.value = true;
-    records.value = await db('orderDetails')
+    await db('orderDetails')
         .leftJoin('orders', 'orders.id', '=', 'orderDetails.orderId')
         .leftJoin('users', 'users.id', '=', 'orders.userId')
         .select('orderDetails.id','orderDetails.productName', 'orderDetails.buyingPrice',
@@ -199,12 +195,32 @@ const search = async (e) => {
             'orderDetails.quantity', 'orderDetails.date', 'users.firstName as user')
         .whereRaw('?? >= ?', ['date', dateFrom])
         .andWhereRaw('?? <= ?', ['date', dateTo])
+        .stream((stream) => {
+
+          stream.on('data', (row) => {
+            records.value.push(row);
+            if (records.value.length > 500) { //If records are more than 500
+              stream.destroy();
+              records.value = [] //clear all record
+              ipcRenderer.send(
+                  'errorMessage',
+                  `You tried to display more than 500 records on screen.\nFor performance sake, please load records in batches`
+              )
+            }
+          })
+
+        });
+
+
+    //If records from streaming
+    if (records.value.length){
+      from.value = null;
+      to.value = null;
+    }
 
     if (dateFrom === dateTo) message.value = `Sales Report On ${new Date(dateFrom).toDateString()}`;
     else message.value = `Sales Report From ${new Date(dateFrom).toLocaleDateString()} To ${new Date(dateTo).toLocaleDateString()}`;
 
-    from.value = null;
-    to.value = null;
 
   }catch (e) { ipcRenderer.send('errorMessage', e.message) }
   finally {

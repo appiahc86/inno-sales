@@ -15,7 +15,7 @@
                   <div class="input-group-text bg-dark text-white"><b>To</b></div>
                   <input type="date" class="form-control form-control-dark" v-model="to" onkeydown="return false">
                   <button class="bg-primary text-white px-3" title="Search" name="submitBtn" style="border: none;">
-                    <span class="spinner-border" v-if="loading"></span>
+                    <span class="spinner-border spinner-border-sm" v-if="loading"></span>
                     <span class="pi pi-search" v-else></span>
                   </button>
                 </div>
@@ -137,7 +137,7 @@ const search = async (e) => {
     e.target.submitBtn.disabled = true;
     loading.value = true;
 
-    records.value = await db('billPayments')
+   await db('billPayments')
         .leftJoin('purchases', 'purchases.id', '=', 'billPayments.purchaseId')
         .leftJoin('vendors', 'vendors.id', '=', 'purchases.vendorId')
         .select('billPayments.id', 'vendors.company', 'purchases.invoice',
@@ -145,13 +145,33 @@ const search = async (e) => {
         .where('purchases.status', 'received')
         .andWhereRaw('?? >= ?', ['billPayments.date', dateFrom])
         .andWhereRaw('?? <= ?', ['billPayments.date', dateTo])
+        .stream((stream) => {
+
+          stream.on('data', (row) => {
+            records.value.push(row);
+            if (records.value.length > 500) { //If records are more than 500
+              stream.destroy();
+              records.value = [] //clear all record
+              ipcRenderer.send(
+                  'errorMessage',
+                  `You tried to display more than 500 records on screen.\nFor performance sake, please load records in batches`
+              )
+            }
+          })
+
+        });
+
+
+    //If records from streaming
+    if (records.value.length){
+      from.value = null;
+      to.value = null;
+    }
 
 
     if (dateFrom === dateTo) message.value = `Bill Payments On ${new Date(dateFrom).toDateString()}`;
     else message.value = `Bill Payments From ${new Date(dateFrom).toLocaleDateString()} To ${new Date(dateTo).toLocaleDateString()}`;
 
-    from.value = null;
-    to.value = null;
 
   }
   catch (e){ ipcRenderer.send('errorMessage', e.message) }

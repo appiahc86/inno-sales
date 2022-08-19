@@ -5,7 +5,7 @@
     <div class="row">
       <div class="col-12">
 
-        <h5 class="text-center" v-if="loading">Loading Data Please Wait... <span class="spinner-grow"></span></h5>
+        <h5 class="text-center" v-if="loading">Loading Data Please Wait... <span class="spinner-grow spinner-grow-sm"></span></h5>
         <h5 class="text-center mb-3" v-else><b>Outstanding Bills</b></h5>
 
         <button class="p-1 fw-bold bg-secondary text-white" v-if="records.length" @click="printReport">

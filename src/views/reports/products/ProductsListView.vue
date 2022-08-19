@@ -66,7 +66,6 @@
         </div>
 
 
-
         <!--  Print table -->
         <template>
           <div class="" v-if="records.length">
@@ -153,10 +152,10 @@ const getAllProducts = async () => {
             'categories.name as category'
         ).orderBy('products.productName','asc')
 
+
   }
   catch (e){ ipcRenderer.send('errorMessage', e.message) }
   finally { loading.value = false; }
-
 
 }
 getAllProducts();

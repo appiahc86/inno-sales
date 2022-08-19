@@ -1,4 +1,3 @@
-import {dialog} from "electron";
 
 const endingMenu = [
     {

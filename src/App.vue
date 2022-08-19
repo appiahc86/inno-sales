@@ -248,13 +248,13 @@
 
 <script setup>
 
-// import runMigrations from "@/models";
+import runMigrations from "@/models";
 import db from "./dbConfig/db";
-// runMigrations() //Run all migrations
+runMigrations() //Run all migrations
 db.raw('PRAGMA foreign_keys = ON').then(()=>{});
 
-// const boom = [];
-// for (let i = 0; i < 3000; i++) {
+const boom = [];
+for (let i = 0; i < 20000; i++) {
   // boom.push({
   //   name: 'Akwasi Mensah', company: 'Boom company limited', phone: '09897652334', address: 'gsdgmj sjkdgkkjs dkfkjhkjhs dsdfgjksd'
   // })
@@ -262,15 +262,20 @@ db.raw('PRAGMA foreign_keys = ON').then(()=>{});
   // boom.push({
   //   orderDate: 1659830400000, type: 'sale', momo:0, total:1200.00, tendered:1200.00, discount:0, tax:0, userId:1
   // })
-//   boom.push({
-//     productName: 'Itel pro', quantity: 10, buyingPrice: 200, sellingPrice:400, category: 1, tax: 'tax'
-//   })
-// }
+  // boom.push({
+  //   productName: 'Nokia X2', quantity: 30, buyingPrice: 200, sellingPrice:900, category: 1, tax: 'tax', description: 'hello'
+  // })
+  // boom.push({
+  //   productId: 1, productName: 'Nokia X2', quantity: 3, buyingPrice: 900, originalPrice: 900, sellingPrice: 900,
+  //   total: 2700, tax: 0, discount: 0, date: 1660867200000, categoryId: 1, orderId: 1
+  // })
+}
 
 // db.batchInsert('customers', boom, 30).then(()=> console.log('data in bulk'))
 // db('customers').del().then(() => console.log('deleted'));
 // db.batchInsert('orders', boom, 30).then(()=> console.log('orders created'))
 // db.batchInsert('products', boom, 30).then(()=> console.log('products created'))
+// db.batchInsert('orderDetails', boom, 30).then(()=> console.log('order details created'))
 
 
 
@@ -387,6 +392,7 @@ const root = ref(null);
 const sidebarMenu = ref(null);
 const sidebarToggle = ref(null);
 const main = ref(null);
+
 const collapseSidebar = () => {
   sidebarMenu.value.classList.add('hideMe');
   sidebarToggle.value.classList.remove('hideMe');

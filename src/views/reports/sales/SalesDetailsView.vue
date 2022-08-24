@@ -195,14 +195,15 @@ const search = async (e) => {
             'orderDetails.quantity', 'orderDetails.date', 'users.firstName as user')
         .whereRaw('?? >= ?', ['date', dateFrom])
         .andWhereRaw('?? <= ?', ['date', dateTo])
+        .limit(510)
         .stream((stream) => {
 
           stream.on('data', (row) => {
             records.value.push(row);
             if (records.value.length > 500) { //If records are more than 500
-              stream.destroy();
+               stream.destroy()
               records.value = [] //clear all record
-              ipcRenderer.send(
+              return ipcRenderer.send(
                   'errorMessage',
                   `You tried to display more than 500 records on screen.\nFor performance sake, please load records in batches`
               )

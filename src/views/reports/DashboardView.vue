@@ -296,7 +296,6 @@ const getData = async () => {
           ).groupBy('products.id')
           .orderBy('totalSold', 'desc')
           .limit(10)
-
     })
 
 

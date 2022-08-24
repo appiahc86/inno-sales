@@ -149,6 +149,7 @@ const search = async (e) => {
         .andWhereRaw('?? <= ?', ['orderDate', dateTo])
         .andWhereRaw('?? = ?', ['type', 'return'])
         .groupBy('orders.orderDate')
+        .limit(510)
         .stream((stream) => {
 
           stream.on('data', (row) => {
@@ -156,7 +157,7 @@ const search = async (e) => {
             if (records.value.length > 500) { //If records are more than 500
               stream.destroy();
               records.value = [] //clear all record
-              ipcRenderer.send(
+             return ipcRenderer.send(
                   'errorMessage',
                   `You tried to display more than 500 records on screen.\nFor performance sake, please load records in batches`
               )
@@ -171,6 +172,7 @@ const search = async (e) => {
       from.value = null;
       to.value = null;
     }
+
 
     if (dateFrom === dateTo) message.value = `Sales Returns Report On ${new Date(dateFrom).toDateString()}`;
     else message.value = `Sales Returns Report From ${new Date(dateFrom).toLocaleDateString()} To ${new Date(dateTo).toLocaleDateString()}`;

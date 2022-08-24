@@ -4,7 +4,6 @@ list of menu IDs in this file
 */
 
 import {dialog, BrowserWindow, app} from "electron";
-import * as path from "path";
 const fse = require('fs-extra');
 
 //Format database name
@@ -40,7 +39,6 @@ const copyDatabaseFile = async (filePath) => {
 const options = {
     title: 'Save database to..',
     buttonLabel: 'Save',
-    // defaultPath: path.join(__dirname, `../../${getDbName()}`),
     defaultPath: app.getPath('documents') + '/' + getDbName(),
     filters: [{name: 'backup', extensions: ['db']}]
 }

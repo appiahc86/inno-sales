@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, Menu, ipcMain, dialog, exec, globalShortcut } from 'electron';
+import { app, protocol, BrowserWindow, Menu, ipcMain, dialog, globalShortcut } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -80,7 +80,7 @@ app.on('activate', () => {
 
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  if (BrowserWindow.getAllWindows().length === 0) createWindow();
 })
 
 // This method will be called when Electron has finished
@@ -205,3 +205,4 @@ ipcMain.on('confirm', async (event, {id, type, message}) => {
   else console.clear();
 
 })
+

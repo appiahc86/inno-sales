@@ -253,8 +253,9 @@ import db from "./dbConfig/db";
 runMigrations() //Run all migrations
 db.raw('PRAGMA foreign_keys = ON').then(()=>{});
 
-const boom = [];
-for (let i = 0; i < 250000; i++) {
+// const boom = [];
+// for (let i = 0; i < 250000; i++) {
+
   // boom.push({
   //   name: 'Akwasi Mensah', company: 'Boom company limited', phone: '09897652334', address: 'gsdgmj sjkdgkkjs dkfkjhkjhs dsdfgjksd'
   // })
@@ -269,7 +270,9 @@ for (let i = 0; i < 250000; i++) {
   //   productId: 1, productName: 'Nokia X2', quantity: 3, buyingPrice: 900, originalPrice: 900, sellingPrice: 900,
   //   total: 2700, tax: 0, discount: 0, date: 1661126400000, categoryId: 1, orderId: 1
   // })
-}
+
+
+// }
 
 // db.batchInsert('customers', boom, 30).then(()=> console.log('data in bulk'))
 // db('customers').del().then(() => console.log('deleted'));

@@ -26,7 +26,7 @@ module.exports = {
         win: {
           target: 'nsis',
           // requestedExecutionLevel: "requireAdministrator",
-          icon: ''
+          icon: './public/icon.png'
         },
         nsis: {
           uninstallDisplayName: 'Inno Sales',

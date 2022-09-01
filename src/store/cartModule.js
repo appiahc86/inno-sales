@@ -4,7 +4,7 @@ const cartModule = {
 
     state: () => ({
         cart: [],
-        tax: 1,
+        tax: 0,
         cashTendered: 0
     }),
 
@@ -62,7 +62,8 @@ const cartModule = {
         addToCart: (state, payload) => {
             let inCart = false;
             for (const item of state.cart) {
-                if (item.id === payload.id) { // check if item is in cart
+                if (item.id === payload.id) { // if item is in cart
+                    item.qty += 1;
                     inCart = true;
                     break;
                 }
@@ -129,7 +130,7 @@ const cartModule = {
             state.cart = [];
         },
 
-        //Unhold item
+        //Un-hold item
         unhold: (state, payload) => {
             state.cart = payload;
         }

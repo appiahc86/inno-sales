@@ -148,7 +148,6 @@ const updateQuantity = async (e) => {
       //Insert into quantityAdjustments table
       await trx('quantityAdjustments').insert({
         userId: user.value.id,
-        date: new Date().setHours(0,0,0,0),
         productId: data.id,
         oldQuantity: data.oldQuantity,
         quantity: data.newQuantity,

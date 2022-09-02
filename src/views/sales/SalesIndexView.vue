@@ -494,7 +494,6 @@ resetPayment();
 const checkout = async (e) => {
    e.target.submitBtn.disabled = true;
   const receipt = document.querySelector("#printTable");
-  const date = new Date().setHours(0,0,0,0);
   const customerId = selectedCustomer.value ? selectedCustomer.value.id : '';
   const getTax = computed(() => store.getters["cartModule/getTax"]);
 
@@ -514,7 +513,6 @@ const checkout = async (e) => {
        await db.transaction( async trx => {
 
          const order = await trx('orders').insert({ //Save to Orders table
-           orderDate: date,
            numberOfItems: cart.value.length,
            momo: momo.value || 0,
            total: total.value,
@@ -537,7 +535,6 @@ const checkout = async (e) => {
              total: item.sellingPrice * item.qty,
              tax: item.salesTax,
              discount: item.discount,
-             date: date,
              categoryId: item.categoryId,
              orderId: order
            })

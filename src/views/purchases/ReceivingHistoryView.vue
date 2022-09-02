@@ -248,9 +248,6 @@ const returnToVendor = async (e) => {
           store.dispatch("productsModule/modifyQty", {id: purchase.productId, qty: purchase.quantity, type: 'decrement'})
         }
 
-        // Set purchase status to returned
-        await trx('purchases').where('id', returnData.id)
-            .update({status: 'returned', returnedDate: new Date(returnData.date).setHours(0,0,0,0) });
 
         //Delete purchase
         await trx('purchases').where('id', returnData.id).del();

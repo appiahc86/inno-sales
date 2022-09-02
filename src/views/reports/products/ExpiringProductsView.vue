@@ -135,7 +135,7 @@ const settings = computed(() => store.getters.setting)
 //get all products
 const getAllProducts = async () => {
 
-  const today = new Date().setHours(0,0,0,0);
+  const today = new Date();
 
   try {
 
@@ -154,13 +154,14 @@ const getAllProducts = async () => {
             'products.expiration',
             'categories.name as category'
         )
-        .whereRaw('?? > ?', ['expiration', today])
+        .whereRaw('DATE(expiration) > ?', [db.fn.now()])
         .orderBy('products.productName','asc')
 
     records.value = data.filter(item => {
       const expDate = new Date(item.expiration);
-      const notificationStartDate = expDate.setDate(expDate.getDate() - 14);
-      const notificationEndDate = new Date(item.expiration).setHours(0,0,0,0);
+      let notificationStartDate = expDate.setDate(expDate.getDate() - 14);
+      notificationStartDate = new Date(notificationStartDate);
+      let notificationEndDate = new Date(item.expiration);
       return today >= notificationStartDate && today < notificationEndDate
     })
 

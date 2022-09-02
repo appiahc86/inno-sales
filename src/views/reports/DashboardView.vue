@@ -238,13 +238,19 @@ const outstandingBillsTotal = computed(() => {
 
 
 const startDate = () => { //This will set date to January 1 of the current year
-  const begin = new Date().setMonth(0,1);
-  return new Date(begin).setHours(0, 0, 0, 0)
+  let yyyy = new Date().getFullYear();
+  let mm = '01';
+  let dd = '01';
+  return `${yyyy}-${mm}-${dd}`;
 }
 
+
+
 const endDate = () => { //This will set date to December 31 of the current year
-  const begin = new Date().setMonth(11,31);
-  return new Date(begin).setHours(0, 0, 0, 0)
+  let yyyy = new Date().getFullYear();
+  let mm = '12';
+  let dd = '31';
+  return `${yyyy}-${mm}-${dd}`;
 }
 
       //...................Get all data from db...............
@@ -255,16 +261,16 @@ const getData = async () => {
 
       //Get orders
       orders.value = await trx('orders')
-          .whereRaw('?? >= ?', ['orderDate', startDate()])
-          .whereRaw('?? <= ?', ['orderDate', endDate()])
+          .whereRaw('DATE(orderDate) >= ?', [startDate()])
+          .andWhereRaw('DATE(orderDate) <= ?', [endDate()])
           .select('orderDate')
           .sum('total as total')
-          .groupBy('orderDate')
+          .groupByRaw('DATE(orderDate)');
 
       //Get purchases
       const purchases = await trx('purchases').where('status', 'received')
-          .whereRaw('?? >= ?', ['billDate', startDate()])
-          .whereRaw('?? <= ?', ['billDate', endDate()])
+          .whereRaw('DATE(billDate) >= ?', [startDate()])
+          .andWhereRaw('DATE(billDate) <= ?', [endDate()])
           .sum('total as totalPurchases');
       totalPurchases.value = purchases[0].totalPurchases || 0;
       pieChartSeries.value[0] = purchases[0].totalPurchases || 0;
@@ -289,8 +295,8 @@ const getData = async () => {
           .leftJoin('orderDetails', 'products.id', '=','orderDetails.productId')
           .leftJoin('categories', 'categories.id', 'orderDetails.categoryId')
           .sum('orderDetails.quantity as totalSold')
-          .whereRaw('?? >= ?', ['orderDetails.date', startDate()])
-          .whereRaw('?? <= ?', ['orderDetails.date', endDate()])
+          .whereRaw('DATE(orderDetails.date) >= ?', [startDate()])
+          .andWhereRaw('DATE(orderDetails.date) <= ?', [endDate()])
           .select('products.id','products.productName','products.sellingPrice',
               'products.dateAdded','categories.name as category'
           ).groupBy('products.id')

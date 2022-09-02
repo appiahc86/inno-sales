@@ -8,7 +8,7 @@ const QuantityAdjustment = async () => {
             table.bigIncrements('id').primary();
             table.bigInteger('userId').notNullable();
             table.bigInteger('productId');
-            table.date('date');
+            table.date('date').defaultTo(db.fn.now());
             table.integer('oldQuantity');
             table.integer('quantity');
             table.enum('type', ['increment', 'decrement']);

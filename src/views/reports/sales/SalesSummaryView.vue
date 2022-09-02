@@ -143,10 +143,9 @@ const settings = computed(() => store.getters.setting);
 const search = async (e) => {
 
   if (!from.value || !to.value) return ipcRenderer.send('errorMessage', 'Please Select Date');
-  const dateFrom = new Date(from.value).setHours(0,0,0,0);
-  const dateTo = new Date(to.value).setHours(0,0,0,0);
-  if (dateFrom > dateTo) return ipcRenderer.send('errorMessage', 'Sorry, (Date from) cannot be greater than (Date to)');
+  if (from.value > to.value) return ipcRenderer.send('errorMessage', 'Sorry, (Date from) cannot be greater than (Date to)');
 
+  records.value = [];
   message.value = null;
 
   try {
@@ -158,9 +157,9 @@ const search = async (e) => {
         .sum('orders.total as total')
         .sum('orders.discount as discount')
         .sum('orders.tax as tax')
-        .whereRaw('?? >= ?', ['orderDate', dateFrom])
-        .andWhereRaw('?? <= ?', ['orderDate', dateTo])
-        .groupBy('orders.orderDate')
+        .whereRaw('DATE(orderDate) >= ?', [from.value])
+        .andWhereRaw('DATE(orderDate) <= ?', [to.value])
+        .groupByRaw('DATE(orders.orderDate)')
         .limit(510)
         .stream((stream) => {
 
@@ -179,16 +178,14 @@ const search = async (e) => {
         });
 
 
+    if (from.value === to.value) message.value = `Sales Report On ${new Date(from.value).toDateString()}`;
+    else message.value = `Sales Report From ${new Date(from.value).toLocaleDateString()} To ${new Date(to.value).toLocaleDateString()}`;
+
     //If records from streaming
     if (records.value.length){
       from.value = null;
       to.value = null;
     }
-
-
-    if (dateFrom === dateTo) message.value = `Sales Report On ${new Date(dateFrom).toDateString()}`;
-    else message.value = `Sales Report From ${new Date(dateFrom).toLocaleDateString()} To ${new Date(dateTo).toLocaleDateString()}`;
-
 
   }catch (e) { ipcRenderer.send('errorMessage', e.message) }
     finally {

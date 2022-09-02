@@ -5,7 +5,7 @@ const Order = async () => {
 
         await db.schema.createTable('orders', table => {
             table.bigIncrements('id').primary();
-            table.date('orderDate');
+            table.date('orderDate').defaultTo(db.fn.now());
             table.enum('type', ['sale', 'return']).defaultTo('sale');
             table.integer('numberOfItems');
             table.float('momo');

@@ -120,7 +120,8 @@ const searchReceipt = async () => {
         .join('orders', 'orderDetails.orderId', '=', 'orders.id')
         .where({ orderId: search.value })
         .andWhere('orders.type', 'sale')
-        .groupBy('orderDetails.id');
+        .groupBy('orderDetails.id')
+        .limit(200);
 
     if (records.length){
       items.value = records;
@@ -193,7 +194,6 @@ const calculateChange = async () => {
           //...................... Return Items ........................
 const returnItems = async () => {
   returningItems.value = items.value.filter(item => item.toBeReturned);
-  const date = new Date().setHours(0,0,0,0);
   returnBtn.value.disabled = true;
   try {
 
@@ -203,7 +203,6 @@ const returnItems = async () => {
 
             // Save to Orders table
       const data = {
-        orderDate: date,
         numberOfItems: -returningItems.value.length,
         type: 'return',
         momo: paymentMethod.value === 'momo' ? -change.value : 0,
@@ -233,7 +232,6 @@ const returnItems = async () => {
           total: parseFloat(ret.sellingPrice) * parseInt(ret.returnQty),
           tax: -(calculatedTax * parseInt(ret.returnQty)), //get negative value
           discount: -(calculatedDiscount * parseInt(ret.returnQty)), //get negative value
-          date: date,
           categoryId: ret.categoryId,
           orderId: saveToOrders
         })

@@ -1,13 +1,14 @@
 
 <template>
   <div class="container-fluid">
+
     <div class="row justify-content-center mb-4">
       <div class="col-12">
         <div class="container">
           <div class="row justify-content-center">
             <div class="col-7" style="max-width: 600px">
               <form @submit.prevent="search">
-                <h5 class="text-center"><b>Sales Returns</b></h5>
+                <h5 class="text-center"><b>Price Adjustment History</b></h5>
                 <div class="input-group">
                   <div class="input-group-text bg-dark text-white"><b>From</b></div>
                   <input type="date" class="form-control form-control-dark" v-model="from" onkeydown="return false">
@@ -19,7 +20,6 @@
                   </button>
                 </div>
               </form>
-
             </div>
           </div>
         </div>
@@ -27,46 +27,54 @@
     </div>
 
 
+
     <div class="row">
       <div class="col-12">
-        <!--   Table     -->
 
         <button class="p-1 fw-bold bg-secondary text-white" v-if="records.length" @click="printReport">
           <span class="pi pi-print"></span> Print</button>
         <h6>{{ message }}</h6>
         <div class="table-responsive">
-
+          <!--   Table     -->
           <DataTable
               :value="records" :paginator="true" dataKey="id"
-              class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines"
+              class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
               filterDisplay="menu" :rows="10"
               paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-              :rowsPerPageOptions="[10, 15, 25]"
-              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" responsiveLayout="scroll"
+              :rowsPerPageOptions="[10,25,50]" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+              responsiveLayout="scroll"
           >
+
             <template #empty>
               No record found.
             </template>
-            <Column header="#" sortable class="data-table-font-size">
+
+            <Column field="productName" header="Product" sortable class="data-table-font-size"></Column>
+            <Column field="date" header="Date" sortable  class="data-table-font-size">
               <template #body="{data}">
-                <td>{{ records.indexOf(data) + 1 }}</td>
+                <td>{{ new Date(data.date).toLocaleDateString() }}</td>
               </template>
             </Column>
-
-            <Column field="orderDate" header="Date" sortable class="data-table-font-size">
+            <Column field="user" header="User" sortable class="data-table-font-size"></Column>
+            <Column field="oldPrice" header="Old Price" sortable class="data-table-font-size">
               <template #body="{data}">
-                <td>{{ new Date(data.orderDate).toLocaleDateString() }}</td>
+                <td>{{ formatNumber(data.oldPrice) }}</td>
               </template>
             </Column>
-
-            <Column field="total" header="Total" sortable class="data-table-font-size">
+            <Column field="newPrice" header="New Price" sortable class="data-table-font-size">
               <template #body="{data}">
-                <td>{{ formatNumber(parseFloat(data.total)) }}</td>
+                <td>{{ formatNumber(data.newPrice) }}</td>
+              </template>
+            </Column>
+            <Column field="reason" header="Reason" sortable class="data-table-font-size">
+              <template #body="{data}">
+                <td :title="data.reason">
+                  {{ data.reason && data.reason.length > 20 ? data.reason.substring(0, 20) + '...' : data.reason }}
+                </td>
               </template>
             </Column>
           </DataTable>
         </div>
-        <h5 class="mt-2" v-if="records.length">Total: GH¢ {{ formatNumber(parseFloat(recordTotal)) }}</h5>
 
 
 
@@ -83,26 +91,29 @@
               </p>
               <table id="print-table">
                 <tr>
-                  <th>#</th>
+                  <th>Product</th>
                   <th>Date</th>
-                  <th>Total</th>
+                  <th>User</th>
+                  <th>Old Price</th>
+                  <th>New Price</th>
+                  <th>Reason</th>
                 </tr>
 
-                <template v-for="(record, index) in records" :key="record.id">
+                <template v-for="record in records" :key="record.id">
                   <tr>
-                    <td>&nbsp; {{ index + 1 }}</td>
-                    <td>&nbsp; {{ new Date(record.orderDate).toLocaleDateString() }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.total)) }}</td>
+                    <td>&nbsp; {{ record.productName }}</td>
+                    <td>&nbsp; {{ new Date(record.date).toLocaleDateString() }}</td>
+                    <td>&nbsp; {{ record.user }}</td>
+                    <td>&nbsp; {{ formatNumber(parseFloat(record.oldPrice)) }}</td>
+                    <td>&nbsp; {{ formatNumber(parseFloat(record.newPrice)) }}</td>
+                    <td>&nbsp; {{ record.reason }}</td>
                   </tr>
                 </template>
 
               </table>
-              <div style="margin-top: 0;"><h5>Total: GH¢ {{ formatNumber(parseFloat(recordTotal)) }}</h5></div>
             </div>
-
           </div>
         </template>
-
 
 
       </div>
@@ -115,23 +126,20 @@
 <script setup>
 import {computed, ref} from "vue";
 import db from "@/dbConfig/db";
-import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
+import {formatNumber} from "@/functions";
 
 const loading = ref(false)
+const records = ref([]);
 const from = ref(null);
 const to = ref(null);
 const message = ref(null);
-const records = ref([]);
-
 const store = useStore();
 
 const settings = computed(() => store.getters.setting)
 
-//....................Search.......................
 
 const search = async (e) => {
-
   if (!from.value || !to.value) return ipcRenderer.send('errorMessage', 'Please Select Date');
   if (from.value > to.value) return ipcRenderer.send('errorMessage', 'Sorry, (Date from) cannot be greater than (Date to)');
 
@@ -141,13 +149,14 @@ const search = async (e) => {
   try {
     e.target.submitBtn.disabled = true;
     loading.value = true;
-    await db('orders')
-        .select('orders.id', 'orders.orderDate')
-        .sum('orders.total as total')
-        .whereRaw('DATE(orderDate) >= ?', [from.value])
-        .andWhereRaw('DATE(orderDate) <= ?', [to.value])
-        .andWhereRaw('?? = ?', ['type', 'return'])
-        .groupBy('orders.orderDate')
+
+    await db('priceAdjustments')
+        .join('users', 'users.id', '=', 'priceAdjustments.userId')
+        .select('priceAdjustments.id','priceAdjustments.productName', 'priceAdjustments.date',
+            'priceAdjustments.oldPrice','priceAdjustments.newPrice','priceAdjustments.reason',
+            'users.firstName as user')
+        .whereRaw('DATE(priceAdjustments.date) >= ?', [from.value])
+        .andWhereRaw('DATE(priceAdjustments.date) <= ?', [to.value])
         .limit(510)
         .stream((stream) => {
 
@@ -156,7 +165,7 @@ const search = async (e) => {
             if (records.value.length > 500) { //If records are more than 500
               stream.destroy();
               records.value = [] //clear all record
-             return ipcRenderer.send(
+              return ipcRenderer.send(
                   'errorMessage',
                   `You tried to display more than 500 records on screen.\nFor performance sake, please load records in batches`
               )
@@ -166,8 +175,9 @@ const search = async (e) => {
         });
 
 
-    if (from.value === to.value) message.value = `Sales Returns Report On ${new Date(from.value).toDateString()}`;
-    else message.value = `Sales Returns Report From ${new Date(from.value).toLocaleDateString()} To ${new Date(to.value).toLocaleDateString()}`;
+    if (from.value === to.value) message.value = `Price Adjustments On ${new Date(from.value).toDateString()}`;
+    else message.value = `Price Adjustments From ${new Date(from.value).toLocaleDateString()} To ${new Date(to.value).toLocaleDateString()}`;
+
 
     //If records from streaming
     if (records.value.length){
@@ -175,24 +185,15 @@ const search = async (e) => {
       to.value = null;
     }
 
-  }catch (e) { ipcRenderer.send('errorMessage', e.message) }
+  }
+  catch (e){ ipcRenderer.send('errorMessage', e.message) }
   finally {
-    loading.value = false;
     e.target.submitBtn.disabled = false;
+    loading.value = false;
   }
 
 }
 
-//Get records total
-const recordTotal = computed(() => {
-  let total = 0;
-  if (records.value.length){
-    for (const record of records.value) {
-      total += parseFloat(record.total)
-    }
-  }
-  return total;
-})
 
 //Print Report
 const printReport = () => {

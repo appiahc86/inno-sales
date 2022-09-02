@@ -379,8 +379,8 @@ const savePurchase = async (e) => {
       await db.transaction( async trx => {
       const purchase = await trx('purchases').insert({ //Save to purchase table
         userId: user.value.id,
-        billDate: new Date(paymentData.billDate).setHours(0,0,0,0),
-        invoiceDue: new Date(paymentData.invoiceDue).setHours(0,0,0,0),
+        billDate: paymentData.billDate,
+        invoiceDue: paymentData.invoiceDue,
         vendorId: paymentData.vendor.id,
         numberOfItems: cart.value.length,
         invoice: paymentData.invoice,
@@ -407,7 +407,7 @@ const savePurchase = async (e) => {
         if (paymentData.alreadyPaid){
           await trx('billPayments').insert({
             purchaseId: purchase,
-            date: new Date(paymentData.billDate).setHours(0,0,0,0),
+            date: paymentData.billDate,
             amount: total.value,
             note: ''
           })

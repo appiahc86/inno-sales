@@ -426,8 +426,7 @@ getCategories();
           const product = await db('products')
               .insert({
                 ...productData,
-                dateAdded:   new Date().setHours(0,0,0,0),
-                expiration:   productData.expiration ? new Date(productData.expiration).setHours(0,0,0,0) : ''
+                expiration:   productData.expiration ? productData.expiration : ''
               });
 
           //Update on front-end
@@ -473,7 +472,7 @@ getCategories();
                 ...editProductData,
                 id: undefined,
                 categoryName: undefined,
-                expiration: editProductData.expiration ? new Date(editProductData.expiration).setHours(0,0,0,0) : undefined
+                expiration: editProductData.expiration ? editProductData.expiration : undefined
               });
           editProductDialog.value.close(); // Close edit dialog
 
@@ -487,7 +486,7 @@ getCategories();
               product.tax = editProductData.tax;
               product.id = editProductData.id;
               product.productName = editProductData.productName;
-              product.expiration = editProductData.expiration ? new Date(editProductData.expiration).setHours(0,0,0,0) : product.expiration;
+              product.expiration = editProductData.expiration ? editProductData.expiration : product.expiration;
               // product.quantity = editProductData.quantity;
               // product.sellingPrice = parseFloat(editProductData.sellingPrice);
             }

@@ -327,7 +327,7 @@ const insertAdminUser = async () => {
     const data = {
       firstName: "Admin", lastName: "Admin",username: "admin",
       password: "$2a$10$N9sVJn6Nwxtm.PUmbRXLzOFNZfRAjTjNK3EfFu2qRjpnNHQrCbd6i", //@LogMeIn
-      role: 1, dateAdded: new Date().setHours(0,0,0,0)
+      role: 1
     };
   await db('users').insert(data);
   }
@@ -344,11 +344,14 @@ const insertAdminUser = async () => {
 
 
         try {
-          const products = await db('products')
-              .select('products.id',
-                  'products.quantity',
-                  'products.expiration',
-              )
+          // const products = await db('products')
+              // .select('products.id',
+              //     'products.quantity',
+              //     'DATE(products.expiration)',
+              // )
+          const products = await db.raw("SELECT id, quantity, expiration FROM products")
+
+
           store.dispatch("productsModule/setProducts", products)
         }catch (e) {
           console.log(e.message);

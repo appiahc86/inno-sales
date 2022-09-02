@@ -7,7 +7,7 @@ const PriceAdjustment = async () => {
         await db.schema.createTable('priceAdjustments', table => {
             table.bigIncrements('id').primary();
             table.bigInteger('userId').notNullable();
-            table.date('date');
+            table.date('date').defaultTo(db.fn.now());
             table.bigInteger('productId');
             table.float('oldCost');
             table.float('newCost');

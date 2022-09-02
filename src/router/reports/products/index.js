@@ -3,6 +3,8 @@ import ProductsListView from "@/views/reports/products/ProductsListView";
 import LowStockView from "@/views/reports/products/LowStockView";
 import ExpiringProductsView from "@/views/reports/products/ExpiringProductsView";
 import ExpiredProductsView from "@/views/reports/products/ExpiredProductsView";
+import QuantityAdjustmentView from "@/views/reports/products/QuantityAdjustmentView";
+import PriceAdjustmentView from "@/views/reports/products/PriceAdjustmentView";
 
 const productsReportRouter = [
     {
@@ -24,6 +26,17 @@ const productsReportRouter = [
         path: '/report/products/products-expired',
         name: 'report-products-expired',
         component: ExpiredProductsView
+    },
+    {
+        path: '/report/products/quantity-adjustment',
+        name: 'report-quantity-adjustment',
+        component: QuantityAdjustmentView
+    },
+
+    {
+        path: '/report/products/price-adjustment',
+        name: 'report-price-adjustment',
+        component: PriceAdjustmentView
     },
 ]
 

@@ -178,10 +178,11 @@ const settings = computed(() => store.getters.setting)
 const search = async (e) => {
 
   if (!from.value || !to.value) return ipcRenderer.send('errorMessage', 'Please Select Date');
-  const dateFrom = new Date(from.value).setHours(0,0,0,0);
-  const dateTo = new Date(to.value).setHours(0,0,0,0);
-  if (dateFrom > dateTo) return ipcRenderer.send('errorMessage', 'Sorry, (Date from) cannot be greater than (Date to)');
+  // const dateFrom = new Date(from.value).setHours(0,0,0,0);
+  // const dateTo = new Date(to.value).setHours(0,0,0,0);
+  if (from.value > to.value) return ipcRenderer.send('errorMessage', 'Sorry, (Date from) cannot be greater than (Date to)');
 
+  records.value = [];
   message.value = null;
 
   try {
@@ -193,8 +194,8 @@ const search = async (e) => {
         .select('orderDetails.id','orderDetails.productName', 'orderDetails.buyingPrice',
             'orderDetails.sellingPrice','orderDetails.tax','orderDetails.discount',
             'orderDetails.quantity', 'orderDetails.date', 'users.firstName as user')
-        .whereRaw('?? >= ?', ['date', dateFrom])
-        .andWhereRaw('?? <= ?', ['date', dateTo])
+        .whereRaw('DATE(date) >= ?', [from.value])
+        .andWhereRaw('DATE(date) <= ?', [to.value])
         .limit(510)
         .stream((stream) => {
 
@@ -213,15 +214,14 @@ const search = async (e) => {
         });
 
 
+    if (from.value === to.value) message.value = `Sales Report On ${new Date(from.value).toDateString()}`;
+    else message.value = `Sales Report From ${new Date(from.value).toLocaleDateString()} To ${new Date(to.value).toLocaleDateString()}`;
+
     //If records from streaming
     if (records.value.length){
       from.value = null;
       to.value = null;
     }
-
-    if (dateFrom === dateTo) message.value = `Sales Report On ${new Date(dateFrom).toDateString()}`;
-    else message.value = `Sales Report From ${new Date(dateFrom).toLocaleDateString()} To ${new Date(dateTo).toLocaleDateString()}`;
-
 
   }catch (e) { ipcRenderer.send('errorMessage', e.message) }
   finally {

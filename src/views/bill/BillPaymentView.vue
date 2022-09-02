@@ -95,7 +95,7 @@ const pay = async (e) => {
 
        await trx('billPayments').insert({ // Save to billPayments table
         purchaseId: purchaseId.value,
-        date: new Date(formData.date).setHours(0,0,0,0),
+        date: formData.date,
         amount: parseFloat(formData.amount),
         note: formData.note
       })

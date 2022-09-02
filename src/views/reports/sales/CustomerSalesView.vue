@@ -179,9 +179,8 @@ const search = async (e) => {
   if (!formData.selectedCustomer) return ipcRenderer.send('errorMessage', 'Please Select Customer');
   if (!formData.from || !formData.to) return ipcRenderer.send('errorMessage', 'Please Select Date');
 
-  const dateFrom = new Date(formData.from).setHours(0,0,0,0);
-  const dateTo = new Date(formData.to).setHours(0,0,0,0);
-  if (dateFrom > dateTo) return ipcRenderer.send('errorMessage', 'Sorry, (Date from) cannot be greater than (Date to)');
+  if (formData.from > formData.to) return ipcRenderer.send('errorMessage', 'Sorry, (Date from) cannot be greater than (Date to)');
+  records.value = [];
   message.value = null;
   customerName.value = null;
 
@@ -190,8 +189,8 @@ const search = async (e) => {
 
     await db('orders')
         .where('customerId', formData.selectedCustomer.id)
-        .andWhereRaw("?? >= ?", ['orderDate', dateFrom])
-        .andWhereRaw("?? <= ?", ['orderDate', dateTo])
+        .whereRaw('DATE(orderDate) >= ?', [formData.from])
+        .andWhereRaw('DATE(orderDate) <= ?', [formData.to])
         .limit(510)
         .stream((stream) => {
 
@@ -210,8 +209,8 @@ const search = async (e) => {
         });
 
 
-    if (dateFrom === dateTo) message.value = `Sales Report On ${new Date(dateFrom).toDateString()}`;
-    else message.value = `Sales Report From ${new Date(dateFrom).toLocaleDateString()} To ${new Date(dateTo).toLocaleDateString()}`;
+    if (formData.from === formData.to) message.value = `Sales Report On ${new Date(formData.from).toDateString()}`;
+    else message.value = `Sales Report From ${new Date(formData.from).toLocaleDateString()} To ${new Date(formData.to).toLocaleDateString()}`;
 
     customerName.value = formData.selectedCustomer.name;
     resetForm();

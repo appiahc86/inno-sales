@@ -169,7 +169,6 @@ const addUser = async (e) => {
 
      //Save user to database
       await db('users').insert({
-        dateAdded: new Date().setHours(0,0,0,0),
         firstName: formData.firstName,
         lastName: formData.lastName,
         username: formData.username.toLowerCase(),

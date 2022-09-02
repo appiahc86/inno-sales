@@ -135,8 +135,6 @@ const settings = computed(() => store.getters.setting)
 //get all products
 const getAllProducts = async () => {
 
-  const today = new Date().setHours(0,0,0,0);
-
   try {
 
     loading.value = true;
@@ -154,7 +152,7 @@ const getAllProducts = async () => {
             'products.expiration',
             'categories.name as category'
         )
-        .whereRaw('?? <= ?', ['expiration', today])
+        .whereRaw('DATE(expiration) <= ?', [db.fn.now()])
         .orderBy('products.productName','asc')
 
   }

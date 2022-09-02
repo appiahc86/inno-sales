@@ -157,7 +157,6 @@ const updatePrice = async (e) => {
         //Insert into priceAdjustments table
       await trx('priceAdjustments').insert({
         userId: user.value.id,
-        date: new Date().setHours(0,0,0,0),
         productId: data.id,
         oldCost: data.oldBuyingPrice,
         newCost: data.newBuyingPrice,

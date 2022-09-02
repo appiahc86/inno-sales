@@ -205,4 +205,3 @@ ipcMain.on('confirm', async (event, {id, type, message}) => {
   else console.clear();
 
 })
-

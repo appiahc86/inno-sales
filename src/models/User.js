@@ -5,7 +5,7 @@ const User = async () => {
 
         await db.schema.createTable('users', table => {
             table.bigIncrements('id').primary();
-            table.date('dateAdded');
+            table.date('dateAdded').defaultTo(db.fn.now());
             table.string('firstName', 20).notNullable();
             table.string('lastName', 20);
             table.string('username', 20).unique();

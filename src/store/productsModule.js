@@ -17,12 +17,14 @@ const productsModule = {
         getExpiringProducts: (state) => { //Get expiring products
             const listOfExpiringProducts = [];
             const getProductsWithExpDate = state.products.filter(product => product.expiration);
-            const today = new Date().setHours(0,0,0,0);
+            const today = new Date();
+
 
             for (const item of getProductsWithExpDate){
                 const expDate = new Date(item.expiration);
-                const notificationStartDate = expDate.setDate(expDate.getDate() - 14);
-                const notificationEndDate = new Date(item.expiration).setHours(0,0,0,0);
+                let notificationStartDate = expDate.setDate(expDate.getDate() - 14);
+                 notificationStartDate = new Date(notificationStartDate);
+                const notificationEndDate = new Date(item.expiration);
                      if (today >= notificationStartDate && today < notificationEndDate){
                          listOfExpiringProducts.push(item.id)
                     }
@@ -34,10 +36,10 @@ const productsModule = {
         getAlreadyExpiredProducts: (state) => { //Already expired products
             const listOfExpiredProducts = [];
             const getProductsWithExpDate = state.products.filter(product => product.expiration);
-            const today = new Date().setHours(0,0,0,0);
+            const today = new Date();
 
             for (const item of getProductsWithExpDate){
-                const expDate = new Date(item.expiration).setHours(0,0,0,0);
+                const expDate = new Date(item.expiration);
 
                 if (today >= expDate){
                     listOfExpiredProducts.push(item.id);
@@ -95,7 +97,7 @@ const productsModule = {
         modifyDate: (state, {id, date}) => {
             for (const p of state.products) {
                 if (p.id.toString() === id.toString()) {
-                    p.expiration = date ? new Date(date).setHours(0,0,0,0) : p.expiration;
+                    p.expiration = date ? date : p.expiration;
                     break;
                 }
             }

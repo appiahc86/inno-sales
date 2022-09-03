@@ -160,6 +160,7 @@ const search = async (e) => {
   try {
     e.target.submitBtn.disabled = true;
     loading.value = true;
+    records.value = [];
 
     records.value = await db('purchases')
         .innerJoin('vendors', 'purchases.vendorId', '=', 'vendors.id')

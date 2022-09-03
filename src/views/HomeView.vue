@@ -155,12 +155,23 @@ const pieChartSeries = ref( []);
 
 
 
+//Today's date
+const today = () => {
+  let yyyy = new Date().getFullYear();
+  let mm = ( new Date().getMonth() + 1) < 10 ? '0' + ( new Date().getMonth() + 1) : new Date().getMonth() + 1;
+  let dd = (new Date().getDate()) < 10 ? '0' + (new Date().getDate()) : (new Date().getDate());
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+
+
 
 //Get today's orders
 const getTodaySales = async () => {
   try {
     records.value = await db('orders')
-        .whereRaw('?? = ?', ['orderDate', new Date().setHours(0,0,0,0)])
+        .whereRaw('DATE(orderDate) >= ?', [today()])
+        .andWhereRaw('DATE(orderDate) <= ?', [today()])
         .select('orders.type', 'orders.momo', 'total');
 
     let returns = 0;
@@ -229,8 +240,8 @@ const getRecordsForChart = async () => {
         .innerJoin('orders', 'orders.id', 'orderDetails.orderId')
         .select('categories.name')
         .sum('orderDetails.quantity as sum')
-        .where('orderDetails.date', '=', new Date().setHours(0,0,0,0))
-        // .where('orders.type', 'sale')
+        .whereRaw('DATE(orderDetails.date) >= ?', [today()])
+        .andWhereRaw('DATE(orderDetails.date) <= ?', [today()])
         .groupBy('categories.id')
         .orderBy('sum', 'desc')
         .limit(10);

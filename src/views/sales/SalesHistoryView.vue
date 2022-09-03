@@ -111,7 +111,7 @@
     <div id="printTable" v-if="details.length">
       <div>
         <div class="mt-0" style="font-size: 11px;">
-          <span>{{ new Date(details[0].orderDate).toLocaleDateString() }}</span>
+          <span>{{ new Date(details[0].orderDate).toLocaleDateString() }}, {{ new Date(details[0].orderDate).toLocaleTimeString() }}</span>
           <b style="float: right;">Receipt #{{ details[0].id }}</b>
         </div>
         <div  style="font-size: 12px;">Store: {{ companySettings.storeName }}</div>
@@ -152,19 +152,19 @@
         <hr>
 
         <div style="font-size: 12px !important">
-          <div style="float: right;">Subtotal: GHS {{ formatNumber(subtotal) }}</div> <br>
+          <div style="float: right;">Subtotal: GH¢ {{ formatNumber(subtotal) }}</div> <br>
           <template v-if="details[0].tax">
-            <div style="float: right;">Tax: GHS {{ formatNumber(details[0].tax) }}</div> <br>
+            <div style="float: right;">Tax: GH¢ {{ formatNumber(details[0].tax) }}</div> <br>
           </template>
           <template v-if="details[0].discount">
-            <div style="float: right;">Discount: GHS {{ formatNumber(details[0].discount) }}</div> <br>
+            <div style="float: right;">Discount: GH¢ {{ formatNumber(details[0].discount) }}</div> <br>
           </template>
-          <div style="float: right;"><b>RECEIPT TOTAL: GHS {{ formatNumber(details[0].total) }}</b></div>
+          <div style="float: right;"><b>RECEIPT TOTAL: GH¢ {{ formatNumber(details[0].total) }}</b></div>
         </div><br>
 
 
-        <div style="font-size: 12px;">Amount Tendered: GHS {{ formatNumber(details[0].tendered) }}</div>
-        <div style="font-size: 12px;">Change Given: GHS {{ formatNumber(details[0].tendered - details[0].total) }}</div>
+        <div style="font-size: 12px;">Amount Tendered: GH¢ {{ formatNumber(details[0].tendered) }}</div>
+        <div style="font-size: 12px;">Change Given: GH¢ {{ formatNumber(details[0].tendered - details[0].total) }}</div>
 
         <p style="font-size: 11px; text-align: center;">Thanks for shopping with us!</p>
 

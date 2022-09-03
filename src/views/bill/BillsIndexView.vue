@@ -147,8 +147,8 @@ const getPurchases = async () => {
             'purchases.invoice', 'purchases.total', 'vendors.company')
         .sum('billPayments.amount as totalPaid')
         .where('purchases.status', 'received')
-        .havingRaw('?? > ?', ['purchases.total',  db.raw('coalesce(sum(billPayments.amount), 0)'  )] )
         .groupBy('purchases.id')
+        .havingRaw('?? > ?', ['purchases.total',  db.raw('coalesce(sum(billPayments.amount), 0)'  )] )
         .orderBy('purchases.id', 'DESC')
 
 

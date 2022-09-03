@@ -286,8 +286,8 @@ const getData = async () => {
           .select('purchases.total', )
           .sum('billPayments.amount as totalPaid')
           .where('purchases.status', 'received')
-          .havingRaw('?? > ?', ['purchases.total',  db.raw('coalesce(sum(billPayments.amount), 0)'  )] )
           .groupBy('purchases.id')
+          .havingRaw('?? > ?', ['purchases.total',  db.raw('coalesce(sum(billPayments.amount), 0)'  )] )
           .orderBy('purchases.id', 'DESC');
 
       // Best-selling products
@@ -354,6 +354,7 @@ const getData = async () => {
   }catch (e) { ipcRenderer.send('errorMessage', e.message) }
   finally { loading.value = false }
 }
+
 getData();
 
 </script>

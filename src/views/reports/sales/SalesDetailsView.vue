@@ -178,8 +178,6 @@ const settings = computed(() => store.getters.setting)
 const search = async (e) => {
 
   if (!from.value || !to.value) return ipcRenderer.send('errorMessage', 'Please Select Date');
-  // const dateFrom = new Date(from.value).setHours(0,0,0,0);
-  // const dateTo = new Date(to.value).setHours(0,0,0,0);
   if (from.value > to.value) return ipcRenderer.send('errorMessage', 'Sorry, (Date from) cannot be greater than (Date to)');
 
   records.value = [];

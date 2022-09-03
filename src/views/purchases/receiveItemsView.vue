@@ -227,8 +227,8 @@
         <hr>
 
         <div style="font-size: 12px !important">
-          <div style="float: right;">Subtotal: GHS {{ formatNumber(total) }}</div> <br>
-          <div style="float: right;"><b>TOTAL: GHS {{ formatNumber(total) }}</b></div>
+          <div style="float: right;">Subtotal: GH¢ {{ formatNumber(total) }}</div> <br>
+          <div style="float: right;"><b>TOTAL: GH¢ {{ formatNumber(total) }}</b></div>
         </div><br>
 
       </div>

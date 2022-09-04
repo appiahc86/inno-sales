@@ -118,6 +118,7 @@
 
         <div style="text-align: center;">
           <div style="font-size: 13px"><b>{{ companySettings.companyName }}</b></div>
+          <div style="font-size: 11px">{{ companySettings.address }}</div>
           <div style="font-size: 11px">{{ companySettings.contact }}</div>
         </div>
 

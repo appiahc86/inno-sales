@@ -18,11 +18,12 @@ const migrations =  [
     Vendor, Purchase, PurchaseDetails, BillPayment, QuantityAdjustment, PriceAdjustment
 ]
 
-  const runMigrations = () => {
+  const runMigrations = async () => {
 
     for (const migration of migrations) {
-        migration();
+        await migration();
     }
+
       console.log('Database Connected')
   }
 

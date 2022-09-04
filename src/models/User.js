@@ -17,9 +17,20 @@ const User = async () => {
             table.boolean('runSalesReport').defaultTo(true);
             table.boolean('giveDiscount').defaultTo(true);
             table.boolean('changePrice').defaultTo(true);
-        })
+        });
+
+        //insert User if none exists
+        await db('users').insert(
+            {
+                firstName: "Admin", lastName: "Admin",username: "admin",
+                password: "$2a$10$N9sVJn6Nwxtm.PUmbRXLzOFNZfRAjTjNK3EfFu2qRjpnNHQrCbd6i", //@LogMeIn
+                role: 1
+            }
+        );
 
     }
+
+
 
 }
 

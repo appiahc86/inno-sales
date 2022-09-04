@@ -251,7 +251,7 @@
 import runMigrations from "@/models";
 import db from "./dbConfig/db";
 runMigrations() //Run all migrations
-db.raw('PRAGMA foreign_keys = ON').then(()=>{});
+db.raw('PRAGMA foreign_keys = ON').then(()=>{}); //set foreign key checks on
 
 // const boom = [];
 // for (let i = 0; i < 250000; i++) {
@@ -291,11 +291,6 @@ import {useRouter} from "vue-router";
 const settings = async () => { // insert data into company settings table
   try {
     let data = await db('settings').first();
-
-    if (!data){
-      data = { companyName: 'Demo Company Name', storeName: '', address: '', contact: '', tax: 0 }
-      await db('settings').insert(data)
-    }
     store.dispatch('cartModule/setTax', data.tax ? parseFloat(data.tax) : 0);
     store.dispatch('setSettings', {...data, tax: undefined})
   }catch (e) {
@@ -303,7 +298,8 @@ const settings = async () => { // insert data into company settings table
   }
 
 }
-settings();
+ settings();
+
 
 
 const time = ref(null);
@@ -318,47 +314,25 @@ const getAlreadyExpiredProducts = computed(()=> store.getters["productsModule/ge
 
 
 
-              //............If no user in users table, Create admin user ...................
-const insertAdminUser = async () => {
-
-  const user = await db('users').first(); //Find one user
-
-  if (!user) { //if No user found in table
-    const data = {
-      firstName: "Admin", lastName: "Admin",username: "admin",
-      password: "$2a$10$N9sVJn6Nwxtm.PUmbRXLzOFNZfRAjTjNK3EfFu2qRjpnNHQrCbd6i", //@LogMeIn
-      role: 1
-    };
-  await db('users').insert(data);
-  }
-
-}
 
       onMounted(async () => {
 
-        insertAdminUser();
-
-        setInterval(()=>{ //Display Time
-          if(time.value) time.value.innerHTML = new Date().toLocaleTimeString();
-        },500)
-
-
         try {
-          // const products = await db('products')
-              // .select('products.id',
-              //     'products.quantity',
-              //     'DATE(products.expiration)',
-              // )
-          const products = await db.raw("SELECT id, quantity, expiration FROM products")
 
-
+          const products = await db.raw("SELECT id, quantity, expiration FROM products");
           store.dispatch("productsModule/setProducts", products)
         }catch (e) {
           console.log(e.message);
           ipcRenderer.send('errorMessage', 'Sorry, error occurred. Please try restarting this application');
         }
 
-      })
+
+        setInterval(()=>{ //Display Time
+          if(time.value) time.value.innerHTML = new Date().toLocaleTimeString();
+        },500)
+
+
+      }) // ./onMounted hook
 
 
 //Logout
@@ -370,7 +344,7 @@ const logout = () => {
 
 // listen to route events and redirect to page
 ipcRenderer.on('routing', (event, args) => {
-  router.push({name: args})
+  router.push({name: args});
 })
 
 //backup database

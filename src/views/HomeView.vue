@@ -101,11 +101,12 @@
 
 <script setup>
 
-import {computed, onMounted, reactive, ref, watch} from "vue";
+import {computed, reactive, ref} from "vue";
 import {formatNumber} from "@/functions";
 import db from "@/dbConfig/db";
 const records = ref([]);
 const barChartRecords = ref([]);
+
 
 //Barchart data
 const barChartOptions = reactive({

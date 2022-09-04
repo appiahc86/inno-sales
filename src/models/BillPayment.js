@@ -10,7 +10,6 @@ const BillPayment = async () => {
             table.date('date').notNullable();
             table.float('amount');
             table.string('note');
-
             table.foreign('purchaseId').references('id').inTable('purchases').onDelete('CASCADE');
         })
 

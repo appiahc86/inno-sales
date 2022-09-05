@@ -125,8 +125,8 @@ watch(selectedProduct, (value, oldValue) => {
   if (value) {
     resetData();
     data.id = value.id;
-    data.oldBuyingPrice = formatNumber(parseFloat(value.buyingPrice));
-    data.oldSellingPrice = formatNumber(parseFloat(value.sellingPrice));
+    data.oldBuyingPrice = parseFloat(value.buyingPrice);
+    data.oldSellingPrice = parseFloat(value.sellingPrice);
     data.newBuyingPrice = parseFloat(value.buyingPrice);
     data.productName = value.productName;
   }

@@ -94,12 +94,10 @@ const save = async () => {
 
 <style scoped>
 .myTable th{
-  padding: 20px;
+  padding: 1em;
 }
 .myTable td{
-  /*width: 65%;*/
-  max-width: 300px;
-  min-width: 300px;
+  width: 320px;
 }
 .form-control-dark{
   padding: 6px;

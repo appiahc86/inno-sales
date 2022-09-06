@@ -121,7 +121,7 @@ const searchReceipt = async () => {
         .where({ orderId: search.value })
         .andWhere('orders.type', 'sale')
         .groupBy('orderDetails.id')
-        .limit(200);
+        .limit(100);
 
     if (records.length){
       items.value = records;

@@ -103,7 +103,7 @@
               </div>
 
               <div class="d-flex mt-1">
-                <h6 class="w-50">Invoice Due</h6>
+                <h6 class="w-50">Invoice Due<span class="text-danger">*</span></h6>
               </div>
               <div class="d-flex">
                 <input type="date" class="form-control-dark w-50" v-model="paymentData.invoiceDue">

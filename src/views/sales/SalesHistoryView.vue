@@ -29,7 +29,7 @@
 
           <Column field="orderDate" header="Date" sortable class="data-table-font-size">
            <template #body="{data}">
-             <td>{{ new Date(data.orderDate).toLocaleDateString() }}</td>
+             <td>{{ new Date(data.orderDate).toLocaleString() }}</td>
            </template>
           </Column>
           <Column field="id" header="Receipt#" sortable  class="data-table-font-size"></Column>
@@ -111,7 +111,7 @@
     <div id="printTable" v-if="details.length">
       <div>
         <div class="mt-0" style="font-size: 11px;">
-          <span>{{ new Date(details[0].orderDate).toLocaleDateString() }}, {{ new Date(details[0].orderDate).toLocaleTimeString() }}</span>
+          <span>{{ new Date(details[0].orderDate).toLocaleString() }}</span>
           <b style="float: right;">Receipt #{{ details[0].id }}</b>
         </div>
         <div  style="font-size: 12px;">Store: {{ companySettings.storeName }}</div>
@@ -216,7 +216,7 @@ const getOrders = async () => {
             'orders.numberOfItems', 'orders.total')
         .where('type', 'sale')
         .orderBy('orders.id', 'DESC')
-        .limit(50)
+        .limit(150)
   }catch (e) { ipcRenderer.send('errorMessage', e.message); }
   finally {
     loading.value = false;
@@ -235,7 +235,8 @@ const showDetails = async (orderId) => {
         .select('orders.id', 'orders.orderDate', 'orders.total', 'orders.tendered',
         'orders.discount', 'orders.tax', 'orderDetails.productName', 'orderDetails.quantity',
         'orderDetails.sellingPrice', 'orderDetails.total as extPrice', 'customers.name as customerName')
-        .where('orders.id', orderId);
+        .where('orders.id', orderId)
+        .limit(100);
 
     dialog.value.showModal();
   }catch (e) {

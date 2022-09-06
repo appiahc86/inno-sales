@@ -146,7 +146,7 @@
       </div>
 
       <div class="d-flex" style="position: absolute; bottom: 0">
-        <b class="text-light">Inno Sales 1.0.0</b>
+        <b class="text-light">&nbsp;Inno Sales 1.0.0</b>
         <b><span class="pi pi-arrow-circle-left text-white" style="margin-left: 3.5em; font-size: 1.5em; cursor: pointer;"
                  @click="collapseSidebar" title="Collapse Sidebar"></span></b>
       </div>
@@ -318,7 +318,6 @@ const getAlreadyExpiredProducts = computed(()=> store.getters["productsModule/ge
       onMounted(async () => {
 
         try {
-
           const products = await db.raw("SELECT id, quantity, expiration FROM products");
           store.dispatch("productsModule/setProducts", products)
         }catch (e) {

@@ -277,7 +277,7 @@
                       <td></td>
                       <td colspan="2">
                         <button name="addProductBtn" class="btn-secondary p-1 fw-bold" type="submit" style="width: 45%;">Save</button>&nbsp;
-                        <button name="addProductBtn" class="p-1 fw-bold" type="button" @click="editProductDialog.close()" style="width: 45%;">cancel</button>
+                        <button name="addProductBtn" class="p-1 fw-bold" type="button" @click="editProductDialog.close()" style="width: 45%;">Cancel</button>
                       </td>
                     </tr>
 

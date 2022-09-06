@@ -59,10 +59,12 @@
     </div>
   </div>
 
-<dialog ref="editDialog">
+<dialog ref="editDialog" style="border: 1px solid #ccc; padding: 20px;" class="shadow shadow-lg">
   <form @submit.prevent="editCategory">
-    <label>Name <input type="text" maxlength="20" class="form-control-dark" v-model.trim="editName"></label>
-    <button type="submit">Save</button>&nbsp;<button type="button" @click="editDialog.close()">Cancel</button>
+    <h5>Edit this record?</h5>
+    <label><b>Name</b> <input type="text" maxlength="20" class="form-control-dark p-1" v-model.trim="editName"></label>&nbsp;
+    <button type="submit" class="p-1 px-3 fw-bold">Save</button>&nbsp;
+    <button type="button" @click="editDialog.close()" class="p-1 px-2 fw-bold">Cancel</button>
   </form>
 </dialog>
 
@@ -126,7 +128,7 @@ import {useStore} from "vuex";
         if (!editName.value) return ipcRenderer.send('errorMessage', "Category name cannot be empty");
 
         //Save data
-        await db('categories').where({id: editId } ).update({ name:editName.value.toLowerCase() });
+        await db('categories').where({id: editId } ).first().update({ name:editName.value.toLowerCase() });
         editDialog.value.close()
 
         //edit in front end
@@ -150,7 +152,7 @@ import {useStore} from "vuex";
 
     ipcRenderer.on('deleteCategory', async (event, id ) => {
       try {
-          await db('categories').where({id}).del();
+          await db('categories').where({id}).first().del();
         categories.value = categories.value.filter(cat => parseInt(cat.id) !== parseInt(id));
       }catch (e){
         if (e.code === "SQLITE_CONSTRAINT")

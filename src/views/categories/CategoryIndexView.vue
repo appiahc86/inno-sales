@@ -2,7 +2,7 @@
   <div class="container-fluid">
 
     <div class="row">
-      <div class="col-6 mt-4">
+      <div class="col-7 mt-4">
         <form @submit.prevent="saveCategory">
               <label class="w-50">
                 <span class="fw-bold" id="label">Enter Category</span>
@@ -14,8 +14,9 @@
         </form>
       </div>
 
-      <div class="col-6 mt-4">
+      <div class="col-5 mt-4">
       <!--   Table     -->
+        <h6 class="text-success"><span class="pi pi-info-circle fw-bold"></span> Right-click on a row to show the context menu.</h6>
         <div class="table-responsive">
 
           <DataTable
@@ -23,9 +24,10 @@
               class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines"
               filterDisplay="menu" :rows="10" v-model:filters="filters"
               paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-              :rowsPerPageOptions="[10, 15, 25]"
+              :rowsPerPageOptions="[10, 15, 25]" v-model:selection="selectedRecord"
               currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
               :globalFilterFields="['name']" responsiveLayout="scroll"
+              contextMenu v-model:contextMenuSelection="selectedCategory" @row-contextmenu="onRowContextMenu"
           >
             <template #header>
               <div class="d-flex justify-content-center align-items-center" style="height: 15px">
@@ -39,19 +41,16 @@
             <template #empty>
               No Category found.
             </template>
+            <Column selection-mode="single" class="data-table-font-size" style="width: 20px;"></Column>
             <Column field="name" header="Name" sortable style="font-size: 0.85em;">
               <template #body="{data}">
                 <td class="text-capitalize">{{ data.name }}</td>
               </template>
             </Column>
 
-            <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" style="font-size: 0.85em;">
-              <template #body="{data}">
-                <span type="button" title="Edit" @click="showModal(data.id, data.name)">&#128221;</span> &nbsp;
-                <span type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
-              </template>
-            </Column>
           </DataTable>
+
+          <ContextMenu :model="menuModel" ref="cm" style="font-size: 1em;" />
 
         </div>
       </div>
@@ -63,7 +62,7 @@
   <form @submit.prevent="editCategory">
     <h5>Edit this record?</h5>
     <label><b>Name</b> <input type="text" maxlength="20" class="form-control-dark p-1" v-model.trim="editName"></label>&nbsp;
-    <button type="submit" class="p-1 px-3 fw-bold">Save</button>&nbsp;
+    <button type="submit" class="p-1 px-3 fw-bold bg-dark text-white">Save</button>&nbsp;
     <button type="button" @click="editDialog.close()" class="p-1 px-2 fw-bold">Cancel</button>
   </form>
 </dialog>
@@ -77,6 +76,7 @@ import {FilterMatchMode} from "primevue/api";
 import errorMessages from "@/errorMessages";
 import {useStore} from "vuex";
 
+    const selectedRecord = ref();
     const store = useStore();
     const name = ref('');
     const  categories = ref([])
@@ -84,6 +84,18 @@ import {useStore} from "vuex";
     const editName = ref('');
     let editId = null;
     const editDialog = ref(null);
+    const cm = ref();
+
+    const menuModel = ref([
+      {label: 'Edit', icon: 'pi pi-pencil', command: () => showModal(selectedCategory.value.id, selectedCategory.value.name)},
+      {label: 'Delete', icon: 'pi pi-trash', command: () => confirmDelete(selectedCategory.value.id)}
+    ]);
+    const selectedCategory = ref();
+    const onRowContextMenu = (event) => {
+      selectedRecord.value = null;
+      selectedRecord.value = event.data;
+      cm.value.show(event.originalEvent);
+    }
 
     const filters = ref({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -148,7 +160,7 @@ import {useStore} from "vuex";
 
 
     //Delete Category
-    const confirm = (id) => ipcRenderer.send('confirm', {id:id, type: 'category', message: 'Are you sure you want to delete this item?' } )
+    const confirmDelete = (id) => ipcRenderer.send('confirm', {id:id, type: 'category', message: 'Are you sure you want to delete this item?' } )
 
     ipcRenderer.on('deleteCategory', async (event, id ) => {
       try {

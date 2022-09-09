@@ -13,12 +13,17 @@
             <span class="pi pi-users"></span>
             Inactive Users
           </button>
+        <h6 class="text-success mt-1">
+          <span class="pi pi-info-circle fw-bold"></span>
+          Right-click on a row to show the context menu.
+        </h6>
           <div class="table-responsive">
             <DataTable :value="users" :paginator="true" dataKey="id" filterDisplay="menu" :rows="10" v-model:filters="filters"
-                class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
+                class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines"  v-model:selection="selectedRecord"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 :rowsPerPageOptions="[10,25,50]" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                 :globalFilterFields="['firstName','lastname', 'username', 'phone']" responsiveLayout="scroll"
+                contextMenu v-model:contextMenuSelection="selectedRow" @row-contextmenu="onRowContextMenu"
             >
               <template #header>
                 <div class="d-flex justify-content-center align-items-center" style="height: 15px">
@@ -33,6 +38,8 @@
               <template #empty>
                 No Record Found.
               </template>
+
+              <Column selection-mode="single" class="data-table-font-size" style="width: 20px;"></Column>
 
               <Column field="firstName" header="First Name" sortable class="data-table-font-size">
                 <template #body="{data}">
@@ -63,21 +70,9 @@
                   </td>
                 </template>
               </Column>
-              <Column field="" header="Edit">
-                <template #body="{data}">
-                  <td>
-                    <span type="button" title="Edit" @click="gotoEditUser(data)">&#128221;</span></td>
-                </template>
-              </Column>
-              <Column field="" header="Delete">
-                <template #body="{data}">
-                  <td>
-                    <span type="button" title="Delete" @click="confirmDelete(data.id)">&#10060;</span>
-                  </td>
-                </template>
-              </Column>
 
             </DataTable>
+            <ContextMenu :model="menuModel" ref="cm" class="context-menu" style="font-size: 0.9em;" />
           </div>
           <br>
 
@@ -94,6 +89,7 @@ import {useRouter} from "vue-router";
 import errorMessages from "@/errorMessages";
 import {useStore} from "vuex";
 
+const selectedRecord = ref();
 const users = ref([]);
 const loading = ref(false);
 const router = useRouter();
@@ -104,6 +100,23 @@ const user = computed(() => store.getters.user)
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
+
+
+//For row context menu
+const cm = ref();
+const menuModel = ref([
+  {label: 'Edit', icon: 'pi pi-pencil', command: () => gotoEditUser(selectedRow.value), class: 'fw-bold'},
+  {separator: true},
+  {label: 'Delete', icon: 'pi pi-trash', command: () => confirmDelete(selectedRow.value.id), class: 'fw-bold'}
+]);
+const selectedRow = ref();
+const onRowContextMenu = (event) => {
+  selectedRecord.value = null;
+  selectedRecord.value = event.data;
+  cm.value.show(event.originalEvent);
+}
+
+
 
 //get all users
 const getUsers = async () => {

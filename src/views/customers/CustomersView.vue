@@ -71,7 +71,11 @@
 
             <!--  Customers Table  -->
         <div v-if="secondActive">
-                  <div class="table-responsive mt-4">
+          <h6 class="text-success mt-4">
+            <span class="pi pi-info-circle fw-bold"></span>
+            Right-click on a row to show the context menu.
+          </h6>
+          <div class="table-responsive">
                     <DataTable
                         :value="customers" :paginator="true" dataKey="id"
                         class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
@@ -80,6 +84,7 @@
                         :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedCustomers"
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         :globalFilterFields="['name','company', 'phone', 'address']" responsiveLayout="scroll"
+                        contextMenu v-model:contextMenuSelection="selectedRow" @row-contextmenu="onRowContextMenu"
                     >
                       <template #header>
                         <div class="d-flex justify-content-center align-items-center" style="height: 15px">
@@ -97,27 +102,17 @@
                         <h4 class="text-white"> Loading Customers data. Please wait.</h4>
                       </template>
 
-                      <Column selection-mode="multiple" class="data-table-font-size"></Column>
+                      <Column selection-mode="multiple" class="data-table-font-size" style="width: 20px;"></Column>
 
                       <Column field="name" header="Name" sortable  class="data-table-font-size"></Column>
                       <Column field="company" header="Company" sortable  class="data-table-font-size"></Column>
                       <Column field="phone" header="Contact" sortable  class="data-table-font-size"></Column>
                       <Column field="address" header="Address" sortable class="data-table-font-size"></Column>
-
-                      <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
-                        <template #body="{data}">
-                          <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span>
-                        </template>
-                      </Column>
-                      <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
-                        <template #body="{data}">
-                          <span type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
-                        </template>
-                      </Column>
                     </DataTable>
+            <ContextMenu :model="menuModel" ref="cm" class="context-menu" style="font-size: 0.9em;" />
                   </div>
                   <br>
-                  <button class="btn-secondary"  @click="confirm(selectedCustomers)" v-if="selectedCustomers.length">
+                  <button class="btn-secondary"  @click="confirmDelete(selectedCustomers)" v-if="selectedCustomers.length">
                     <span class="pi pi-trash"></span>
                     Delete Selection
                   </button>
@@ -156,8 +151,9 @@
                     <tr>
                       <th class="float-end"></th>
                       <td>
-                        <button class="mt-2 btn-secondary py-1" type="submit" style="width: 45%;">Update</button>&nbsp;
-                        <button type="button" @click="closeDialog" class="py-1" style="width: 45%;">Cancel</button>
+                        <button class="mt-2 btn-secondary py-1" type="submit" style="width: 49%;">Update</button>
+                        <span style="width: 1%">&nbsp;</span>
+                        <button type="button" @click="closeDialog" class="py-1" style="width: 49%;">Cancel</button>
                       </td>
                     </tr>
                   </table>
@@ -212,6 +208,24 @@ const filters = ref({
 });
 
 
+//For row context menu
+const cm = ref();
+const selectedRow = ref();
+const menuModel = ref([
+  {label: 'Edit', icon: 'pi pi-pencil', command: () => openDialog(selectedRow.value), class: 'fw-bold'},
+  {separator: true},
+  {label: 'Delete', icon: 'pi pi-trash', command: () => confirmDelete(selectedRow.value.id), class: 'fw-bold'}
+]);
+
+const onRowContextMenu = (event) => {
+  selectedCustomers.value = [];
+  selectedCustomers.value.push(event.data);
+  cm.value.show(event.originalEvent);
+}
+
+
+
+
     //.............Get all Customers .........................
 const getCustomers = async () => {
   try {
@@ -261,7 +275,7 @@ const addCustomer = async (e) => {
 //.............Edit Customer .........................
 const editCustomer =async () => {
   try {
-      await db('customers').where('id', customerId.value).update(editCustomerData);
+      await db('customers').where('id', customerId.value).first().update(editCustomerData);
     for (let cust of customers.value) {
       if (cust.id === customerId.value){
         cust.name = editCustomerData.name;
@@ -295,7 +309,7 @@ const closeDialog = () => {
 
 
                           //.............Delete Customer .........................
-const confirm = (id) => {
+const confirmDelete = (id) => {
   let singleOrMultiple = id;
   let ids = [];
   if (typeof id === 'object'){    // check if user selected multiple items

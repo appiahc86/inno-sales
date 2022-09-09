@@ -3,17 +3,22 @@
   <div class="row">
     <div class="col-12">
 
-      <h5 class="text-center" v-if="loading">Loading Data Please Wait... <span class="spinner-grow"></span></h5>
+      <h5 class="text-center" v-if="loading">Loading Data Please Wait... <span class="spinner-grow spinner-grow-sm"></span></h5>
       <h4 class="text-center" v-else>List Of Invoices Received From Vendors</h4>
 
+      <h6 class="text-success mt-3">
+        <span class="pi pi-info-circle fw-bold"></span>
+        Right-click on a row to show the context menu.
+      </h6>
       <div class="table-responsive">
         <DataTable
             :value="purchases" :paginator="true" dataKey="id"
-            class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
-            filterDisplay="menu" :rows="10" v-model:filters="filters"
+            class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines"
+            filterDisplay="menu" :rows="10" v-model:filters="filters" v-model:selection="selectedRecord"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             :rowsPerPageOptions="[10,25,50]" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            :globalFilterFields="['company', 'invoice', 'total']" responsiveLayout="scroll"
+            :globalFilterFields="['company', 'invoice', 'total']" responsiveLayout="scroll" @row-click="rowClicked"
+            contextMenu v-model:contextMenuSelection="selectedRow" @row-contextmenu="onRowContextMenu"
         >
           <template #header>
             <div class="d-flex justify-content-center align-items-center" style="height: 15px">
@@ -28,7 +33,7 @@
             No record found.
           </template>
 
-<!--          <Column selection-mode="multiple"  style="font-size: 0.85em;"></Column>-->
+       <Column selection-mode="single" class="data-table-font-size" style="width: 20px;"></Column>
 
           <Column field="company" header="Vendor" sortable style="font-size: 0.75em;"></Column>
           <Column field="invoice" header="Invoice#" sortable style="font-size: 0.75em;"></Column>
@@ -53,19 +58,9 @@
               {{ formatNumber(data.total) }}
             </template>
           </Column>
-          <Column headerStyle="text-align: center" header="Return To Vendor" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.75em;">
-            <template #body="{data}">
-              <span title="Return to Vendor" @click="openReturnDialog(data.id, data.company)" style="cursor: pointer;">
-                <span class="pi pi-reply"></span>
-              </span> &nbsp;
-            </template>
-          </Column>
-          <Column headerStyle="text-align: center" header="View" bodyStyle="text-align: center; overflow: visible"  style="font-size: 0.75em;">
-            <template #body="{data}">
-              <span title="View Details" @click="showDetails(data.id)" style="cursor: pointer;">&#128064;</span> &nbsp;
-            </template>
-          </Column>
+
         </DataTable>
+        <ContextMenu :model="menuModel" ref="cm" class="context-menu" style="font-size: 0.9em;" />
       </div>
     </div>
   </div>
@@ -123,10 +118,10 @@
               Proceed if you are sure you want to reverse this document. Also will clear any
               payment made if available
             </p>
-            <div class="d-flex mb-3">
-              <label><b>Return Date</b> <input type="date" class="form-control-dark p-1" v-model="returnData.date"></label>
-            </div>
-            <button name="submitBtn" type="submit" class="px-2 btn-dark">Proceed</button>
+<!--            <div class="d-flex mb-3">-->
+<!--              <label><b>Return Date</b> <input type="date" class="form-control-dark p-1" v-model="returnData.date"></label>-->
+<!--            </div>-->
+            <button name="submitBtn" type="submit" class="px-2 bg-dark text-white" style="outline: none !important;">Proceed</button>
             <button type="button" class="float-end px-2 btn-secondary" @click="closeReturnDialog">Cancel</button>
 
           </form>
@@ -146,6 +141,7 @@ import {formatNumber} from "@/functions";
 import * as Validator from "validatorjs";
 import {useStore} from "vuex";
 
+const selectedRecord = ref();
 const store = useStore();
 const purchases = ref([]);
 const loading = ref(false);
@@ -162,6 +158,26 @@ const returnData = reactive({
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
+
+
+//For row context menu
+const cm = ref();
+const menuModel = ref([
+  {label: 'View Details', icon: 'pi pi-eye', command: () => showDetails(selectedRow.value.id), class: 'fw-bold'},
+  {separator: true},
+  {label: 'Return To Vendor', icon: 'pi pi-undo', command: () => openReturnDialog(selectedRow.value.id, selectedRow.value.company), class: 'fw-bold'}
+]);
+const selectedRow = ref();
+const onRowContextMenu = (event) => {
+  selectedRecord.value = null;
+  selectedRecord.value = event.data;
+  cm.value.show(event.originalEvent);
+}
+
+//Row click event
+const rowClicked = (e) => {
+  selectedRecord.value = e.data;
+}
 
 
 //Get purchases
@@ -195,11 +211,11 @@ const showDetails = async (id) => {
         .select('purchases.invoice', 'purchases.total', 'purchaseDetails.productName',
             'purchaseDetails.cost', 'purchaseDetails.quantity', 'purchaseDetails.total as extCost'
         ).where('purchases.id', id)
+        .limit(100);
     detailsDialog.value.showModal();
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);
   }
-
 }
 
 
@@ -222,25 +238,20 @@ const openReturnDialog = (id, vendor) => { // open dialog
 
 const returnToVendor = async (e) => {
   try {
-    // validation
-    let validation = new Validator(returnData,{
-      date: 'required'
-    })
 
-    if (validation.passes()) { // If validation passes
       e.target.submitBtn.disabled = true;
-
 
       await db.transaction( async trx => {
         const records = await trx('purchases')
             .join('purchaseDetails', 'purchases.id', '=', 'purchaseDetails.purchaseId')
             .select('purchaseDetails.productId', 'purchaseDetails.quantity')
             .where('purchases.id', returnData.id)
+            .limit(200)
 
 
         //Batch update  products quantity
         for (const purchase of records) {
-          await trx('products').where('id', purchase.productId).decrement('quantity', purchase.quantity)
+          await trx('products').where('id', purchase.productId).first().decrement('quantity', purchase.quantity)
         }
 
         //Update qty in vuex store
@@ -250,7 +261,7 @@ const returnToVendor = async (e) => {
 
 
         //Delete purchase
-        await trx('purchases').where('id', returnData.id).del();
+        await trx('purchases').where('id', returnData.id).first().del();
 
         // Update on front-end
         purchases.value = purchases.value.filter(purchase => purchase.id !== returnData.id)
@@ -260,8 +271,6 @@ const returnToVendor = async (e) => {
         returnData.vendor = null;
         returnDialog.value.close();
       })
-
-    }else ipcRenderer.send('errorMessage', `${Object.values(validation.errors.all())[0]}`) //if Validation fails
 
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message)

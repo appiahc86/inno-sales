@@ -12,7 +12,7 @@
 
           <div class="table-responsive">
             <DataTable :value="users" :paginator="true" dataKey="id" filterDisplay="menu" :rows="10" v-model:filters="filters"
-                       class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
+                       class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines"
                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                        :rowsPerPageOptions="[10,25,50]" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                        :globalFilterFields="['firstName','lastname', 'username', 'phone']" responsiveLayout="scroll"

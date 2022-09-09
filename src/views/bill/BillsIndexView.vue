@@ -6,15 +6,21 @@
       <h5 class="text-center" v-if="loading">Loading Data Please Wait... <span class="spinner-grow spinner-grow-sm"></span></h5>
       <h4 class="text-center" v-else>Outstanding Bills</h4>
 
+      <h6 class="text-success mt-3">
+        <span class="pi pi-info-circle fw-bold"></span>
+        Right-click on a row to show the context menu.
+      </h6>
       <div class="table-responsive">
         <DataTable
             :value="purchases" :paginator="true" dataKey="id"
-            class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
-            filterDisplay="menu" :rows="10" v-model:filters="filters"
+            class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines"
+            filterDisplay="menu" :rows="10" v-model:filters="filters" @row-click="rowClicked"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            :rowsPerPageOptions="[10,25,50]"
+            :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedRecord"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            :globalFilterFields="['company', 'invoice']" responsiveLayout="scroll">
+            :globalFilterFields="['company', 'invoice']" responsiveLayout="scroll"
+            contextMenu v-model:contextMenuSelection="selectedRow" @row-contextmenu="onRowContextMenu"
+        >
 
           <template #header>
             <div class="d-flex justify-content-center align-items-center" style="height: 15px">
@@ -28,6 +34,8 @@
           <template #empty>
             No record found.
           </template>
+
+          <Column selection-mode="single" class="data-table-font-size" style="width: 20px;"></Column>
 
           <Column field="company" header="Vendor" sortable class="data-table-font-size"></Column>
           <Column field="invoice" header="Invoice#" sortable class="data-table-font-size"></Column>
@@ -51,21 +59,8 @@
               <b>{{ formatNumber(data.total - (data.totalPaid || 0)) }}</b>
             </template>
           </Column>
-          <Column headerStyle="text-align: center" header="View Payments" bodyStyle="text-align: center; overflow: visible"  class="data-table-font-size">
-            <template #body="{data}">
-              <span title="View Payment History" @click="showHistory(data.id)" style="cursor: pointer;">
-                <span class="pi pi-eye-slash"></span>
-              </span> &nbsp;
-            </template>
-          </Column>
-          <Column headerStyle="text-align: center" header="Pay Bill" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
-            <template #body="{data}">
-              <span title="Make Payment" @click="goToPaymentPage(data)" style="cursor: pointer;">
-               <span class="pi pi-money-bill"></span>
-              </span> &nbsp;
-            </template>
-          </Column>
         </DataTable>
+        <ContextMenu :model="menuModel" ref="cm" class="context-menu" style="font-size: 0.9em;" />
       </div>
     </div>
   </div>
@@ -121,7 +116,7 @@ import {computed, ref} from "vue";
 import {FilterMatchMode} from "primevue/api";
 import {useRouter} from "vue-router";
 
-
+const selectedRecord = ref();
 const purchases = ref([]);
 const loading = ref(false);
 const router = useRouter();
@@ -132,6 +127,25 @@ const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 
+
+//For row context menu
+const cm = ref();
+const menuModel = ref([
+  {label: 'View Payment History', icon: 'pi pi-eye', command: () => showHistory(selectedRow.value.id), class: 'fw-bold'},
+  {separator: true},
+  {label: 'Make Payment', icon: 'pi pi-money-bill', command: () => goToPaymentPage(selectedRow.value), class: 'fw-bold'}
+]);
+const selectedRow = ref();
+const onRowContextMenu = (event) => {
+  selectedRecord.value = null;
+  selectedRecord.value = event.data;
+  cm.value.show(event.originalEvent);
+}
+
+//Row click event
+const rowClicked = (e) => {
+ selectedRecord.value = e.data;
+}
 
 
 //Get purchases
@@ -150,6 +164,7 @@ const getPurchases = async () => {
         .groupBy('purchases.id')
         .havingRaw('?? > ?', ['purchases.total',  db.raw('coalesce(sum(billPayments.amount), 0)'  )] )
         .orderBy('purchases.id', 'DESC')
+        .limit(150)
 
 
   }catch (e) { ipcRenderer.send("errorMessage", e.message) }
@@ -169,7 +184,8 @@ const showHistory = async (purchaseId) => {
   try {
     paymentHistory.value = [];
     paymentHistory.value = await db('billPayments').where('purchaseId', purchaseId)
-        .orderBy('id', 'DESC');
+        .orderBy('id', 'DESC')
+        .limit(100);
     paymentHistoryDialog.value.showModal();
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);
@@ -207,12 +223,11 @@ const confirmUndo = (id, purchaseId, amount) => {
 }
 
 ipcRenderer.on('undoBillPayment', async (event, args) => {
-// return console.log(parseFloat(args.amount))
+
   try {
-    await db.transaction( async trx => {
     //Remove record from billPayments Table
-    await trx('billPayments').where('id', args.id).del();
-    })
+    await db('billPayments').where('id', args.id).first().del();
+
 
     //Update in front-end
     paymentHistory.value = paymentHistory.value.filter(history => history.id !== args.id)

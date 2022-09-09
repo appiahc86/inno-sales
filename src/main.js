@@ -6,6 +6,7 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import PrimeVue from "primevue/config";
 import InputText from "primevue/inputtext";
+import ContextMenu from "primevue/contextmenu";
 import vSelect from "vue-select"
 import Vue3Apexcharts from "vue3-apexcharts";
 const app = createApp(App)
@@ -18,6 +19,7 @@ app.use(PrimeVue);
 app.use(Vue3Apexcharts)
 app.component('DataTable', DataTable);
 app.component('Column', Column);
+app.component('ContextMenu', ContextMenu);
 app.component('InputText', InputText);
 app.component('v-select', vSelect);
 app.use(store);

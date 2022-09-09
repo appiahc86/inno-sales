@@ -118,15 +118,20 @@
 
         <!-- Products Table  -->
           <div :style="{ display: secondActive ? 'block' : 'none'}">
-            <div class="table-responsive mt-3">
+            <h6 class="text-success mt-3">
+              <span class="pi pi-info-circle fw-bold"></span>
+              Right-click on a row to show the context menu.
+            </h6>
+            <div class="table-responsive">
               <DataTable
                   :value="products" :paginator="true" dataKey="id"
-                  class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
+                  class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines"
                   filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
                   paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                   :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedProducts"
                   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                   :globalFilterFields="['productName','category', 'description']" responsiveLayout="scroll"
+                  contextMenu v-model:contextMenuSelection="selectedRow" @row-contextmenu="onRowContextMenu"
               >
                 <template #header>
                   <div class="d-flex justify-content-center align-items-center" style="height: 15px">
@@ -145,7 +150,7 @@
                   <h4 class="text-white"> Loading data. Please wait.</h4>
                 </template>
 
-                <Column selection-mode="multiple" class="data-table-font-size"></Column>
+                <Column selection-mode="multiple" class="data-table-font-size" style="width: 20px;"></Column>
 
                 <Column field="productName" header="Product" sortable class="data-table-font-size">
                   <template #body="{data}">
@@ -157,7 +162,7 @@
                     <td class="text-capitalize">{{ data.category }}</td>
                   </template>
                 </Column>
-                <Column header="Exp" sortable class="data-table-font-size">
+                <Column header="Exp" sortable class="data-table-font-size" style="width: 20px;">
                   <template #body="{data}">
                     <td >{{ data.expiration ? new Date(data.expiration).toLocaleDateString() : '' }}</td>
                   </template>
@@ -173,9 +178,9 @@
                   </template>
                 </Column>
                 <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" class="data-table-font-size"></Column>
-                <Column field="tax" header="Tax" sortable class="data-table-font-size">
+                <Column field="tax" header="Tax" sortable class="data-table-font-size" style="width: 20px;">
                   <template #body="{data}">
-                    <td class="text-capitalize">{{ data.tax }}</td>
+                    <td class="text-capitalize" >{{ data.tax }}</td>
                   </template>
                 </Column>
                 <Column field="description" header="Desc" sortable class="data-table-font-size">
@@ -186,17 +191,8 @@
                   </template>
                 </Column>
 
-                <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
-                  <template #body="{data}">
-                    <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span>
-                  </template>
-                </Column>
-                <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
-                  <template #body="{data}">
-                    <span type="button" title="Delete" @click="confirmDelete(data.id)">&#10060;</span>
-                  </template>
-                </Column>
               </DataTable>
+              <ContextMenu :model="menuModel" ref="cm" class="context-menu" style="font-size: 0.9em;" />
             </div>
             <br>
             <button class="btn-secondary" v-if="selectedProducts.length" @click="confirmDelete(selectedProducts)">
@@ -276,8 +272,9 @@
                     <tr>
                       <td></td>
                       <td colspan="2">
-                        <button name="addProductBtn" class="btn-secondary p-1 fw-bold" type="submit" style="width: 45%;">Save</button>&nbsp;
-                        <button name="addProductBtn" class="p-1 fw-bold" type="button" @click="editProductDialog.close()" style="width: 45%;">Cancel</button>
+                        <button name="addProductBtn" class="btn-secondary p-1 fw-bold" type="submit" style="width: 49%;">Save</button>
+                        <span style="width: 1%">&nbsp;</span>
+                        <button name="addProductBtn" class="p-1 fw-bold" type="button" @click="editProductDialog.close()" style="width: 49%;">Cancel</button>
                       </td>
                     </tr>
 
@@ -355,7 +352,25 @@ const secondActive = ref(false);
       category: '',
       categoryName: '',
       tax: ''
-    })
+    });
+
+//For row context menu
+const cm = ref();
+const selectedRow = ref();
+const menuModel = ref([
+  {label: 'Edit', icon: 'pi pi-pencil', command: () => openDialog(selectedRow.value), class: 'fw-bold'},
+  {separator: true},
+  {label: 'Delete', icon: 'pi pi-trash', command: () => confirmDelete(selectedRow.value.id), class: 'fw-bold'}
+]);
+
+const onRowContextMenu = (event) => {
+  selectedProducts.value = [];
+  selectedProducts.value.push(event.data);
+  cm.value.show(event.originalEvent);
+}
+
+
+
 
 //Get all Categories
 const getCategories = async () => {

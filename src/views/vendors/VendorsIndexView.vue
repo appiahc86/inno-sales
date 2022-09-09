@@ -77,15 +77,20 @@
 
           <!--   Vendors Table       -->
         <div v-if="secondActive">
-          <div class="table-responsive mt-3">
+          <h6 class="text-success mt-4">
+            <span class="pi pi-info-circle fw-bold"></span>
+            Right-click on a row to show the context menu.
+          </h6>
+          <div class="table-responsive">
             <DataTable
                 :value="vendors" :paginator="true" dataKey="id"
-                class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines p"
+                class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines"
                 filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedVendors"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                 :globalFilterFields="['company', 'phone', 'address', 'contactPerson']" responsiveLayout="scroll"
+                contextMenu v-model:contextMenuSelection="selectedRow" @row-contextmenu="onRowContextMenu"
             >
               <template #header>
                 <div class="d-flex justify-content-center align-items-center" style="height: 15px">
@@ -103,7 +108,7 @@
                 <h4 class="text-white"> Loading data. Please wait...</h4>
               </template>
 
-              <Column selection-mode="multiple" class="data-table-font-size"></Column>
+              <Column selection-mode="multiple" class="data-table-font-size" style="width: 20px;"></Column>
 
               <Column field="company" header="Company" sortable class="data-table-font-size"></Column>
               <Column field="address" header="Address" sortable  class="data-table-font-size"></Column>
@@ -118,20 +123,11 @@
                 </template>
               </Column>
 
-              <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
-                <template #body="{data}">
-                  <span type="button" title="Edit" @click="openDialog(data)">&#128221;</span>
-                </template>
-              </Column>
-              <Column headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
-                <template #body="{data}">
-                  <span type="button" title="Delete" @click="confirm(data.id)">&#10060;</span>
-                </template>
-              </Column>
             </DataTable>
+            <ContextMenu :model="menuModel" ref="cm" class="context-menu" style="font-size: 0.9em;" />
           </div>
           <br>
-          <button class="btn-secondary" v-if="selectedVendors.length" @click="confirm(selectedVendors)">
+          <button class="btn-secondary" v-if="selectedVendors.length" @click="confirmDelete(selectedVendors)">
             <span class="pi pi-trash"></span>
             Delete Selection
           </button>
@@ -180,11 +176,12 @@
                     <tr>
                       <th class="float-end"></th>
                       <td>
-                        <button class=" mt-1 btn-secondary p-1" style="width: 45%;" type="submit" name="submitBtn">
+                        <button class=" mt-1 btn-secondary p-1" style="width: 49%;" type="submit" name="submitBtn">
                           <span class="pi pi-save"></span>
                           Save
-                        </button> &nbsp;
-                        <button type="button" class="p-1" @click="editDialog.close()" style="width: 45%;">Cancel</button>
+                        </button>
+                        <span style="width: 1%">&nbsp;</span>
+                        <button type="button" class="p-1" @click="editDialog.close()" style="width: 49%;">Cancel</button>
                       </td>
                     </tr>
 
@@ -236,6 +233,21 @@ const resetVendorData = () => {
   vendorData.accountNumber = ''; vendorData.notes = '';
 }
 
+
+//For row context menu
+const cm = ref();
+const selectedRow = ref();
+const menuModel = ref([
+  {label: 'Edit', icon: 'pi pi-pencil', command: () => openDialog(selectedRow.value), class: 'fw-bold'},
+  {separator: true},
+  {label: 'Delete', icon: 'pi pi-trash', command: () => confirmDelete(selectedRow.value.id), class: 'fw-bold'}
+]);
+
+const onRowContextMenu = (event) => {
+  selectedVendors.value = [];
+  selectedVendors.value.push(event.data);
+  cm.value.show(event.originalEvent);
+}
 
 
             //........................Get all vendors ...........................
@@ -329,7 +341,7 @@ const editVendor = async () => {
 
 
 //.............Delete Vendor .........................
-const confirm = (id) => {
+const confirmDelete = (id) => {
   let singleOrMultiple = id;
   let ids = [];
   if (typeof id === 'object'){    // check if user selected multiple items

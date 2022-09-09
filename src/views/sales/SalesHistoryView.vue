@@ -167,7 +167,7 @@
         <div style="font-size: 12px;">Amount Tendered: GH¢ {{ formatNumber(details[0].tendered) }}</div>
         <div style="font-size: 12px;">Change Given: GH¢ {{ formatNumber(details[0].tendered - details[0].total) }}</div>
 
-        <p style="font-size: 11px; text-align: center;">Thanks for shopping with us!</p>
+        <div style="font-size: 11px; text-align: center;">Thanks for shopping with us!</div>
 
         <div  style="text-align: center">
           <svg id="barcode"></svg>

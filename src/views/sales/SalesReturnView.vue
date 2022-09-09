@@ -7,7 +7,7 @@
       <p>Look up the receipt for the items being returned</p>
       <form class="py-2" @submit.prevent="searchReceipt">
         <div class="input-group">
-          <input type="search" v-model.trim.number="search" class="form-control-dark px-3" placeholder="Enter Receipt#">
+          <input type="search" v-model.trim.number="search" ref="searchInput" class="form-control-dark px-3" placeholder="Enter Receipt#">
           <div class="input-group-append">
             <button type="submit" class="py-2 px-3 text-white bg-primary" name="submitBtn" style="border: none;">
               <span class="pi pi-search"></span>
@@ -84,11 +84,12 @@
 </template>
 
 <script setup>
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import db from "@/dbConfig/db";
 import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
 
+const searchInput = ref();
 const search = ref(null);
 const items = ref([]);
 const returningItems = ref([]);
@@ -100,6 +101,8 @@ const paymentMethod = ref('cash');
 const store = useStore();
 
 const user = computed(() => store.getters.user);
+
+onMounted(() => searchInput.value.focus() )
 
 //Search for receipt number
 const searchReceipt = async () => {

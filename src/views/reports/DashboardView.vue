@@ -30,7 +30,8 @@
             <div class="col mr-2">
               <div class="text-xs fw-bold mb-1" style="font-size: 0.9em; color: darkgoldenrod">ANNUAL PURCHASES </div>
               <div class="h6 mb-0 fw-bold" v-if="loading">
-                <span class="spinner-border spinner-border-sm"></span> loading...</div>
+                <span class="spinner-border spinner-border-sm"></span> loading...
+              </div>
               <div class="h6 mb-0 fw-bold" v-else>GH¢ {{ formatNumber(totalPurchases) }}</div>
             </div>
             <div class="col-auto">
@@ -245,7 +246,6 @@ const startDate = () => { //This will set date to January 1 of the current year
 }
 
 
-
 const endDate = () => { //This will set date to December 31 of the current year
   let yyyy = new Date().getFullYear();
   let mm = '12';
@@ -265,7 +265,7 @@ const getData = async () => {
           .andWhereRaw('DATE(orderDate) <= ?', [endDate()])
           .select('orderDate')
           .sum('total as total')
-          .groupByRaw('DATE(orderDate)');
+          .groupByRaw("DATE(orderDate, 'start of month')");
 
       //Get purchases
       const purchases = await trx('purchases').where('status', 'received')

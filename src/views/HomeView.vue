@@ -11,7 +11,10 @@
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
                 <div class="text-xs fw-bold text-primary mb-1" style="font-size: 0.9em;">SALES COUNT</div>
-                <div class="h6 mb-0 fw-bold">&nbsp; {{ salesCount }}</div>
+                <div class="h6 mb-0 fw-bold" v-if="loading">
+                  <span class="spinner-border spinner-border-sm"></span> loading...
+                </div>
+                <div class="h6 mb-0 fw-bold" v-else>&nbsp; {{ salesCount }}</div>
               </div>
               <div class="col-auto">
                 <span class="text-black-50" style="font-size: 250%">&#128722;</span>
@@ -27,7 +30,10 @@
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
                 <div class="text-xs fw-bold text-warning mb-1" style="font-size: 0.9em;">MOMO </div>
-                <div class="h6 mb-0 fw-bold">GH¢ {{ formatNumber(momo) }}</div>
+                <div class="h6 mb-0 fw-bold" v-if="loading">
+                  <span class="spinner-border spinner-border-sm"></span> loading...
+                </div>
+                <div class="h6 mb-0 fw-bold" v-else>GH¢ {{ formatNumber(momo) }}</div>
               </div>
               <div class="col-auto">
                 <span class="" style="font-size: 250%">&#128241;</span>
@@ -44,7 +50,10 @@
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
                 <div class="text-xs fw-bold text-danger mb-1" style="font-size: 0.9em;">RETURNS</div>
-                <div class="h6 mb-0 fw-bold">GH¢ {{ formatNumber(returns) }}</div>
+                <div class="h6 mb-0 fw-bold" v-if="loading">
+                  <span class="spinner-border spinner-border-sm"></span> loading...
+                </div>
+                <div class="h6 mb-0 fw-bold" v-else>GH¢ {{ formatNumber(totalReturns) }}</div>
               </div>
               <div class="col-auto">
                 <span style="font-size: 250%">&#128683;</span>
@@ -61,11 +70,13 @@
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
                 <div class="text-xs fw-bold text-success mb-1" style="font-size: 0.9em;">TOTAL SALES</div>
-                <div class="h6 mb-0 fw-bold">GH¢ {{ formatNumber(totalSales) }}</div>
+                <div class="h6 mb-0 fw-bold" v-if="loading">
+                  <span class="spinner-border spinner-border-sm"></span> loading...
+                </div>
+                <div class="h6 mb-0 fw-bold" v-else>GH¢ {{ formatNumber(totalSales) }}</div>
               </div>
               <div class="col-auto">
                 <span style="font-size: 250%">
-<!--                  &#128722;-->
                   &#128181;
                 </span>
               </div>
@@ -104,7 +115,15 @@
 import {computed, reactive, ref} from "vue";
 import {formatNumber} from "@/functions";
 import db from "@/dbConfig/db";
+
+const loading = ref(false);
 const records = ref([]);
+const totalSales = ref(0);
+const totalReturns = ref(0);
+const momo = ref(0);
+const salesCount = ref(0);
+
+
 const barChartRecords = ref([]);
 
 
@@ -138,7 +157,6 @@ const barChartSeries = reactive([
   {
     name: 'Category',
     data: []
-
   }
 ])
 
@@ -154,8 +172,6 @@ const chartOptions = reactive({
 })
 const pieChartSeries = ref( []);
 
-
-
 //Today's date
 const today = () => {
   let yyyy = new Date().getFullYear();
@@ -167,75 +183,55 @@ const today = () => {
 
 
 
-//Get today's orders
+//Get Records
 const getTodaySales = async () => {
   try {
-    records.value = await db('orders')
+    loading.value = true;
+
+    const query = await db('orders')
         .whereRaw('DATE(orderDate) >= ?', [today()])
         .andWhereRaw('DATE(orderDate) <= ?', [today()])
-        .select('orders.type', 'orders.momo', 'total');
+        .select('orders.type', 'orders.momo', 'total')
+        .sum('orders.total as totalSales')
+        .sum('orders.momo as totalMomo')
+        .count('* as salesCount')
+        .groupBy('orders.type');
+
 
     let returns = 0;
     let sales = 0;
-    for (const record of records.value) {
-      if (record.type === 'sale') sales += parseFloat(record.total)
-      else returns += parseFloat(-record.total)
+    let totalMomo = 0;
+    for (const record of query) {
+      if (record.type === 'sale') {
+        salesCount.value = record.salesCount; //Get sales count if type is equal to sales
+        sales += parseFloat(record.totalSales);
+        totalMomo += record.totalMomo;
+      }
+      else if (record.type === 'return') {
+        returns += parseFloat(record.totalSales) || 0;
+        totalReturns.value = record.totalSales || 0; //Get total returns
+        totalMomo += record.totalMomo;
+      }
     }
+
+    totalSales.value = sales + returns;
+    momo.value = totalMomo;
 
     pieChartSeries.value = [parseFloat(sales.toFixed(2)), parseFloat(returns.toFixed(2))];
 
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);
+  }finally {
+    loading.value = false;
   }
 }
 getTodaySales();
-
-//Get total sales
-const totalSales = computed(() => {
-  let total = 0;
-  for (const record of records.value) {
-    total += parseFloat(record.total);
-  }
-  return total;
-})
-
-
-//Get momo
-const momo = computed(() => {
-  let total = 0;
-  for (const record of records.value) {
-    total += parseFloat(record.momo);
-  }
-  return total;
-})
-
-
-
-//Get returns
-const returns = computed(() => {
-  let total = 0;
-  for (const record of records.value) {
-    if (record.type === 'return')
-    total += parseFloat(record.total);
-  }
-  return total;
-})
-
-//Get sales count
-const salesCount = computed(() => {
-  let total = 0;
-  for (const record of records.value) {
-    if (record.type === 'sale')
-      total += 1
-  }
-  return total;
-})
-
 
 
  //get data for bar chart
 const getRecordsForChart = async () => {
   try {
+    loading.value = true;
     barChartRecords.value = await db('orderDetails')
         .innerJoin('categories', 'orderDetails.categoryId', 'categories.id')
         .innerJoin('orders', 'orders.id', 'orderDetails.orderId')
@@ -246,7 +242,6 @@ const getRecordsForChart = async () => {
         .groupBy('categories.id')
         .orderBy('sum', 'desc')
         .limit(10);
-
 
     barChartRecords.value =  barChartRecords.value.filter(item => item.sum > 0)
 
@@ -259,6 +254,8 @@ const getRecordsForChart = async () => {
 
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);
+  }finally {
+    loading.value = false;
   }
 }
 getRecordsForChart();

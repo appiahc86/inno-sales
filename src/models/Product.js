@@ -5,7 +5,7 @@ const Product = async () => {
     if (!await db.schema.hasTable('products')){
 
         await db.schema.createTable('products', table => {
-            table.bigIncrements('id').primary();
+            table.increments('id').primary();
             table.string('productName', 100).notNullable();
             table.string('description', 100).nullable();
             table.integer('quantity').notNullable();
@@ -14,7 +14,7 @@ const Product = async () => {
             table.string('tax', 6).notNullable();
             table.date('dateAdded').defaultTo(db.fn.now());
             table.date('expiration');
-            table.bigInteger('category').unsigned().notNullable();
+            table.integer('category').unsigned().notNullable();
             table.foreign('category').references('id').inTable('categories');
         })
     }

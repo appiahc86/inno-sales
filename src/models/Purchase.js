@@ -4,11 +4,11 @@ const Purchase = async () => {
     if (!await db.schema.hasTable('purchases')){
 
         await db.schema.createTable('purchases', table => {
-            table.bigIncrements('id').primary();
-            table.bigInteger('userId');
+            table.increments('id').primary();
+            table.integer('userId');
             table.date('billDate');
             table.date('invoiceDue');
-            table.bigInteger( 'vendorId');
+            table.integer( 'vendorId');
             table.enum('status', ['received', 'returned']).defaultTo('received')
             table.integer('numberOfItems');
             table.date('returnedDate');

@@ -105,7 +105,16 @@
                     step="any" v-model="momo" min="0" ref="momoRef">
            </div>
 
-           <h6 class="mt-2 fw-bold">Tendered: {{ formatNumber(tendered) }}</h6>
+           <div class="mt-3">
+             <h6 class="text-center">Momo Type</h6>
+             <label><input type="radio" id="mtn" value="mtn" v-model="momoType" class="p-radiobutton"> MTN</label>
+             &nbsp; &nbsp;
+             <label><input type="radio" id="vodafone" value="vodafone" v-model="momoType" class="p-radiobutton"> Vodafone</label>
+             &nbsp; &nbsp;
+             <label><input type="radio" id="airtelTigo" value="airtelTigo" v-model="momoType" class="p-radiobutton"> AirtelTigo</label>
+           </div>
+
+           <h6 class="mt-4 fw-bold">Tendered: {{ formatNumber(tendered) }}</h6>
            <h5 class="mt-2 fw-bold text-primary">Change: {{ formatNumber(change) }}</h5><br>
            <label>
              <input type="checkbox" class="p-checkbox" v-model="printReceipt">
@@ -439,11 +448,24 @@ watch(
 
 const cash = ref(0);
 const momo = ref(0);
+const momoType = ref('mtn');
 const cashRef = ref(null);
 const momoRef = ref(null);
 let tendered = computed(() => store.getters["cartModule/cashTendered"]);
 const change = ref(0);
 
+
+//watch total and update cash input field
+watch(() => total.value, (value, oldValue) => {
+  cash.value = value;
+  store.dispatch("cartModule/setCashTendered", parseFloat(value));
+})
+
+//set cash input to total on mounted
+onMounted(() => {
+  cash.value = total.value;
+  store.dispatch("cartModule/setCashTendered", parseFloat(total.value));
+})
 
 //calculate change by cash
 const calculateChangeByCash = () => {
@@ -480,8 +502,6 @@ watch(momo, (value) => {
 
 //Reset payment form
 const resetPayment = () => {
-  store.dispatch("cartModule/setCashTendered", 0);
-  cash.value = 0;
   change.value = 0;
   momo.value = 0;
 }
@@ -516,6 +536,7 @@ const checkout = async (e) => {
          const order = await trx('orders').insert({ //Save to Orders table
            numberOfItems: cart.value.length,
            momo: momo.value || 0,
+           momoType: momo.value ? momoType.value : '',
            total: total.value,
            tendered: tendered.value,
            discount: totalDiscount.value,

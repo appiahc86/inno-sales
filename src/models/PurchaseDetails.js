@@ -4,11 +4,11 @@ const PurchaseDetails = async () => {
     if (!await db.schema.hasTable('purchaseDetails')){
 
         await db.schema.createTable('purchaseDetails', table => {
-            table.bigIncrements('id').primary();
-            table.bigInteger( 'purchaseId');
+            table.increments('id').primary();
+            table.integer( 'purchaseId');
             table.string('productName');
             table.integer('quantity');
-            table.bigInteger('productId');
+            table.integer('productId');
             table.float('cost');
             table.float('total');
 

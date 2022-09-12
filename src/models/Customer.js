@@ -4,7 +4,7 @@ const Customer = async () => {
     if (!await db.schema.hasTable('customers')){
 
         await db.schema.createTable('customers', table => {
-            table.bigIncrements('id').primary();
+            table.increments('id').primary();
             table.string('name', 40);
             table.string('company', 60);
             table.string('phone', 36);

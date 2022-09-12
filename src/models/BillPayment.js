@@ -5,8 +5,8 @@ const BillPayment = async () => {
     if (!await db.schema.hasTable('billPayments')){
 
         await db.schema.createTable('billPayments', table => {
-            table.bigIncrements('id').primary();
-            table.bigInteger('purchaseId').notNullable();
+            table.increments('id').primary();
+            table.integer('purchaseId').notNullable();
             table.date('date').notNullable();
             table.float('amount');
             table.string('note');

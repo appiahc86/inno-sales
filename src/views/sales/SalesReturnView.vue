@@ -59,14 +59,23 @@
           <label><input type="radio" id="cash" value="cash" v-model="paymentMethod" class="p-radiobutton"> Cash</label>
           &nbsp; &nbsp;
           <label><input type="radio" id="momo" value="momo" v-model="paymentMethod" class="p-radiobutton"> Momo</label>
+
+          <div class="mt-3" v-if="paymentMethod === 'momo'">
+            <h6 class="text-center">Momo Type</h6>
+            <label><input type="radio" id="mtn" value="mtn" v-model="momoType" class="p-radiobutton"> MTN</label>
+            &nbsp; &nbsp;
+            <label><input type="radio" id="vodafone" value="vodafone" v-model="momoType" class="p-radiobutton"> Vodafone</label>
+            &nbsp; &nbsp;
+            <label><input type="radio" id="airtelTigo" value="airtelTigo" v-model="momoType" class="p-radiobutton"> AirtelTigo</label>
+          </div>
+
           <br>
           <button class="p-1 mt-2" :disabled="!anItemIsChecked" ref="returnBtn"
                   @click="returnItems" title="Return Item(s)" style="width: 100px">
             <b><span class="pi pi-save"></span> Save</b>
           </button>
+
         </div>
-
-
       </div>
 
       <div class="text-center">
@@ -97,6 +106,7 @@ const change = ref(null);
 const discount = ref(null);
 const tax = ref(null);
 const returnBtn = ref(null);
+const momoType = ref('mtn')
 const paymentMethod = ref('cash');
 const store = useStore();
 
@@ -212,6 +222,7 @@ const returnItems = async () => {
         total:  -change.value, //Get a negative value
         tendered: 0,
         discount: discount.value,
+        momoType: paymentMethod.value === 'momo' ? momoType.value : '',
         tax: tax.value,
         customerId: '',
         userId: user.value.id

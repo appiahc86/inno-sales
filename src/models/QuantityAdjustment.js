@@ -5,9 +5,9 @@ const QuantityAdjustment = async () => {
     if (!await db.schema.hasTable('quantityAdjustments')){
 
         await db.schema.createTable('quantityAdjustments', table => {
-            table.bigIncrements('id').primary();
-            table.bigInteger('userId').notNullable();
-            table.bigInteger('productId');
+            table.increments('id').primary();
+            table.integer('userId').notNullable();
+            table.integer('productId');
             table.date('date').defaultTo(db.fn.now());
             table.integer('oldQuantity');
             table.integer('quantity');

@@ -152,7 +152,6 @@ const search = async (e) => {
     e.target.submitBtn.disabled = true;
     loading.value = true;
     await db('orders')
-        // .leftJoin('users', 'users.id', '=', 'orders.userId')
         .select('orders.id', 'orders.orderDate')
         .sum('orders.total as total')
         .sum('orders.discount as discount')

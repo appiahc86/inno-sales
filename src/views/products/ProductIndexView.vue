@@ -162,34 +162,22 @@
                     <td class="text-capitalize">{{ data.category }}</td>
                   </template>
                 </Column>
-                <Column header="Exp" sortable class="data-table-font-size" style="width: 20px;">
+                <Column header="Expiration" sortable class="data-table-font-size" style="width: 20px;">
                   <template #body="{data}">
                     <td >{{ data.expiration ? new Date(data.expiration).toLocaleDateString() : '' }}</td>
                   </template>
                 </Column>
-                <Column field="buyingPrice" header="Buy. Price" sortable class="data-table-font-size">
+                <Column field="buyingPrice" header="Buying Price" sortable class="data-table-font-size">
                   <template #body="{data}">
                     <td>{{ formatNumber(parseFloat(data.buyingPrice)) }}</td>
                   </template>
                 </Column>
-                <Column field="sellingPrice" header="Sel. Price" sortable class="data-table-font-size">
+                <Column field="sellingPrice" header="Selling Price" sortable class="data-table-font-size">
                   <template #body="{data}">
                     <td><b>{{ formatNumber(parseFloat(data.sellingPrice)) }}</b></td>
                   </template>
                 </Column>
                 <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" class="data-table-font-size"></Column>
-                <Column field="tax" header="Tax" sortable class="data-table-font-size" style="width: 20px;">
-                  <template #body="{data}">
-                    <td class="text-capitalize" >{{ data.tax }}</td>
-                  </template>
-                </Column>
-                <Column field="description" header="Desc" sortable class="data-table-font-size">
-                  <template #body="{data}">
-                    <td :title="data.description">
-                      {{ data.description && data.description.length > 15 ? data.description.substring(0, 15) + '...' : data.description }}
-                    </td>
-                  </template>
-                </Column>
 
               </DataTable>
               <ContextMenu :model="menuModel" ref="cm" class="context-menu" style="font-size: 0.9em;" />
@@ -207,7 +195,10 @@
         <dialog ref="editProductDialog" style="border: 2px solid #ccc;" name="dialog">
           <h4>Edit product</h4>
           <div class="container-fluid">
-            <div class="row justify-content-center">
+            <div class="p-5" v-if="detailsLoading">
+              <h5 class="text-center">Loading... <span class="spinner-border spinner-border-sm"></span></h5>
+            </div>
+            <div class="row justify-content-center" v-else>
               <div class="col-md-12">
                 <form @submit.prevent="editProduct">
                   <table class="w-100 myTable">
@@ -285,6 +276,66 @@
           </div>
         </dialog>
 
+
+        <!--  View Details Dialog-->
+        <dialog ref="detailsDialog" style="min-width: 500px; border: 2px solid #ccc;">
+          <button class="text-white bg-danger" style="float: right;" @click="detailsDialog.close()">X</button><br>
+
+          <div class="container-fluid">
+            <div class="p-5" v-if="detailsLoading">
+              <h5 class="text-center">Loading... <span class="spinner-border spinner-border-sm"></span></h5>
+            </div>
+            <div class="row" v-else>
+              <div class="col" v-if="productDetails">
+
+                  <h5 class="text-center"><b>{{ productDetails.productName }}</b></h5>
+
+                <div class="table-responsive" style="height: 350px;">
+                  <table class="table table-sm table-striped table-hover">
+                    <thead>
+                    <tr>
+                      <th>Category</th>
+                      <td class="text-capitalize">{{ productDetails.category }}</td>
+                    </tr>
+                    <tr>
+                      <th>Expiration</th>
+                      <td>{{ productDetails.expiration ? new Date(productDetails.expiration).toLocaleDateString() : '' }}</td>
+                    </tr>
+                    <tr>
+                      <th>Buying Price</th>
+                      <td>{{ formatNumber(parseFloat(productDetails.buyingPrice)) }}</td>
+                    </tr>
+                    <tr>
+                      <th>Selling Price</th>
+                      <td>{{ formatNumber(parseFloat(productDetails.sellingPrice)) }}</td>
+                    </tr>
+                    <tr>
+                      <th>Quantity</th>
+                      <td>{{ productDetails.quantity }}</td>
+                    </tr>
+                    <tr>
+                      <th>Tax</th>
+                      <td class="text-capitalize">{{ productDetails.tax }}</td>
+                    </tr>
+                    <tr>
+                      <th>Date Added</th>
+                      <td>
+                        {{ productDetails.dateAdded ? new Date(productDetails.dateAdded).toLocaleDateString() : '' }}
+                      </td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                  </table>
+                  <h6 class="text-center">Description</h6>
+                  <textarea cols="10" rows="4" class="w-100" disabled>{{ productDetails.description }}</textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </dialog>
+
+
         <!--  Category Dialog -->
         <dialog ref="categoryDialog" style="border: 2px solid #ccc;">
 
@@ -298,6 +349,7 @@
             <button type="submit" name="submitBtn"><span class="pi pi-save px-2 py-1"></span><b>Save</b></button>
           </form>
         </dialog>
+
 
       </div>
     </div>
@@ -324,8 +376,11 @@ const secondActive = ref(false);
     const selectedProducts = ref([]);
     const store = useStore();
     const loading = ref(false);
+    const detailsLoading = ref(false);
     const categories = ref([]);
-    const products = ref([])
+    const products = ref([]);
+    const productDetails = ref();
+    const detailsDialog = ref();
     const categoryDialog = ref(null);
     const editProductDialog = ref(null);
     const categoryName = ref('');
@@ -358,9 +413,11 @@ const secondActive = ref(false);
 const cm = ref();
 const selectedRow = ref();
 const menuModel = ref([
-  {label: 'Edit', icon: 'pi pi-pencil', command: () => openDialog(selectedRow.value), class: 'fw-bold'},
+  {label: 'Edit', icon: 'pi pi-pencil', command: () => openDialog(selectedRow.value.id), class: 'fw-bold'},
   {separator: true},
-  {label: 'Delete', icon: 'pi pi-trash', command: () => confirmDelete(selectedRow.value.id), class: 'fw-bold'}
+  {label: 'Delete', icon: 'pi pi-trash', command: () => confirmDelete(selectedRow.value.id), class: 'fw-bold'},
+  {separator: true},
+  {label: 'View Details', icon: 'pi pi-eye-slash', command: () => viewDetails(selectedRow.value.id), class: 'fw-bold'}
 ]);
 
 const onRowContextMenu = (event) => {
@@ -394,8 +451,6 @@ getCategories();
                   'products.buyingPrice',
                   'products.sellingPrice',
                   'products.quantity',
-                  'products.tax',
-                  'products.description',
                   'products.expiration',
                   'categories.name as category',
                   'categories.id as categoryId'
@@ -403,11 +458,44 @@ getCategories();
 
       }
       catch (e){ ipcRenderer.send('errorMessage', e.message) }
-      finally { loading.value = false; }
+      finally {
+        loading.value = false;
+      }
 
 
     }
     getAllProducts();
+
+
+    //View product details
+    const viewDetails = async (id) => {
+      try {
+        productDetails.value = null;
+        detailsDialog.value.showModal();
+        detailsLoading.value = true;
+
+       productDetails.value = await db('products')
+           .leftJoin('categories', 'products.category', '=','categories.id')
+           .select(
+               'products.productName',
+               'products.buyingPrice',
+               'products.sellingPrice',
+               'products.quantity',
+               'products.tax',
+               'products.description',
+               'products.expiration',
+               'products.dateAdded',
+               'categories.name as category'
+           )
+           .where('products.id', id)
+           .first();
+
+      }catch (e) {
+        ipcRenderer.send('errorMessage', e.message)
+      }finally {
+        detailsLoading.value = false;
+      }
+    }
 
 
     //Reset Product from data
@@ -416,11 +504,15 @@ getCategories();
       productData.buyingPrice = ''; productData.sellingPrice = ''; productData.category = null;
       productData.tax = 'tax'; productData.expiration = null
     }
-
-
+//Reset Product from data
+const resetEditProductData = () => {
+  editProductData.productName = ''; editProductData.id = ''; editProductData.description = '';
+  editProductData.expiration = null; editProductData.category = ''; editProductData.tax = 'tax'; editProductData.categoryName = ''
+}
 
       // Add product
     const addProduct = async (e) => {
+
 
       try {
         // validation
@@ -557,26 +649,49 @@ getCategories();
     }) // ./Delete Product
 
     // open dialog for editing product
-    const openDialog = (data) => {
+    const openDialog = async (id) => {
 
-      if (data.expiration){
-        let yyyy = new Date(data.expiration).getFullYear();
-        let mm = ( new Date(data.expiration).getMonth() + 1) < 10 ? '0' + ( new Date(data.expiration).getMonth() + 1) : new Date(data.expiration).getMonth() + 1;
-        let dd = (new Date(data.expiration).getDate()) < 10 ? '0' + (new Date(data.expiration).getDate()) : (new Date(data.expiration).getDate());
-        editProductData.expiration = `${yyyy}-${mm}-${dd}`;
-      }else editProductData.expiration = null;
+      try {
+        resetEditProductData();
+        editProductDialog.value.showModal();
+        detailsLoading.value = true; //Use detail loading icon instead of creating new variable
 
-          editProductData.id = data.id;
+        const query =  await db('products')
+            .leftJoin('categories', 'products.category', '=','categories.id')
+            .select(
+                'products.id',
+                'products.productName',
+                'products.tax',
+                'products.description',
+                'products.expiration',
+                'categories.id as categoryId',
+                'categories.name as category'
+            )
+            .where('products.id', id)
+            .first();
 
-          editProductData.productName = data.productName;
-          // editProductData.quantity = data.quantity;
-          editProductData.description = data.description;
-          // editProductData.buyingPrice = data.buyingPrice;
-          // editProductData.sellingPrice = data.sellingPrice;
-          editProductData.category = data.categoryId;
-          editProductData.categoryName = data.category;
-          editProductData.tax = data.tax;
-          editProductDialog.value.showModal();
+        if (query.expiration){
+          let yyyy = new Date(query.expiration).getFullYear();
+          let mm = ( new Date(query.expiration).getMonth() + 1) < 10 ? '0' + ( new Date(query.expiration).getMonth() + 1) : new Date(query.expiration).getMonth() + 1;
+          let dd = ( new Date(query.expiration).getDate()) < 10 ? '0' + ( new Date(query.expiration).getDate()) : ( new Date(query.expiration).getDate());
+          editProductData.expiration = `${yyyy}-${mm}-${dd}`;
+        }else editProductData.expiration = null;
+
+
+        editProductData.id = id;
+
+        editProductData.productName = query.productName;
+        editProductData.description = query.description;
+        editProductData.category = query.categoryId;
+        editProductData.categoryName = query.category;
+        editProductData.tax = query.tax;
+
+      }catch (e) {
+        ipcRenderer.send('errorMessage', e.message)
+      }finally {
+        detailsLoading.value = false; //Use detail loading icon instead of creating new variable
+      }
+
 
     }
 
@@ -596,7 +711,8 @@ const openCategoryDialog = (e) => {
 
         //Save record
         const newCat =  await db('categories').insert({ name: cat });
-        categories.value.push({ id: newCat[0], name: cat })
+        categories.value.push({ id: newCat[0], name: cat });
+        productData.category = { id: newCat[0], name: cat } //select this category in the dropdown
         categoryDialog.value.close();
         categoryName.value = '';
 

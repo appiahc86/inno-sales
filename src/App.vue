@@ -248,27 +248,29 @@
 
 <script setup>
 
-// import runMigrations from "@/models";
+import runMigrations from "@/models";
 import db from "./dbConfig/db";
-// runMigrations() //Run all migrations
+runMigrations() //Run all Migrations
 db.raw('PRAGMA foreign_keys = ON').then(()=>{}); //set foreign key checks on
 
 // const boom = [];
-// for (let i = 0; i < 1000; i++) {
+// let count = 1;
+// for (let i = 0; i < 200; i++) {
 
   // boom.push({
   //   name: 'Akwasi Mensah', company: 'Boom company limited', phone: '09897652334', address: 'gsdgmj sjkdgkkjs dkfkjhkjhs dsdfgjksd'
   // })
 
   // boom.push({
-  //   orderDate: '2022-09-12 07:54:00', type: 'sale', momo:0, total:3000.00, tendered:6200.00, discount:0, tax:0, userId:1
+  //   orderDate: '2022-03-14 07:55:00', type: 'sale', momo:0, total:55.00, tendered:6200.00, discount:0, tax:0, userId:1
   // })
   // boom.push({
-  //   productName: 'Nokia X2', quantity: 30, buyingPrice: 200, sellingPrice:900, category: 1, tax: 'tax', description: 'hello'
+  //   productName: 'Pawpaw'+count, quantity: 20, buyingPrice: 80, sellingPrice: 100, category: 5, tax: 'tax', description: 'hello'
   // })
+  // count++
   // boom.push({
-  //   productId: 3, productName: 'Wardrobe', quantity: 3, buyingPrice: 900, originalPrice: 900, sellingPrice: 900,
-  //   total: 3000, tax: 0, discount: 0, date: '2022-07-16 07:54:00', categoryId: 1, orderId: 3675003
+  //   productId: 1, productName: 'Plantain', quantity: 3, buyingPrice: 900, originalPrice: 900, sellingPrice: 1000,
+  //   total: 3000, tax: 0, discount: 0, date: '2022-08-12 07:54:00', categoryId: 2, orderId: 2700005
   // })
 //
 //
@@ -311,7 +313,7 @@ const user = computed(() => store.getters.user);
 const lowQuantityProducts = computed(() => store.getters["productsModule/getLowQty"]); //Low qty Products
 const getExpiringProducts =  computed(() => store.getters["productsModule/getExpiringProducts"]); //Expired Products
 const getAlreadyExpiredProducts = computed(()=> store.getters["productsModule/getAlreadyExpiredProducts"]) //Already expired products
-
+const freezeRouting = computed(() => store.getters.getFreezeRoutingStatus) //Freeze routing status
 
 
 
@@ -343,11 +345,18 @@ const logout = () => {
 
 // listen to route events and redirect to page
 ipcRenderer.on('routing', (event, args) => {
+  if (!!freezeRouting.value){
+    return ipcRenderer.send("errorMessage", "There is a query in progress. Please wait for it to finish")
+  }
   router.push({name: args});
+
 })
 
 //backup database
 ipcRenderer.on('backing-up', (event, args) => {
+  if (!!freezeRouting.value){
+    return ipcRenderer.send("errorMessage", "There is a query in progress. Please wait for it to finish")
+  }
   backupDialog.value.showModal();
   backupDialog.value.addEventListener('cancel', e => e.preventDefault());
 })
@@ -357,13 +366,20 @@ ipcRenderer.on('backup-complete', (event, args) => {
 
 //Rebuild Database
 ipcRenderer.on('rebuild-db', async (event, args) => {
+  if (!!freezeRouting.value){
+    return ipcRenderer.send("errorMessage", "There is a query in progress. Please wait for it to finish")
+  }
   rebuildDialog.value.showModal();
   rebuildDialog.value.addEventListener('cancel', e => e.preventDefault());
   try {
+    store.commit("setFreezeRouting", true); //Freeze routing
     await db.raw("VACUUM");
     ipcRenderer.send('successMessage', 'Congrats!!!, Database Rebuild was successful')
   }catch (e) { ipcRenderer.send('errorMessage', e.message) }
-  finally { rebuildDialog.value.close() }
+  finally {
+    rebuildDialog.value.close();
+    store.commit("setFreezeRouting", false); //Enable routing
+  }
 })
 
                     //....................Handle sidebar toggle.............................
@@ -375,7 +391,7 @@ const main = ref(null);
 const collapseSidebar = () => {
   sidebarMenu.value.classList.add('hideMe');
   sidebarToggle.value.classList.remove('hideMe');
-  main.value.classList.remove('main')
+  main.value.classList.remove('main');
 }
 
 //restore sidebar

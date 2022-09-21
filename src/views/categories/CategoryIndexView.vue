@@ -164,7 +164,7 @@ import {useStore} from "vuex";
 
     ipcRenderer.on('deleteCategory', async (event, id ) => {
       try {
-          await db('categories').where({id}).first().del();
+          await db('categories').where({id}).del();
         categories.value = categories.value.filter(cat => parseInt(cat.id) !== parseInt(id));
       }catch (e){
         if (e.code === "SQLITE_CONSTRAINT")

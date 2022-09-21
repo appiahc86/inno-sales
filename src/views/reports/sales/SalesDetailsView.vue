@@ -192,8 +192,8 @@ const search = async (e) => {
         .select('orderDetails.id','orderDetails.productName', 'orderDetails.buyingPrice',
             'orderDetails.sellingPrice','orderDetails.tax','orderDetails.discount',
             'orderDetails.quantity', 'orderDetails.date', 'users.firstName as user')
-        .whereRaw('DATE(date) >= ?', [from.value])
-        .andWhereRaw('DATE(date) <= ?', [to.value])
+        .whereRaw('date >= ?', [from.value + ' 00:00:01'])
+        .andWhereRaw('date <= ?', [to.value + ' 23:59:59'])
         .limit(510)
         .stream((stream) => {
 

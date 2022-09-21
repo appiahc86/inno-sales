@@ -16,6 +16,7 @@
         </div>
       </form>
 
+      <h5 class="text-center" v-if="loading">Loading...<span class="spinner-border spinner-border-sm"></span></h5>
       <div v-if="items.length">
        <h5 class="text-center"><mark>Receipt#: {{ items[0].orderId }}</mark></h5>
       <div class="table-responsive" style="max-height: 450px;">
@@ -98,6 +99,7 @@ import db from "@/dbConfig/db";
 import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
 
+const loading = ref(false);
 const searchInput = ref();
 const search = ref(null);
 const items = ref([]);
@@ -106,7 +108,7 @@ const change = ref(null);
 const discount = ref(null);
 const tax = ref(null);
 const returnBtn = ref(null);
-const momoType = ref('mtn')
+const momoType = ref('mtn');
 const paymentMethod = ref('cash');
 const store = useStore();
 
@@ -115,7 +117,7 @@ const user = computed(() => store.getters.user);
 onMounted(() => searchInput.value.focus() )
 
 //Search for receipt number
-const searchReceipt = async () => {
+const searchReceipt = async (e) => {
   items.value = [];
   change.value = null;
   tax.value = null;
@@ -124,6 +126,8 @@ const searchReceipt = async () => {
 
   if (!search.value) return ipcRenderer.send('errorMessage', 'Please Enter Receipt number');
   try {
+    loading.value = true;
+    e.target.submitBtn.disabled = true;
     const records = await db.select('orderDetails.id', 'orderDetails.productId', 'orderDetails.productName',
         'orderDetails.quantity', 'orderDetails.buyingPrice', 'orderDetails.originalPrice',
         'orderDetails.sellingPrice', 'orderDetails.total', 'orderDetails.tax', 'orderDetails.discount',
@@ -146,6 +150,9 @@ const searchReceipt = async () => {
     search.value = null;
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);
+  }finally {
+    loading.value = false;
+    e.target.submitBtn.disabled = false;
   }
 }
 

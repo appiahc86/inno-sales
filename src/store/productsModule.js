@@ -10,6 +10,8 @@ const productsModule = {
     //......................................Getters..................................
     getters: {
 
+        productsCount: (state) => state.products.length,
+
         getLowQty: (state) => { //Get products below qty of 5
             return state.products.filter(item => parseInt(item.quantity) < 5);
         },

@@ -68,12 +68,15 @@
 
 
 
-  <!--  Payment Dialog Dialog -->
+  <!--  Payment history Dialog -->
   <dialog ref="paymentHistoryDialog" style="min-width: 500px; border: 2px solid #ccc;">
     <button class="text-white bg-danger" style="float: right;" @click="closePaymentHistoryDialog">X</button><br>
 
     <div class="container-fluid">
-      <div class="row">
+      <div class="p-5" v-if="detailsLoading">
+        <h5 class="text-center">Loading... <span class="spinner-border spinner-border-sm"></span></h5>
+      </div>
+      <div class="row" v-else>
         <div class="col">
           <div class="table-responsive" v-if="paymentHistory.length" style="height: 300px;">
             <table class="table table-sm table-borderless table-striped table-hover">
@@ -119,6 +122,7 @@ import {useRouter} from "vue-router";
 const selectedRecord = ref();
 const purchases = ref([]);
 const loading = ref(false);
+const detailsLoading = ref(false);
 const router = useRouter();
 const paymentHistory = ref([]);
 const paymentHistoryDialog = ref(null);
@@ -160,7 +164,6 @@ const getPurchases = async () => {
         .select('purchases.id', 'purchases.billDate', 'purchases.invoiceDue',
             'purchases.invoice', 'purchases.total', 'vendors.company')
         .sum('billPayments.amount as totalPaid')
-        .where('purchases.status', 'received')
         .groupBy('purchases.id')
         .havingRaw('?? > ?', ['purchases.total',  db.raw('coalesce(sum(billPayments.amount), 0)'  )] )
         .orderBy('purchases.id', 'DESC')
@@ -183,12 +186,16 @@ const goToPaymentPage = ({id, company, invoice,  total, totalPaid, invoiceDue}) 
 const showHistory = async (purchaseId) => {
   try {
     paymentHistory.value = [];
+    paymentHistoryDialog.value.showModal();
+    detailsLoading.value = true;
+
     paymentHistory.value = await db('billPayments').where('purchaseId', purchaseId)
         .orderBy('id', 'DESC')
         .limit(100);
-    paymentHistoryDialog.value.showModal();
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);
+  }finally {
+    detailsLoading.value = false;
   }
 
 }

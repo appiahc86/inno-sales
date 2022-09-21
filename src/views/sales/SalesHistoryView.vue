@@ -54,10 +54,13 @@
 
       <!-- Details dialog -->
   <dialog ref="dialog" style="min-width: 500px; border: 2px solid #ccc;">
-    <button class="text-white bg-danger" style="float: right;" @click="closeDialog">X</button><br>
+    <button class="text-white bg-danger" v-if="!detailsLoading" style="float: right;" @click="closeDialog">X</button><br>
 
     <div class="container-fluid">
-      <div class="row">
+      <div class="p-5" v-if="detailsLoading">
+        <h5 class="text-center">Loading... <span class="spinner-border spinner-border-sm"></span></h5>
+      </div>
+      <div class="row" v-else>
         <div class="col">
           <div class="table-responsive" v-if="details.length" style="height: 200px;">
             <table class="table table-sm table-borderless table-striped">
@@ -92,12 +95,16 @@
         </div> <br>
       </div>
           <br>
-          <h5>Total : <span class="text-danger">{{ details.length ? formatNumber(details[0].total) : 0 }}</span></h5>
-          <div class="text-center py-1">
-            <button class="fw-bold btn-secondary" @click="reprint(details.length ? details[0].id : '')">
-              <span class="pi pi-print"></span>
-              Reprint</button>
+          <div class="" v-if="details.length">
+            <h5>Total : <span class="text-danger">{{ details.length ? formatNumber(details[0].total) : 0 }}</span></h5>
+            <div class="text-center py-1">
+              <button class="fw-bold btn-secondary" @click="reprint(details.length ? details[0].id : '')">
+                <span class="pi pi-print"></span>
+                Reprint</button>
+            </div>
           </div>
+          <div v-else><h5 class="text-center">No Match Found</h5></div>
+
 
         </div>
       </div>
@@ -192,6 +199,7 @@ import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
 
 const loading = ref(false);
+const detailsLoading = ref(false);
 const orders = ref([]);
 const details = ref([]);
 const dialog = ref(null);
@@ -227,6 +235,8 @@ getOrders();
 
         //...............Show details..................
 const showDetails = async (orderId) => {
+  dialog.value.showModal();
+  detailsLoading.value = true;
   try {
     details.value = [];
     details.value = await db('orders')
@@ -238,9 +248,10 @@ const showDetails = async (orderId) => {
         .where('orders.id', orderId)
         .limit(100);
 
-    dialog.value.showModal();
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message)
+  }finally {
+    detailsLoading.value = false;
   }
 
 }

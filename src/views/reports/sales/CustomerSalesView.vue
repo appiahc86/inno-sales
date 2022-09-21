@@ -189,8 +189,8 @@ const search = async (e) => {
 
     await db('orders')
         .where('customerId', formData.selectedCustomer.id)
-        .whereRaw('DATE(orderDate) >= ?', [formData.from])
-        .andWhereRaw('DATE(orderDate) <= ?', [formData.to])
+        .whereRaw('orderDate >= ?', [formData.from + '00:00:01'])
+        .andWhereRaw('orderDate <= ?', [formData.to + ' 23:59:59'])
         .limit(510)
         .stream((stream) => {
 

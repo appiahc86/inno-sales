@@ -146,7 +146,7 @@
           </Column>
           <Column field="totalSold" header="Qty Sold" class="data-table-font-size">
             <template #body="{data}">
-              <td>{{ data.totalSold ? data.totalSold.toLocaleString() : '' }}</td>
+              <td>{{ data.totalSold ? data.totalSold.toLocaleString() : 0 }}</td>
             </template>
           </Column>
         </DataTable>
@@ -154,21 +154,27 @@
     </div>
   </div>
 
+  <dialog class="myDialog" ref="dialog"></dialog>
+
 </div>
 </template>
 
 <script setup>
-import {computed, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import db from "@/dbConfig/db";
 import {formatNumber} from "@/functions";
 import {reactive} from "vue";
+import {useStore} from "vuex";
 
 const orders = ref([]);
 const outstandingBills = ref([]);
 const loading = ref(false);
+const dialog = ref();
 const totalPurchases = ref(0);
 const totalProducts = ref(0);
 const bestSellingProducts = ref([]);
+const store = useStore();
+const productsLength = computed(()=> store.getters["productsModule/productsCount"])
 
 //Line chart data
 const lineChartOptions = reactive({
@@ -242,7 +248,7 @@ const startDate = () => { //This will set date to January 1 of the current year
   let yyyy = new Date().getFullYear();
   let mm = '01';
   let dd = '01';
-  return `${yyyy}-${mm}-${dd}`;
+  return `${yyyy}-${mm}-${dd} 00:00:01`;
 }
 
 
@@ -250,34 +256,48 @@ const endDate = () => { //This will set date to December 31 of the current year
   let yyyy = new Date().getFullYear();
   let mm = '12';
   let dd = '31';
-  return `${yyyy}-${mm}-${dd}`;
+  return `${yyyy}-${mm}-${dd} 23:59:59`;
 }
+
+onMounted(() => {
+  if (loading.value){
+    dialog.value.showModal();
+    dialog.value.addEventListener('cancel', e => e.preventDefault());
+    watch(() => loading.value, (value) => {
+      if (!value) dialog.value.close();
+    })
+  }
+
+})
 
       //...................Get all data from db...............
 const getData = async () => {
   loading.value = true;
+  store.commit("setFreezeRouting", true); // Freeze routing
+
   try {
     await db.transaction( async trx => {
 
       //Get orders
       orders.value = await trx('orders')
-          .whereRaw('DATE(orderDate) >= ?', [startDate()])
-          .andWhereRaw('DATE(orderDate) <= ?', [endDate()])
+          .whereRaw('orderDate >= ?', [startDate()])
+          .andWhereRaw('orderDate <= ?', [endDate()])
           .select('orderDate')
           .sum('total as total')
-          .groupByRaw("DATE(orderDate, 'start of month')");
+          .groupByRaw("DATE(orderDate, 'start of month')")
+          .limit(12)
+
 
       //Get purchases
-      const purchases = await trx('purchases').where('status', 'received')
-          .whereRaw('DATE(billDate) >= ?', [startDate()])
-          .andWhereRaw('DATE(billDate) <= ?', [endDate()])
+      const purchases = await trx('purchases')
+          .whereRaw('billDate >= ?', [startDate()])
+          .andWhereRaw('billDate <= ?', [endDate()])
           .sum('total as totalPurchases');
       totalPurchases.value = purchases[0].totalPurchases || 0;
       pieChartSeries.value[0] = purchases[0].totalPurchases || 0;
 
       //Get  Number of products
-      const productsCount = await trx('products').count('id as totalProducts');
-      totalProducts.value = productsCount[0].totalProducts || 0;
+      totalProducts.value = productsLength.value || 0;
 
       //Outstanding Bills
       outstandingBills.value = await trx('purchases')
@@ -285,21 +305,21 @@ const getData = async () => {
           .leftJoin('billPayments', 'purchases.id', 'billPayments.purchaseId')
           .select('purchases.total', )
           .sum('billPayments.amount as totalPaid')
-          .where('purchases.status', 'received')
           .groupBy('purchases.id')
           .havingRaw('?? > ?', ['purchases.total',  db.raw('coalesce(sum(billPayments.amount), 0)'  )] )
           .orderBy('purchases.id', 'DESC');
 
       // Best-selling products
       bestSellingProducts.value = await trx('products')
-          .leftJoin('orderDetails', 'products.id', '=','orderDetails.productId')
-          .leftJoin('categories', 'categories.id', 'orderDetails.categoryId')
+          .innerJoin('orderDetails', 'products.id', '=','orderDetails.productId')
+          .innerJoin('categories', 'categories.id', 'orderDetails.categoryId')
           .sum('orderDetails.quantity as totalSold')
-          .whereRaw('DATE(orderDetails.date) >= ?', [startDate()])
-          .andWhereRaw('DATE(orderDetails.date) <= ?', [endDate()])
+          .whereRaw('orderDetails.date >= ?', [startDate()])
+          .andWhereRaw('orderDetails.date <= ?', [endDate()])
           .select('products.id','products.productName','products.sellingPrice',
               'products.dateAdded','categories.name as category'
-          ).groupBy('products.id')
+          )
+          .groupBy('products.id')
           .orderBy('totalSold', 'desc')
           .limit(10)
     })
@@ -352,7 +372,10 @@ const getData = async () => {
     }////////////////////////////////////////
 
   }catch (e) { ipcRenderer.send('errorMessage', e.message) }
-  finally { loading.value = false }
+  finally {
+    loading.value = false;
+    store.commit("setFreezeRouting", false); // Enable routing
+  }
 }
 
 getData();
@@ -360,5 +383,10 @@ getData();
 </script>
 
 <style scoped>
-
+.myDialog{
+  border: none; visibility: hidden;
+}
+.myDialog::backdrop{
+  background: transparent;
+}
 </style>

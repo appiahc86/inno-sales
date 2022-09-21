@@ -151,9 +151,8 @@ const search = async (e) => {
         .join('vendors', 'purchases.vendorId', '=', 'vendors.id')
         .select( 'purchases.billDate', 'purchases.invoiceDue','purchases.numberOfItems',
             'purchases.invoice', 'purchases.total','vendors.company')
-        .where('status', 'received')
-        .whereRaw('DATE(billDate) >= ?', [from.value])
-        .andWhereRaw('DATE(billDate) <= ?', [to.value])
+        .whereRaw('billDate >= ?', [from.value + ' 00:00:01'])
+        .andWhereRaw('billDate <= ?', [to.value + ' 23:59:59'])
         .orderBy('vendors.company', 'asc')
         .limit(510)
         .stream((stream) => {

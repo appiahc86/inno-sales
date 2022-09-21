@@ -37,7 +37,9 @@
 
             <tr>
               <th class="float-end"><span class="pi pi-user"></span> Username &nbsp;</th>
-              <td><input type="text" class="form-control-dark" v-model.trim="formData.username"></td>
+              <td>
+                <input type="text" class="form-control-dark" v-model.trim="formData.username">
+              </td>
             </tr>
 
             <tr>

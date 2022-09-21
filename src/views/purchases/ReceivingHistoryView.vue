@@ -71,7 +71,10 @@
     <button class="text-white bg-danger" style="float: right;" @click="detailsDialog.close()">X</button><br>
 
     <div class="container-fluid">
-      <div class="row">
+      <div class="p-5" v-if="detailsLoading">
+        <h5 class="text-center">Loading... <span class="spinner-border spinner-border-sm"></span></h5>
+      </div>
+      <div class="row" v-else>
         <div class="col" v-if="details.length">
 
             <template v-if="details[0].invoice">
@@ -145,6 +148,7 @@ const selectedRecord = ref();
 const store = useStore();
 const purchases = ref([]);
 const loading = ref(false);
+const detailsLoading = ref(false);
 const details = ref([]);
 const  detailsDialog = ref(null);
 const  returnDialog = ref(null);
@@ -206,15 +210,19 @@ getPurchases();
 //Show details
 const showDetails = async (id) => {
   try {
+    detailsDialog.value.showModal();
+    detailsLoading.value = true;
     details.value = await db('purchases')
         .innerJoin('purchaseDetails', 'purchases.id', '=', 'purchaseDetails.purchaseId')
         .select('purchases.invoice', 'purchases.total', 'purchaseDetails.productName',
             'purchaseDetails.cost', 'purchaseDetails.quantity', 'purchaseDetails.total as extCost'
         ).where('purchases.id', id)
         .limit(100);
-    detailsDialog.value.showModal();
+
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);
+  }finally {
+    detailsLoading.value = false;
   }
 }
 
@@ -261,7 +269,7 @@ const returnToVendor = async (e) => {
 
 
         //Delete purchase
-        await trx('purchases').where('id', returnData.id).first().del();
+        await trx('purchases').where('id', returnData.id).del();
 
         // Update on front-end
         purchases.value = purchases.value.filter(purchase => purchase.id !== returnData.id)

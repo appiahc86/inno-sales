@@ -105,7 +105,7 @@
                     step="any" v-model="momo" min="0" ref="momoRef">
            </div>
 
-           <div class="mt-3">
+           <div class="mt-3" v-if="momo">
              <h6 class="text-center">Momo Type</h6>
              <label><input type="radio" id="mtn" value="mtn" v-model="momoType" class="p-radiobutton"> MTN</label>
              &nbsp; &nbsp;
@@ -337,7 +337,8 @@ getAllProducts();
 //.............Get all Customers .........................
 const getCustomers = async () => {
   try {
-    customers.value = await db.select().from('customers');
+    customers.value = await db('customers')
+        .select('name', 'phone');
     customers.value.map(cust => {cust.display = cust.name + " | " + cust.phone;})
   }catch (e) {
     ipcRenderer.send("errorMessage", e.message)

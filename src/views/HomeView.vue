@@ -36,7 +36,7 @@
                 <div class="h6 mb-0 fw-bold" v-else>GH¢ {{ formatNumber(momo) }}</div>
               </div>
               <div class="col-auto">
-                <span class="" style="font-size: 250%">&#128241;</span>
+                <span title="View Details" style="font-size: 250%; cursor: pointer;" @click="showMomoDetails">&#128241;</span>
               </div>
             </div>
           </div>
@@ -106,23 +106,60 @@
         </div>
       </div>
 
+<!--   Loading dialog -->
+    <dialog class="myDialog" ref="loadingDialog"></dialog>
+
+
+    <!-- Details dialog -->
+    <dialog ref="dialog" style="min-width: 400px; border: 2px solid #ccc;">
+      <button class="text-white bg-danger" v-if="!detailsLoading" style="float: right;" @click="dialog.close()">X</button><br>
+
+      <div class="container-fluid">
+        <div class="p-5" v-if="detailsLoading">
+          <h5 class="text-center">Loading... <span class="spinner-border spinner-border-sm"></span></h5>
+        </div>
+        <div class="row" v-else>
+          <div class="col">
+            <div class="table-responsive" v-if="momoDetails.length" style="height: 100px;">
+              <table class="table table-sm table-borderless table-striped">
+                <template v-for="record in momoDetails" :key="record.momoType">
+                  <tr>
+                    <th class="text-uppercase">{{ record.momoType }}</th>
+                    <td>{{ formatNumber(parseFloat(record.total)) }}</td>
+                  </tr>
+                </template>
+              </table>
+            </div>
+            <div v-else><h5 class="text-center">No Record Found</h5></div>
+            <br>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
 
   </div>
 </template>
 
 <script setup>
 
-import {computed, reactive, ref} from "vue";
+import {reactive, ref} from "vue";
 import {formatNumber} from "@/functions";
 import db from "@/dbConfig/db";
+import {onMounted, watch} from "vue";
+import {useStore} from "vuex";
 
 const loading = ref(false);
+const loadingDialog = ref();
+const detailsLoading = ref(false);
+const dialog = ref();
+const momoDetails = ref([]);
 const records = ref([]);
 const totalSales = ref(0);
 const totalReturns = ref(0);
 const momo = ref(0);
 const salesCount = ref(0);
-
+const store = useStore();
 
 const barChartRecords = ref([]);
 
@@ -177,25 +214,39 @@ const today = () => {
   let yyyy = new Date().getFullYear();
   let mm = ( new Date().getMonth() + 1) < 10 ? '0' + ( new Date().getMonth() + 1) : new Date().getMonth() + 1;
   let dd = (new Date().getDate()) < 10 ? '0' + (new Date().getDate()) : (new Date().getDate());
-  return `${yyyy}-${mm}-${dd}`;
+  return {start: `${yyyy}-${mm}-${dd} 00:00:01`, end: `${yyyy}-${mm}-${dd} 23:59:59`};
 }
+const interval = today();
 
 
-
+onMounted(() => {
+  if (loading.value){
+    loadingDialog.value.showModal();
+    loadingDialog.value.addEventListener('cancel', e => e.preventDefault());
+    watch(() => loading.value, (value) => {
+      if (!value) loadingDialog.value.close();
+    })
+  }
+})
 
 //Get Records
-const getTodaySales = async () => {
+const getData = async () => {
   try {
     loading.value = true;
+    store.commit("setFreezeRouting", true); //Freeze routing
 
-    const query = await db('orders')
-        .whereRaw('DATE(orderDate) >= ?', [today()])
-        .andWhereRaw('DATE(orderDate) <= ?', [today()])
+    await db.transaction( async tx => {
+
+    //...............................Today's sales................................
+    const query = await tx('orders')
+        .whereRaw('orderDate >= ?', [interval.start])
+        .andWhereRaw('orderDate <= ?', [interval.end])
         .select('orders.type', 'orders.momo', 'total')
         .sum('orders.total as totalSales')
         .sum('orders.momo as totalMomo')
         .count('* as salesCount')
         .groupBy('orders.type');
+
 
 
     let returns = 0;
@@ -217,51 +268,68 @@ const getTodaySales = async () => {
     totalSales.value = sales + returns;
     momo.value = totalMomo;
 
-    pieChartSeries.value = [parseFloat(sales.toFixed(2)), parseFloat(returns.toFixed(2))];
-
-  }catch (e) {
-    ipcRenderer.send('errorMessage', e.message);
-  }finally {
-    loading.value = false;
-  }
-}
-getTodaySales();
+    pieChartSeries.value = [parseFloat(sales.toFixed(2)), parseFloat(-returns.toFixed(2))];
 
 
- //get data for bar chart
-const getRecordsForChart = async () => {
-  try {
-    loading.value = true;
-    barChartRecords.value = await db('orderDetails')
-        .innerJoin('categories', 'orderDetails.categoryId', 'categories.id')
-        .innerJoin('orders', 'orders.id', 'orderDetails.orderId')
-        .select('categories.name')
-        .sum('orderDetails.quantity as sum')
-        .whereRaw('DATE(orderDetails.date) >= ?', [today()])
-        .andWhereRaw('DATE(orderDetails.date) <= ?', [today()])
-        .groupBy('categories.id')
-        .orderBy('sum', 'desc')
-        .limit(10);
+    //..........................Records for bar chart.............................
+      barChartRecords.value = await tx('orderDetails')
+          .innerJoin('categories', 'orderDetails.categoryId', 'categories.id')
+          .innerJoin('orders', 'orders.id', 'orderDetails.orderId')
+          .select('categories.name')
+          .sum('orderDetails.quantity as sum')
+          .whereRaw('orderDetails.date >= ?', [interval.start])
+          .andWhereRaw('orderDetails.date <= ?', [interval.end])
+          .groupBy('categories.id')
+          .orderBy('sum', 'desc')
+          .limit(10);
 
-    barChartRecords.value =  barChartRecords.value.filter(item => item.sum > 0)
 
-    if (barChartRecords.value.length){
-      for (const chartRecord of barChartRecords.value) {
-        barChartOptions.xaxis.categories.push(chartRecord.name);
-        barChartSeries[0].data .push(chartRecord.sum);
+      barChartRecords.value =  barChartRecords.value.filter(item => item.sum > 0)
+
+      if (barChartRecords.value.length){
+        for (const chartRecord of barChartRecords.value) {
+          barChartOptions.xaxis.categories.push(chartRecord.name);
+          barChartSeries[0].data .push(chartRecord.sum);
+        }
       }
-    }
+
+    })
 
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);
   }finally {
     loading.value = false;
+    store.commit("setFreezeRouting", false); // Enable routing
   }
 }
-getRecordsForChart();
+getData();
+
+
+const showMomoDetails = async () => {
+  try {
+    dialog.value.showModal();
+    detailsLoading.value = true;
+    momoDetails.value = await db('orders')
+        .select('momoType')
+        .whereRaw('orderDate >= ?', [interval.start])
+        .andWhereRaw('orderDate <= ?', [interval.end])
+        .andWhereNot({momoType: ''})
+        .sum("momo as total")
+        .groupBy('momoType')
+  }catch (e) {
+    ipcRenderer.send('errorMessage', e.message);
+  }finally {
+    detailsLoading.value = false;
+  }
+}
 
 </script>
 
 <style scoped>
-
+.myDialog{
+  border: none; visibility: hidden;
+}
+.myDialog::backdrop{
+  background: transparent;
+}
 </style>

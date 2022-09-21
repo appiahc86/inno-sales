@@ -28,9 +28,6 @@
             <template #empty>
               No Record Found.
             </template>
-<!--            <template #loading>-->
-<!--              <h4 class="text-white"> Loading data. Please wait.</h4>-->
-<!--            </template>-->
 
             <Column field="productName" header="Product" sortable class="data-table-font-size">
               <template #body="{data}">
@@ -53,12 +50,8 @@
               </template>
             </Column>
             <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" class="data-table-font-size"></Column>
-            <Column field="tax" header="Tax" sortable class="data-table-font-size">
-              <template #body="{data}">
-                <td class="text-capitalize">{{ data.tax }}</td>
-              </template>
-            </Column>
-            <Column field="description" header="Desc" sortable class="data-table-font-size">
+
+            <Column field="description" header="Description" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td :title="data.description">
                   {{ data.description && data.description.length > 20 ? data.description.substring(0, 20) + '...' : data.description }}
@@ -101,7 +94,6 @@ const getAllProducts = async () => {
               'products.productName',
               'products.sellingPrice',
               'products.quantity',
-              'products.tax',
               'products.description',
               'categories.name as category',
               'products.expiration'

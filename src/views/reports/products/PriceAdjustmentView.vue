@@ -155,8 +155,8 @@ const search = async (e) => {
         .select('priceAdjustments.id','priceAdjustments.productName', 'priceAdjustments.date',
             'priceAdjustments.oldPrice','priceAdjustments.newPrice','priceAdjustments.reason',
             'users.firstName as user')
-        .whereRaw('DATE(priceAdjustments.date) >= ?', [from.value])
-        .andWhereRaw('DATE(priceAdjustments.date) <= ?', [to.value])
+        .whereRaw('priceAdjustments.date >= ?', [from.value + ' 00:00:01'])
+        .andWhereRaw('priceAdjustments.date <= ?', [to.value + ' 23:59:59'])
         .limit(510)
         .stream((stream) => {
 

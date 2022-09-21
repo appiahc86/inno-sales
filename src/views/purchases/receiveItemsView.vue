@@ -6,7 +6,7 @@
       <div class="col-8 mt-4">
         <div class="card shadow p-2" style="height: 500px;">
           <template v-if="loading">
-            <v-select placeholder="Loading data. please wait......"
+            <v-select placeholder="Loading data. please wait....."
                       class="v-select" disabled="disabled" title="Data is loading. please be patient...">
             </v-select>
           </template>

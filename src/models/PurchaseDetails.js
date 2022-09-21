@@ -5,7 +5,7 @@ const PurchaseDetails = async () => {
 
         await db.schema.createTable('purchaseDetails', table => {
             table.increments('id').primary();
-            table.integer( 'purchaseId');
+            table.integer( 'purchaseId').index();
             table.string('productName');
             table.integer('quantity');
             table.integer('productId');

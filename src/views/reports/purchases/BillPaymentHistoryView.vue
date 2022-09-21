@@ -142,8 +142,8 @@ const search = async (e) => {
         .select('billPayments.id', 'vendors.company', 'purchases.invoice',
             'billPayments.date', 'billPayments.amount')
         .where('purchases.status', 'received')
-       .whereRaw('DATE(billPayments.date) >= ?', [from.value])
-       .andWhereRaw('DATE(billPayments.date) <= ?', [to.value])
+       .whereRaw('billPayments.date >= ?', [from.value + ' 00:00:01'])
+       .andWhereRaw('billPayments.date <= ?', [to.value + ' 23:59:59'])
        .limit(510)
         .stream((stream) => {
 

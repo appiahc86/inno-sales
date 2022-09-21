@@ -151,13 +151,14 @@ const search = async (e) => {
   try {
     e.target.submitBtn.disabled = true;
     loading.value = true;
+
     await db('orders')
         .select('orders.id', 'orders.orderDate')
         .sum('orders.total as total')
         .sum('orders.discount as discount')
         .sum('orders.tax as tax')
-        .whereRaw('DATE(orderDate) >= ?', [from.value])
-        .andWhereRaw('DATE(orderDate) <= ?', [to.value])
+        .whereRaw('orderDate >= ?', [from.value + ' 00:00:01'])
+        .andWhereRaw('orderDate <= ?', [to.value + ' 23:59:59'])
         .groupByRaw('DATE(orders.orderDate)')
         .limit(510)
         .stream((stream) => {

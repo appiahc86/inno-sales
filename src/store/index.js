@@ -7,13 +7,15 @@ export default createStore({
 
   state: {
     user: null,
-    settings: {}
+    settings: {},
+    freezeRouting: false
   },
 
                           //GETTERS
   getters: {
     user: state => state.user, //Get User
     setting: state => state.settings, //get settings
+    getFreezeRoutingStatus: state => state.freezeRouting, //get freeze routing status
   },
 
                            // MUTATIONS
@@ -27,6 +29,9 @@ export default createStore({
     logout: (state, payload) => {
       state.user = null;
     },
+    setFreezeRouting: (state, payload) => {
+      state.freezeRouting = payload;
+    }
   },
 
                                 //ACTIONS
@@ -42,7 +47,9 @@ export default createStore({
     logout: ({commit}, payload) => { //this will set user to null
       commit('logout', payload);
     },
-
+    setFreezeRouting: ({commit}, payload) => { // set freeze routing status
+      commit('setFreezeRouting', payload);
+    }
   },
 
 

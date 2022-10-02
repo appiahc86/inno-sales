@@ -294,7 +294,7 @@ const getData = async () => {
           .andWhereRaw('billDate <= ?', [endDate()])
           .sum('total as totalPurchases');
       totalPurchases.value = purchases[0].totalPurchases || 0;
-      pieChartSeries.value[0] = parseFloat(purchases[0].totalPurchases.toFixed(2)) || 0;
+      pieChartSeries.value[0] = purchases[0].totalPurchases ? parseFloat(purchases[0].totalPurchases.toFixed(2)) : 0;
 
       //Get  Number of products
       totalProducts.value = productsLength.value || 0;

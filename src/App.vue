@@ -248,9 +248,9 @@
 
 <script setup>
 
-// import runMigrations from "@/models";
+import runMigrations from "@/models";
 import db from "./dbConfig/db";
-// runMigrations() //Run all Migrations
+runMigrations() //Run all Migrations
 db.raw('PRAGMA foreign_keys = ON').then(()=>{}); //set foreign key checks on
 
 // const boom = [];

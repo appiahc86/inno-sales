@@ -219,22 +219,6 @@
                       <td><input type="text" class="form-control-dark" v-model.trim="editProductData.productName"></td>
                     </tr>
 
-                    <!--              <tr>-->
-                    <!--                <th class="w-10"><span class="pi pi-money-bill"></span> Buying Price &nbsp;</th>-->
-                    <!--                <td class="w-40"><input type="number" step="0.01" min="0" class="form-control-dark w-100"-->
-                    <!--                                        v-model.number="editProductData.buyingPrice" disabled></td>-->
-                    <!--              </tr>-->
-
-                    <!--              <tr>-->
-                    <!--                <th class="float-end"><span class="pi pi-money-bill"></span> Selling Price &nbsp;</th>-->
-                    <!--                <td><input type="number" step="0.01" min="0" class="form-control-dark" disabled-->
-                    <!--                           v-model.number="editProductData.sellingPrice"></td>-->
-                    <!--              </tr>-->
-
-                    <!--              <tr>-->
-                    <!--                <th class="float-end"><span class="pi pi-sort-numeric-up"></span> Quantity &nbsp;</th>-->
-                    <!--                <td><input type="number" class="form-control-dark" v-model.number="editProductData.quantity" disabled></td>-->
-                    <!--              </tr>-->
 
                     <tr>
                       <th class="float-end"><span class="pi pi-money-bill"></span> Tax &nbsp;</th>
@@ -278,7 +262,7 @@
 
 
         <!--  View Details Dialog-->
-        <dialog ref="detailsDialog" style="min-width: 500px; border: 2px solid #ccc;">
+        <dialog ref="detailsDialog" draggable style="min-width: 500px; border: 2px solid #ccc;">
           <button class="text-white bg-danger" style="float: right;" @click="detailsDialog.close()">X</button><br>
 
           <div class="container-fluid">

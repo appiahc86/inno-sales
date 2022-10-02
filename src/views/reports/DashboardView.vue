@@ -227,7 +227,7 @@ const totalSales = computed(() => { //Get Annual Sales
       total += parseFloat(record.total)
     }
   }
-  pieChartSeries.value[1] = total;
+  pieChartSeries.value[1] = parseFloat(total.toFixed(2));
   return total;
 })
 
@@ -294,7 +294,7 @@ const getData = async () => {
           .andWhereRaw('billDate <= ?', [endDate()])
           .sum('total as totalPurchases');
       totalPurchases.value = purchases[0].totalPurchases || 0;
-      pieChartSeries.value[0] = purchases[0].totalPurchases || 0;
+      pieChartSeries.value[0] = parseFloat(purchases[0].totalPurchases.toFixed(2)) || 0;
 
       //Get  Number of products
       totalProducts.value = productsLength.value || 0;
@@ -331,29 +331,29 @@ const getData = async () => {
       for (const order of orders.value) { // for of loop
         switch (new Date(order.orderDate).getMonth() + 1) { //switch
 
-          case 1: jan+= parseFloat(order.total); //January
+          case 1: jan+= parseFloat(order.total.toFixed(2)); //January
           break;
-          case 2: feb+= parseFloat(order.total); //February
+          case 2: feb+= parseFloat(order.total.toFixed(2)); //February
           break;
-          case 3: mar+= parseFloat(order.total); //March
+          case 3: mar+= parseFloat(order.total.toFixed(2)); //March
           break;
-          case 4: apr+= parseFloat(order.total);  //April
+          case 4: apr+= parseFloat(order.total.toFixed(2));  //April
           break;
-          case 5: may+= parseFloat(order.total);  //May
+          case 5: may+= parseFloat(order.total.toFixed(2));  //May
           break;
-          case 6: jun+= parseFloat(order.total);  //June
+          case 6: jun+= parseFloat(order.total.toFixed(2));  //June
           break;
-          case 7: jul+= parseFloat(order.total);  //July
+          case 7: jul+= parseFloat(order.total.toFixed(2));  //July
           break;
-          case 8: aug+= parseFloat(order.total);  //August
+          case 8: aug+= parseFloat(order.total.toFixed(2));  //August
           break
-          case 9: sep+= parseFloat(order.total);  //September
+          case 9: sep+= parseFloat(order.total.toFixed(2));  //September
           break;
-          case 10: oct+= parseFloat(order.total);  //October
+          case 10: oct+= parseFloat(order.total.toFixed(2));  //October
           break;
-          case 11: nov+= parseFloat(order.total);  //November
+          case 11: nov+= parseFloat(order.total.toFixed(2));  //November
           break;
-          case 12: dec+= parseFloat(order.total);  //December
+          case 12: dec+= parseFloat(order.total.toFixed(2));  //December
           break;
           default: console.clear();
           break;

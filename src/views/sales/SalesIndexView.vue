@@ -338,7 +338,7 @@ getAllProducts();
 const getCustomers = async () => {
   try {
     customers.value = await db('customers')
-        .select('name', 'phone');
+        .select('id', 'name', 'phone');
     customers.value.map(cust => {cust.display = cust.name + " | " + cust.phone;})
   }catch (e) {
     ipcRenderer.send("errorMessage", e.message)
@@ -518,6 +518,7 @@ const checkout = async (e) => {
   const receipt = document.querySelector("#printTable");
   const customerId = selectedCustomer.value ? selectedCustomer.value.id : '';
   const getTax = computed(() => store.getters["cartModule/getTax"]);
+
 
   //Map cart and calculate individual tax and total
   cart.value.map(p => {

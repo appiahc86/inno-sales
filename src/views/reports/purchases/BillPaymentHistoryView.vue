@@ -141,7 +141,6 @@ const search = async (e) => {
         .leftJoin('vendors', 'vendors.id', '=', 'purchases.vendorId')
         .select('billPayments.id', 'vendors.company', 'purchases.invoice',
             'billPayments.date', 'billPayments.amount')
-        .where('purchases.status', 'received')
        .whereRaw('billPayments.date >= ?', [from.value + ' 00:00:01'])
        .andWhereRaw('billPayments.date <= ?', [to.value + ' 23:59:59'])
        .limit(510)

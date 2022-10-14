@@ -168,7 +168,6 @@ const search = async (e) => {
         .select('purchases.id','purchases.billDate', 'purchases.invoiceDue','purchases.numberOfItems',
             'purchases.invoice', 'purchases.total', 'vendors.company')
         .sum('billPayments.amount as totalPaid')
-        .where('purchases.status', 'received')
         .andWhere('vendors.id', selectedVendor.value.id)
         .havingRaw('?? > ?', ['purchases.total',  db.raw('coalesce(sum(billPayments.amount), 0)'  )] )
         .groupBy('purchases.id')

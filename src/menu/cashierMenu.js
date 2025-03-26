@@ -28,6 +28,16 @@ const cashierMenu = [
     },
     //..........................Sales.........................
 
+    //..........................Customers.........................
+    {
+        label: 'Customers',
+        submenu: [
+            {label: 'Manage Customers', click(){sendRouteEvent('customers')}},
+            {label: 'Outstanding Invoices', click(){sendRouteEvent('outstanding-customers')}},
+        ]
+    },
+
+    //..........................Customers.........................
 
 
     //..........................Reports.........................

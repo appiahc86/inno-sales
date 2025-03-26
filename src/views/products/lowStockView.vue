@@ -55,13 +55,14 @@
               </template>
             </Column>
             <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" class="data-table-font-size"></Column>
-            <Column field="description" header="Desc" sortable class="data-table-font-size">
-              <template #body="{data}">
-                <td :title="data.description">
-                  {{ data.description && data.description.length > 20 ? data.description.substring(0, 20) + '...' : data.description }}
-                </td>
-              </template>
-            </Column>
+            <Column field="warehouseQty" header="WH Qty" sortable bodyStyle="width:90px !important;" class="data-table-font-size text-primary"></Column>
+<!--            <Column field="description" header="Desc" sortable class="data-table-font-size">-->
+<!--              <template #body="{data}">-->
+<!--                <td :title="data.description">-->
+<!--                  {{ data.description && data.description.length > 20 ? data.description.substring(0, 20) + '...' : data.description }}-->
+<!--                </td>-->
+<!--              </template>-->
+<!--            </Column>-->
           </DataTable>
         </div>
 
@@ -88,7 +89,7 @@
                   <th>Qty</th>
                   <th>Cost</th>
                   <th>Selling Price</th>
-                  <th>Description</th>
+                  <th>WH Qty</th>
                 </tr>
 
                 <template v-for="(record, index) in records" :key="record.id">
@@ -102,7 +103,7 @@
                     <td>&nbsp; {{ record.quantity }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.buyingPrice)) }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.sellingPrice)) }}</td>
-                    <td>&nbsp; {{ record.description }}</td>
+                    <td>&nbsp; {{ record.warehouseQty }}</td>
                   </tr>
                 </template>
 
@@ -146,9 +147,9 @@ const getAllProducts = async () => {
             'products.buyingPrice',
             'products.sellingPrice',
             'products.quantity',
+            'products.warehouseQty',
             'products.dateAdded',
             'products.tax',
-            'products.description',
             'products.expiration',
             'categories.name as category'
         )

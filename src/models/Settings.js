@@ -10,11 +10,20 @@ const Settings = async () => {
             table.string('address', 60).nullable();
             table.string('contact', 60).nullable();
             table.float('tax', 2).defaultTo(0);
+            table.enum('paperType', ['roll', 'a4']).defaultTo('roll')
         });
 
 
         //insert company details
-        await db('settings').insert({ companyName: '', storeName: '', address: '', contact: '', tax: 0 });
+        await db('settings').insert(
+            {   companyName: '',
+                storeName: '',
+                address: '',
+                contact: '',
+                tax: 0 ,
+                paperType: 'roll'
+            }
+            );
 
     }
 

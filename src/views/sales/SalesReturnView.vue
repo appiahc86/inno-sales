@@ -98,6 +98,7 @@ import {computed, onMounted, ref} from "vue";
 import db from "@/dbConfig/db";
 import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
+import moment from "moment/moment";
 
 const loading = ref(false);
 const searchInput = ref();
@@ -137,6 +138,7 @@ const searchReceipt = async (e) => {
         .join('orders', 'orderDetails.orderId', '=', 'orders.id')
         .where({ orderId: search.value })
         .andWhere('orders.type', 'sale')
+        .andWhere('saleType', 'cash')
         .groupBy('orderDetails.id')
         .limit(100);
 
@@ -231,7 +233,8 @@ const returnItems = async () => {
         discount: discount.value,
         momoType: paymentMethod.value === 'momo' ? momoType.value : '',
         tax: tax.value,
-        customerId: '',
+        customerId: 1,
+        invoiceNumber:  moment().format('YYYYMMDDHHssSSS'),
         userId: user.value.id
       }
 
@@ -270,19 +273,20 @@ const returnItems = async () => {
         store.dispatch("productsModule/modifyQty", {id: ret.productId, qty: ret.returnQty, type: 'increment'})
       }
 
+      //dispatch qty to vuex store products
+      for (const ret of returningItems.value) {
+        store.dispatch("productsModule/modifyQty", {id: ret.productId, qty: ret.returnQty, type: 'increment'});
+      }
+      returningItems.value = [];
+      items.value = [];
 
     })
 
-    //dispatch qty to vuex store products
-    for (const ret of returningItems.value) {
-      store.dispatch("productsModule/modifyQty", {id: ret.productId, qty: ret.returnQty, type: 'increment'});
-    }
-    returningItems.value = [];
-    items.value = [];
+
 
 
     }catch (e) { ipcRenderer.send('errorMessage', e.message) }
-   finally { returnBtn.value.disabled = true; }
+   // finally { returnBtn.value.disabled = true; }
 
 
   }

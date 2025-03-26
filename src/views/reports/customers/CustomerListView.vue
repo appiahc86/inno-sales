@@ -27,6 +27,11 @@
 
             <Column field="name" header="Name" sortable  class="data-table-font-size"></Column>
             <Column field="company" header="Company" sortable  class="data-table-font-size"></Column>
+            <Column field="account" header="Credit Balance" sortable  class="data-table-font-size">
+              <template #body="{data}">
+                <td>{{ formatNumber(parseFloat(data.account)) }}</td>
+              </template>
+            </Column>
             <Column field="phone" header="Contact" sortable  class="data-table-font-size"></Column>
             <Column field="address" header="Address" sortable class="data-table-font-size"></Column>
 
@@ -50,6 +55,7 @@
                   <th>#</th>
                   <th>Name</th>
                   <th>Company</th>
+                  <th>Credit Balance</th>
                   <th>Phone</th>
                   <th>Address</th>
                 </tr>
@@ -59,6 +65,7 @@
                     <th>{{ index + 1 }}</th>
                     <td>&nbsp; {{ record.name }}</td>
                     <td>&nbsp; {{ record.company }}</td>
+                    <td>&nbsp; {{ formatNumber(record.account) }}</td>
                     <td>&nbsp; {{ record.phone }}</td>
                     <td>&nbsp; {{ record.address }}</td>
                   </tr>
@@ -82,6 +89,7 @@
 import {computed, ref} from "vue";
 import db from "@/dbConfig/db";
 import {useStore} from "vuex";
+import {formatNumber} from "../../../functions";
 
 const loading = ref(false)
 const records = ref([]);
@@ -94,7 +102,13 @@ const getCustomers = async () => {
 
   try {
     loading.value = true;
-    records.value = await db('customers').orderBy('customers.name', 'asc');
+    records.value = await db('customers')
+        .orderBy('customers.name', 'asc');
+
+    if (records.value.length) {
+      records.value = records.value.filter((record) => record.id !== 1);
+    }
+
   }
   catch (e){ ipcRenderer.send('errorMessage', e.message) }
   finally { loading.value = false; }

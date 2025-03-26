@@ -247,6 +247,7 @@ import {computed} from "vue";
 import {reactive} from "vue";
 import * as Validator from "validatorjs";
 import purchase from "@/models/Purchase";
+import moment from "moment";
 
 const loading = ref(false);
 const products = ref([]);
@@ -255,7 +256,8 @@ const dialog = ref(null);
 const selectedProduct = ref(null)
 const store = useStore();
 const companySettings = computed(() => store.getters.setting); //get company settings
-const user = computed(() => store.getters.user)
+const user = computed(() => store.getters.user);
+
 
 const editData = reactive({
   id: '',
@@ -379,8 +381,8 @@ const savePurchase = async (e) => {
       await db.transaction( async trx => {
       const purchase = await trx('purchases').insert({ //Save to purchase table
         userId: user.value.id,
-        billDate: paymentData.billDate,
-        invoiceDue: paymentData.invoiceDue,
+        billDate: moment(paymentData.billDate).format("YYYY-MM-DD hh:mm:ss"),
+        invoiceDue: moment(paymentData.invoiceDue).format("YYYY-MM-DD hh:mm:ss"),
         vendorId: paymentData.vendor.id,
         numberOfItems: cart.value.length,
         invoice: paymentData.invoice,

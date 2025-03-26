@@ -5,24 +5,6 @@
 
       <h4 class="text-black-50 my-3"><b>HOME</b></h4>
 
-      <div class="col-3">
-        <div class="card shadow h-100 py-2 border-primary border-4 border-bottom-0 border-top-0 border-end-0">
-          <div class="card-body">
-            <div class="row no-gutters align-items-center">
-              <div class="col mr-2">
-                <div class="text-xs fw-bold text-primary mb-1" style="font-size: 0.9em;">SALES COUNT</div>
-                <div class="h6 mb-0 fw-bold" v-if="loading">
-                  <span class="spinner-border spinner-border-sm"></span> loading...
-                </div>
-                <div class="h6 mb-0 fw-bold" v-else>&nbsp; {{ salesCount }}</div>
-              </div>
-              <div class="col-auto">
-                <span class="text-black-50" style="font-size: 250%">&#128722;</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <div class="col-3">
         <div class="card shadow h-100 py-2 border-warning border-4 border-bottom-0 border-top-0 border-end-0">
@@ -43,20 +25,40 @@
         </div>
       </div>
 
-
+<!--      Credit Sales -->
       <div class="col-3">
         <div class="card shadow h-100 py-2 border-danger border-4 border-bottom-0 border-top-0 border-end-0">
           <div class="card-body">
             <div class="row no-gutters align-items-center">
               <div class="col mr-2">
-                <div class="text-xs fw-bold text-danger mb-1" style="font-size: 0.9em;">RETURNS</div>
+                <div class="text-xs fw-bold text-danger mb-1" style="font-size: 0.9em;">CREDIT SALES</div>
                 <div class="h6 mb-0 fw-bold" v-if="loading">
                   <span class="spinner-border spinner-border-sm"></span> loading...
                 </div>
-                <div class="h6 mb-0 fw-bold" v-else>GH¢ {{ formatNumber(totalReturns) }}</div>
+                <div class="h6 mb-0 fw-bold" v-else>&nbsp; {{ formatNumber(creditSales) }}</div>
               </div>
               <div class="col-auto">
-                <span style="font-size: 250%">&#128683;</span>
+                <span class="text-black-50" style="font-size: 250%">&#128683;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<!--      Cash sales -->
+      <div class="col-3">
+        <div class="card shadow h-100 py-2 border-primary border-4 border-bottom-0 border-top-0 border-end-0">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs fw-bold text-primary mb-1" style="font-size: 0.9em;">CASH SALES</div>
+                <div class="h6 mb-0 fw-bold" v-if="loading">
+                  <span class="spinner-border spinner-border-sm"></span> loading...
+                </div>
+                <div class="h6 mb-0 fw-bold" v-else>GH¢ {{ formatNumber(cashSales) }}</div>
+              </div>
+              <div class="col-auto">
+                <span style="font-size: 250%">&#128176;</span>
               </div>
             </div>
           </div>
@@ -143,7 +145,7 @@
 
 <script setup>
 
-import {reactive, ref} from "vue";
+import {computed, reactive, ref} from "vue";
 import {formatNumber} from "@/functions";
 import db from "@/dbConfig/db";
 import {onMounted, watch} from "vue";
@@ -154,11 +156,9 @@ const loadingDialog = ref();
 const detailsLoading = ref(false);
 const dialog = ref();
 const momoDetails = ref([]);
-const records = ref([]);
-const totalSales = ref(0);
-const totalReturns = ref(0);
+const cashSales = ref(0);
 const momo = ref(0);
-const salesCount = ref(0);
+const creditSales = ref(0);
 const store = useStore();
 
 const barChartRecords = ref([]);
@@ -201,9 +201,9 @@ const barChartSeries = reactive([
 
 //PieChart data
 const chartOptions = reactive({
-  labels: ['Sales', 'Returns'],
+  labels: ['Cash Sales', 'Credit Sales'],
   title: {
-    text: 'Today\'s Sales And Returns',
+    text: 'Today\'s Cash And Credit Sales',
     align: 'left'
   },
 })
@@ -241,34 +241,24 @@ const getData = async () => {
     const query = await tx('orders')
         .whereRaw('orderDate >= ?', [interval.start])
         .andWhereRaw('orderDate <= ?', [interval.end])
-        .select('orders.type', 'orders.momo', 'total')
-        .sum('orders.total as totalSales')
-        .sum('orders.momo as totalMomo')
-        .count('* as salesCount')
-        .groupBy('orders.type');
+        .select('orders.saleType', 'total', 'momo')
 
 
 
-    let returns = 0;
-    let sales = 0;
-    let totalMomo = 0;
+
     for (const record of query) {
-      if (record.type === 'sale') {
-        salesCount.value = record.salesCount; //Get sales count if type is equal to sales
-        sales += parseFloat(record.totalSales);
-        totalMomo += record.totalMomo;
+      if (record.saleType === 'credit') {
+        creditSales.value += parseFloat(record.total);
+        momo.value += parseFloat(record.momo);
       }
-      else if (record.type === 'return') {
-        returns += parseFloat(record.totalSales) || 0;
-        totalReturns.value = record.totalSales || 0; //Get total returns
-        totalMomo += record.totalMomo;
+      else if (record.saleType === 'cash') {
+        cashSales.value += record.total;
+        momo.value += parseFloat(record.momo);
       }
     }
 
-    totalSales.value = sales + returns;
-    momo.value = totalMomo;
 
-    pieChartSeries.value = [parseFloat(sales.toFixed(2)), parseFloat(-returns.toFixed(2))];
+    pieChartSeries.value = [parseFloat(cashSales.value.toFixed(2)), parseFloat(creditSales.value.toFixed(2))];
 
 
     //..........................Records for bar chart.............................
@@ -304,6 +294,10 @@ const getData = async () => {
 }
 getData();
 
+//Total sales
+const  totalSales = computed(() => {
+  return creditSales.value + cashSales.value;
+})
 
 const showMomoDetails = async () => {
   try {

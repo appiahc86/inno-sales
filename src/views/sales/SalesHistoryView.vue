@@ -113,9 +113,9 @@
 
 
 
-  <!-- Print table  -->
+  <!-- Print  paper roll -->
   <template>
-    <div id="printTable" v-if="details.length">
+    <div id="receipt-roll" v-if="details.length">
       <div>
         <div class="mt-0" style="font-size: 11px;">
           <span>{{ new Date(details[0].orderDate).toLocaleString() }}</span>
@@ -180,13 +180,81 @@
           <svg id="barcode"></svg>
         </div>
 
-        <div style="font-size: 11px; text-align: center;">
-          Software by <span class="fw-bold mt-2">Appiah</span> 0242740320</div>
+<!--        <div style="font-size: 11px; text-align: center;">-->
+<!--          Software by <span class="fw-bold mt-2">Appiah</span> 0242740320</div>-->
 
       </div>
     </div>
   </template>
 
+<!--  Print A4-->
+  <template>
+    <div id="receipt-a4" v-if="details.length">
+      <div>
+        <div class="mt-0" style="font-size: 11.5px;">
+          <span>{{ new Date(details[0].orderDate).toLocaleString() }}</span>
+          <b style="float: right;">Receipt #{{ details[0].id }}</b>
+        </div>
+        <div  style="font-size: 12px;">Store: {{ companySettings.storeName }}</div>
+
+        <div style="text-align: center;">
+          <div style="font-size: 13px"><b>{{ companySettings.companyName }}</b></div>
+          <div style="font-size: 11.5px">{{ companySettings.address }}</div>
+          <div style="font-size: 11.5px">{{ companySettings.contact }}</div>
+        </div>
+
+
+        <br>
+        <table style="width: 100%; font-size: 11.5px;">
+          <thead>
+          <tr style="border-bottom: 1px solid black; text-align: left; border-bottom: 1px solid black;">
+            <th style="width: 40%;">Item</th>
+            <th style="width: 10%;">Qty</th>
+            <th style="width: 20%;">Price</th>
+            <th style="width: 30%;">Ext Price</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <template v-for="item in details">
+            <tr style="text-align: left;">
+              <td>{{ item.productName }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ formatNumber(item.sellingPrice) }}</td>
+              <td>{{ formatNumber(item.extPrice) }}</td>
+            </tr>
+          </template>
+          </tbody>
+        </table>
+        <hr>
+
+        <div style="font-size: 12px !important">
+          <div style="float: right;">Subtotal: GH¢ {{ formatNumber(subtotal) }}</div> <br>
+          <template v-if="details[0].tax">
+            <div style="float: right;">Tax: GH¢ {{ formatNumber(details[0].tax) }}</div> <br>
+          </template>
+          <template v-if="details[0].discount">
+            <div style="float: right;">Discount: GH¢ {{ formatNumber(details[0].discount) }}</div> <br>
+          </template>
+          <div style="float: right;"><b>RECEIPT TOTAL: GH¢ {{ formatNumber(details[0].total) }}</b></div>
+        </div><br>
+
+
+        <div style="font-size: 12.5px;">Amount Tendered: GH¢ {{ formatNumber(details[0].tendered) }}</div>
+        <div style="font-size: 12.5px;">Change Given: GH¢ {{ formatNumber(details[0].tendered - details[0].total) }}</div>
+
+        <div style="font-size: 11.5px; text-align: center;">Thanks for shopping with us!</div>
+
+        <div  style="text-align: center">
+          <svg id="barcode"></svg>
+        </div>
+
+<!--        <div style="font-size: 11px; text-align: center;">-->
+<!--          Software by <span class="fw-bold mt-2">Appiah</span> 0242740320</div>-->
+
+      </div>
+    </div>
+  </template>
 
 </template>
 
@@ -221,10 +289,17 @@ const getOrders = async () => {
     orders.value = await db('orders')
         .leftJoin('users', 'orders.userId', '=', 'users.id')
         .select('orders.id', 'orders.orderDate', 'users.firstName',
-            'orders.numberOfItems', 'orders.total')
+            'orders.numberOfItems', 'orders.total', 'orders.saleType')
         .where('type', 'sale')
         .orderBy('orders.id', 'DESC')
         .limit(150)
+
+    //filter only cash sales
+    if (orders.value.length){
+      orders.value = orders.value.filter((item) => { return item.saleType === "cash"})
+    }
+
+
   }catch (e) { ipcRenderer.send('errorMessage', e.message); }
   finally {
     loading.value = false;
@@ -276,7 +351,8 @@ const closeDialog = () => {
 
 //Reprint receipt
 const reprint = async (receiptNumber) => {
-  const receipt = document.querySelector("#printTable");
+  const receiptRoll = document.querySelector("#receipt-roll");
+  const receiptA4 = document.querySelector("#receipt-a4");
 
   // Initialize barcode
   JsBarcode("#barcode", receiptNumber, {
@@ -285,7 +361,10 @@ const reprint = async (receiptNumber) => {
     fontOptions: 'bold'
   })
 
-  await printTiny(receipt, {scanStyles: false, scanHTML: true});
+  if (companySettings.value.paperType === 'a4'){
+    await printTiny(receiptA4, {scanStyles: false, scanHTML: true});
+  }else  await printTiny(receiptRoll, {scanStyles: false, scanHTML: true});
+
   console.clear();
 }
 

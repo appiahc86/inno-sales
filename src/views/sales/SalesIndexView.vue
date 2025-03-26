@@ -86,13 +86,35 @@
   <!--  checkout  -->
    <div class="col-4">
      <div class="card shadow-lg p-1">
-       <v-select :options="customers" label="display" v-model="selectedCustomer"
-                 placeholder="select customer" class="v-select">
-       </v-select>
-         <h5 class="text-center fw-bold blink text-danger mt-1" v-if="tendered < total">Awaiting Payment</h5>
-         <h5 class="mt-1 invisible" v-else>.</h5>
+
+<!--       Type of sales ie Cash / Credit-->
+       <h6 class="text-center fw-bold my-2">Type Of Sale</h6>
+       <div class="d-inline-flex fw-bold align-content-center">
+         <label>
+           <input type="radio" id="cash" value="cash" v-model="typeOfSale" class="p-radiobutton">
+           Cash
+         </label>
+         &nbsp; &nbsp; &nbsp; &nbsp;
+         <label>
+           <input type="radio" id="credit" value="credit" v-model="typeOfSale" class="p-radiobutton">
+           Credit
+         </label>
+         &nbsp; &nbsp; &nbsp; &nbsp;
+         <label>
+           <input type="radio" id="credit" value="proforma" v-model="typeOfSale" class="p-radiobutton">
+           Proforma
+         </label>
+       </div>
+       <hr>
+
 
        <div class="card-body">
+
+<!--     If cash Sale  -->
+       <div class="" v-if="typeOfSale === 'cash'">
+         <h5 class="text-center fw-bold blink text-danger mt-1" v-if="tendered < total">Awaiting Payment</h5>
+<!--         <h5 class="mt-1 invisible" v-else>.</h5>-->
+
          <form @submit.prevent="checkout">
            <div class="d-flex">
              <h6 class="w-50">Cash</h6>
@@ -123,89 +145,127 @@
            <button class="float-end" name="submitBtn" style="width: 80px;" type="submit" :disabled="tendered < total || total === 0">
              <span class="pi pi-print"></span> Save</button>
          </form>
+
        </div>
+       <!--     ./ If cash Sale  -->
+
+
+<!--         If Credit Sale-->
+         <div class="" v-else-if="typeOfSale === 'credit'">
+           <form @submit.prevent="checkout">
+
+             <v-select :options="customers" label="display" v-model="selectedCustomer"
+                       placeholder="Select Customer" class="v-select mb-3" v-if="typeOfSale === 'credit'">
+             </v-select>
+             <div class="d-flex">
+               <h6 class="w-50">Invoice Date<span class="text-danger">*</span></h6>
+               <h6 class="w-50">Due Date<span class="text-danger">*</span></h6>
+             </div>
+             <div class="d-flex mb-4">
+               <input type="date" class="form-control-dark w-50" v-model="invoiceDate" required> &nbsp;
+               <input type="date" class="form-control-dark w-50" v-model="dueDate" required>
+             </div>
+              <div class="">
+                <label class="fw-bold">Invoice Number</label> <br>
+                <input type="text" v-model.trim="invoiceNumber" class="form-control-dark w-50" required>
+              </div>
+             <br>
+
+             <label>
+               <input type="checkbox" class="p-checkbox" v-model="printReceipt">
+               &nbsp; <b>Print Invoice</b>
+             </label>
+             <button class="float-end" name="submitBtn" style="width: 80px;" type="submit"
+                     :disabled="!selectedCustomer || !total">
+               <span class="pi pi-print"></span> Save</button>
+           </form>
+         </div>
+         <!--        ./ If Credit Sale-->
+
+
+<!--         If proforma-->
+         <div class="" v-else>
+           <form @submit.prevent="checkout">
+
+             <v-select :options="customers" label="display" v-model="selectedCustomer"
+                       placeholder="Select Customer" class="v-select mb-3" v-if="typeOfSale === 'credit'">
+             </v-select>
+             <div class="d-flex">
+               <h6 class="w-50">Invoice Date<span class="text-danger">*</span></h6>
+               <h6 class="w-50">Due Date<span class="text-danger">*</span></h6>
+             </div>
+             <div class="d-flex mb-4">
+               <input type="date" class="form-control-dark w-50" v-model="proformaData.invoiceDate" required> &nbsp;
+               <input type="date" class="form-control-dark w-50" v-model="proformaData.dueDate" required>
+             </div>
+
+             <h6 class="text-center fw-bold">BILL TO</h6>
+
+             <div class="">
+               <label class="fw-bold">Name</label> <br>
+               <input type="text" v-model.trim="proformaData.name" class="form-control-dark w-100" required>
+               <br><br>
+
+               <label class="fw-bold">Address</label> <br>
+               <input type="text" v-model.trim="proformaData.address" class="form-control-dark w-100">
+               <br><br>
+
+               <label class="fw-bold">Phone</label> <br>
+               <input type="text" v-model.trim="proformaData.phone" class="form-control-dark w-50">
+
+             </div>
+             <br>
+
+             <button class="float-end" name="submitBtn" style="width: 80px;" type="submit"
+                     :disabled="!total">
+               <span class="pi pi-print"></span> Print</button>
+           </form>
+         </div>
+                <!-- ./ If proforma-->
+
+       </div>
+
      </div>
 
      <div class="card mt-5" v-if="selectedCustomer">
        <h5><b>Bill To: </b> <span class="text-black-50">{{ selectedCustomer.name }}</span></h5>
+       <h6><b>Phone: </b> <span class="text-black-50">{{ selectedCustomer.phone }}</span></h6>
+       <h6><b>Invoice Date: </b>
+         <span class="text-black-50">{{ invoiceDate ? moment(invoiceDate).format('YYYY-MM-DD') : '' }}</span>
+       </h6>
+       <h6><b>Due Date: </b>
+         <span class="text-black-50">{{ dueDate ? moment(dueDate).format('YYYY-MM-DD') : '' }}</span>
+       </h6>
+
      </div>
 
    </div>
 
 
-      <!-- Print table  -->
    <template>
-     <div id="printTable">
-       <div>
-<div class="mt-0" style="font-size: 11px;">
-  <span>{{ new Date().toLocaleString() }}</span>
-  <b style="float: right;">Receipt #{{ barcode }}</b>
-</div>
-       <div  style="font-size: 12px;">Store: {{ companySettings.storeName }}</div>
+     <PrintReceiptRoll :tendered="tendered" :change="change" :barcode="barcode" />
+     <PrintReceiptA4  :tendered="tendered" :change="change" :barcode="barcode" />
 
-       <div style="text-align: center;">
-         <div style="font-size: 13px"><b>{{ companySettings.companyName }}</b></div>
-         <div style="font-size: 11px">{{ companySettings.address }}</div>
-         <div style="font-size: 11px">{{ companySettings.contact }}</div>
-       </div>
+     <ProformaRoll :phone="proformaData.phone"
+                   :address="proformaData.address" :name="proformaData.name"
+                   :due-date="proformaData.dueDate" :invoice-date="proformaData.invoiceDate" />
+     <ProformaA4  :phone="proformaData.phone"
+     :address="proformaData.address" :name="proformaData.name"
+     :due-date="proformaData.dueDate" :invoice-date="proformaData.invoiceDate" />
 
-
-         <template v-if="selectedCustomer">
-           <div style="font-size: 12px"><br>
-             <span><b>Bill To: </b></span> <span>{{ selectedCustomer.name }}</span>
-           </div>
-         </template>
-         <br>
-       <table style="width: 100%; font-size: 11px;">
-       <thead>
-       <tr style="border-bottom: 1px solid black; text-align: left; border-bottom: 1px solid black;">
-         <th style="width: 40%;">Item</th>
-         <th style="width: 10%;">Qty</th>
-         <th style="width: 20%;">Price</th>
-         <th style="width: 30%;">Ext Price</th>
-       </tr>
-       </thead>
-
-         <tbody>
-         <template v-for="item in cart">
-           <tr style="text-align: left;">
-             <td>{{ item.productName }}</td>
-             <td>{{ item.qty }}</td>
-             <td>{{ formatNumber(item.sellingPrice) }}</td>
-             <td>{{ formatNumber(item.sellingPrice * item.qty ) }}</td>
-           </tr>
-         </template>
-         </tbody>
-       </table>
-       <hr>
-
-       <div style="font-size: 12px !important">
-         <div style="float: right;">Subtotal: GH¢ {{ formatNumber(subTotal) }}</div> <br>
-         <template v-if="totalTax">
-           <div style="float: right;">Tax: GH¢ {{ formatNumber(totalTax) }}</div> <br>
-         </template>
-         <template v-if="totalDiscount">
-           <div style="float: right;">Discount: GH¢ {{ formatNumber(totalDiscount) }}</div> <br>
-         </template>
-         <div style="float: right;"><b>RECEIPT TOTAL: GH¢ {{ formatNumber(total) }}</b></div>
-       </div><br>
+     <PrintInvoiceA4 :name="selectedCustomer?.name || ''" :address="selectedCustomer?.address || ''"
+                     :phone="selectedCustomer?.phone || ''" :invoice-date="invoiceDate || ''"
+                     :dueDate="dueDate || ''" :invoice-number="invoiceNumber || ''"/>
 
 
-        <div style="font-size: 12px;">Amount Tendered: GH¢ {{ formatNumber(tendered) }}</div>
-        <div style="font-size: 12px;">Change Given: GH¢ {{ formatNumber(change) }}</div>
+     <PrintInvoiceRoll :name="selectedCustomer?.name || ''" :address="selectedCustomer?.address || ''"
+                     :phone="selectedCustomer?.phone || ''" :invoice-date="invoiceDate || ''"
+                     :dueDate="dueDate || ''" :invoice-number="invoiceNumber || ''"/>
 
-       <div style="font-size: 11px; text-align: center;">Thanks for shopping with us!</div>
-
-       <div  style="text-align: center;">
-         <svg id="barcode"></svg>
-       </div>
-
-       <div style="font-size: 11px; text-align: center;">
-         Software by <span class="fw-bold mt-2">Appiah</span> 0242740320</div>
-
-     </div>
-     </div>
    </template>
+
+
+
 
  </div>
 
@@ -277,6 +337,13 @@ import db from "@/dbConfig/db";
 import 'vue-select/dist/vue-select.css'
 import { useStore } from "vuex";
 import { formatNumber } from "@/functions";
+import moment from "moment";
+import PrintReceiptRoll from "@/components/paperRoll/PrintReceiptRoll.vue";
+import PrintReceiptA4 from "@/components/a4/PrintReceiptA4.vue";
+import ProformaRoll from "@/components/paperRoll/ProformaRoll.vue";
+import ProformaA4 from "@/components/a4/ProformaA4.vue";
+import PrintInvoiceA4 from "@/components/a4/PrintInvoiceA4.vue";
+import PrintInvoiceRoll from "@/components/paperRoll/PrintInvoiceRoll.vue";
 
 const store = useStore();
 const selectedProduct = ref(null);
@@ -286,10 +353,20 @@ const customers = ref([]);
 const dialog = ref(null);
 const barcode = ref(1); //For barcode
 const loading = ref(false);
+const typeOfSale = ref("cash");
+const invoiceDate = ref(null);
+const invoiceNumber = ref(null);
+const dueDate = ref(null);
 const printReceipt = ref(true);
 const companySettings = computed(() => store.getters.setting); //get company settings
-const user = computed(() => store.getters.user); //Grt loggedIn user
-
+const user = computed(() => store.getters.user); //Get loggedIn user
+const proformaData = reactive({
+  name: "",
+  address: "",
+  phone: "",
+  invoiceDate: "",
+  dueDate: ""
+})
 
 const discountInput = ref(null) // will watch and check if its focused
 const discountInPercentageInput = ref(null) // will watch and check if its focused
@@ -338,7 +415,8 @@ getAllProducts();
 const getCustomers = async () => {
   try {
     customers.value = await db('customers')
-        .select('id', 'name', 'phone');
+        .where('id', '!=', '1')
+        .select('id', 'name', 'phone', 'address');
     customers.value.map(cust => {cust.display = cust.name + " | " + cust.phone;})
   }catch (e) {
     ipcRenderer.send("errorMessage", e.message)
@@ -515,8 +593,16 @@ resetPayment();
 
 const checkout = async (e) => {
    e.target.submitBtn.disabled = true;
-  const receipt = document.querySelector("#printTable");
-  const customerId = selectedCustomer.value ? selectedCustomer.value.id : '';
+  //  Print paper types
+  const receiptRoll = document.querySelector("#receipt-roll");
+  const receiptA4 = document.querySelector("#receipt-a4");
+  const invoiceRoll = document.querySelector("#invoice-roll");
+  const invoiceA4 = document.querySelector("#invoice-a4");
+  const proformaRoll = document.querySelector("#proforma-roll");
+  const proformaA4 = document.querySelector("#proforma-a4");
+
+
+  const customerId = selectedCustomer?.value ? selectedCustomer.value.id : null;
   const getTax = computed(() => store.getters["cartModule/getTax"]);
 
 
@@ -533,19 +619,82 @@ const checkout = async (e) => {
 
   try {
 
+
+    //If proforma
+    if (typeOfSale.value === "proforma"){
+
+      if (companySettings.value.paperType === 'roll'){
+        printTiny(proformaRoll, {scanStyles: false, scanHTML: true});
+      }else  printTiny(proformaA4, {scanStyles: false, scanHTML: true});
+
+        clearCart();
+        resetPayment();
+
+        proformaData.address = "";
+        proformaData.name = "";
+        proformaData.invoiceDate = "";
+        proformaData.dueDate = "";
+        proformaData.invoiceNumber = "";
+        proformaData.phone = "";
+
+      printReceipt.value = true;
+      selectedCustomer.value = null; //clear selected customer
+      invoiceDate.value = null;
+      dueDate.value = null;
+      invoiceNumber.value = null;
+
+      return console.clear();
+    }
+
+
+
        await db.transaction( async trx => {
 
-         const order = await trx('orders').insert({ //Save to Orders table
-           numberOfItems: cart.value.length,
-           momo: momo.value || 0,
-           momoType: momo.value ? momoType.value : '',
-           total: total.value,
-           tendered: tendered.value,
-           discount: totalDiscount.value,
-           tax: totalTax.value,
-           customerId: customerId,
-           userId: user.value.id
-         })
+         let order;
+
+         if (typeOfSale.value === 'cash'){ //If cash sale
+           order = await trx('orders').insert({ //Save to Orders table
+             numberOfItems: cart.value.length,
+             momo: momo.value || 0,
+             momoType: momo.value ? momoType.value : '',
+             total: total.value,
+             tendered: tendered.value,
+             invoiceNumber: moment().format('YYYYMMDDHHssSSS'),
+             discount: totalDiscount.value,
+             tax: totalTax.value,
+             customerId: 1,
+             userId: user.value.id
+           })
+           barcode.value = await order[0];
+         }else if (typeOfSale.value === 'credit') {  // If credit sale
+
+           //Check iF a customer is selected
+           if (!customerId && typeOfSale.value === "credit"){
+             e.target.submitBtn.disabled = false;
+             return ipcRenderer.send('errorMessage', 'Please Select a Customer' )
+           }
+
+           order = await trx('orders').insert({ //Save to Orders table
+             numberOfItems: cart.value.length,
+             momo: 0,
+             orderDate: moment(invoiceDate.value).format('YYYY-MM-DD hh:mm:ss'), //
+             momoType: '',
+             total: total.value,
+             tendered: 0,
+             saleType: "credit", //
+             isPaid: false, //
+             invoiceNumber: invoiceNumber?.value.toUpperCase(),
+             payments: JSON.stringify({dueDate: moment(dueDate.value).format('YYYY-MM-DD hh:mm:ss'), payments: []}),
+             discount: totalDiscount.value,
+             tax: totalTax.value,
+             customerId: customerId,
+             userId: user.value.id
+           })
+
+           barcode.value = await order[0];
+
+         }
+
 
          const orderDetailsArray = [];      //prepare for batch insert into order details
          for (const item of cart.value) {
@@ -558,6 +707,7 @@ const checkout = async (e) => {
              sellingPrice: item.sellingPrice,
              total: item.sellingPrice * item.qty,
              tax: item.salesTax,
+             date: typeOfSale.value === "credit" ? moment(invoiceDate.value).format("YYYY-MM-DD hh:mm:ss") : moment().format("YYYY-MM-DD hh:mm:ss"),
              discount: item.discount,
              categoryId: item.categoryId,
              orderId: order
@@ -571,36 +721,60 @@ const checkout = async (e) => {
            await trx('products').where('id', '=', item.id ).first().decrement({quantity: parseInt(item.qty)})
          }
 
-         barcode.value = order[0]; //Set barcode number for invoice printing
-       })
 
-    //dispatch quantities to vuex store products
-    for (const item of cart.value) {
-      store.dispatch("productsModule/modifyQty", {id: item.id, qty: item.qty, type: 'decrement'})
+
+         //dispatch quantities to vuex store products
+         for (const item of cart.value) {
+           store.dispatch("productsModule/modifyQty", {id: item.id, qty: item.qty, type: 'decrement'})
+         }
+
+         if (printReceipt.value){
+
+           // Initialize barcode
+           JsBarcode("#barcode", barcode.value, {
+             height: 30,
+             fontSize: 13,
+             fontOptions: 'bold'
+           })
+
+           if (companySettings.value.paperType === 'roll'){ // If Paper roll printing
+            if (typeOfSale.value === 'cash'){ //for cash sale
+              printTiny(receiptRoll, {scanStyles: false, scanHTML: true});
+            } else  printTiny(invoiceRoll, {scanStyles: false, scanHTML: true}); //for credit sale
+
+           }
+
+           if (companySettings.value.paperType === 'a4'){ // If A4 printing
+             if (typeOfSale.value === 'cash'){  //for cash sale
+               printTiny(receiptA4, {scanStyles: false, scanHTML: true});
+             } else  printTiny(invoiceA4, {scanStyles: false, scanHTML: true}); //for credit sale
+           }
+
+           console.clear();
+
+         }
+
+         //Clear cart and reset payment form
+         clearCart();
+         resetPayment();
+
+         printReceipt.value = true;
+         selectedCustomer.value = null; //clear selected customer
+         invoiceDate.value = null;
+         dueDate.value = null;
+         invoiceNumber.value = null;
+
+       })// End of Transaction
+
+
+
+  }catch (error) {
+    if (error.code === "SQLITE_CONSTRAINT"){
+      e.target.submitBtn.disabled = false;
+      return ipcRenderer.send('errorMessage', 'Invoice Number Already Exists');
     }
 
-    //Clear cart and reset payment form
-    clearCart();
-    resetPayment();
-
-    if (printReceipt.value){
-      // Initialize barcode
-      JsBarcode("#barcode", barcode.value, {
-        height: 30,
-        fontSize: 13,
-        fontOptions: 'bold'
-      })
-
-      printTiny(receipt, {scanStyles: false, scanHTML: true});
-      console.clear();
-    }
-
-    printReceipt.value = true;
-    selectedCustomer.value = null; //clear selected customer
-
-
-  }catch (e) {
-    ipcRenderer.send('errorMessage', e.message)
+    ipcRenderer.send('errorMessage', error.code);
   }
 
 }

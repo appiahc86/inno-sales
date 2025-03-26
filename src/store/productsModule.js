@@ -78,9 +78,10 @@ const productsModule = {
                     if (type === 'increment') {
                         product.quantity = parseInt(product.quantity) + parseInt(qty);
                     }
-                    else {
+                    else if (type === "decrement") {
                         product.quantity = parseInt(product.quantity) - parseInt(qty);
                     }
+                    else product.quantity = parseInt(qty) //if type is set
                     break;
                 }
             }

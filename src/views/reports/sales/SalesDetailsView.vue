@@ -5,14 +5,13 @@
       <div class="col-12">
         <div class="container">
           <div class="row justify-content-center">
-            <div class="col-7" style="max-width: 600px">
+            <div class="col-6" style="max-width: 400px">
               <form @submit.prevent="search">
                 <h5 class="text-center"><b>Sales Details</b></h5>
                 <div class="input-group">
-                  <div class="input-group-text bg-dark text-white"><b>From</b></div>
-                  <input type="date" class="form-control form-control-dark" v-model="from" onkeydown="return false">
-                  <div class="input-group-text bg-dark text-white"><b>To</b></div>
-                  <input type="date" class="form-control form-control-dark" v-model="to" onkeydown="return false">
+                  <div class="input-group-text bg-dark text-white"><b>Date</b></div>
+                  <input type="date" class="form-control form-control-dark" v-model="date" onkeydown="return false">
+
                   <button class="bg-primary text-white px-3" title="Search" name="submitBtn" style="border: none;">
                     <span class="spinner-border spinner-border-sm" v-if="loading"></span>
                     <span class="pi pi-search" v-else></span>
@@ -131,7 +130,7 @@
                     <td>&nbsp; {{ record.productName }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.buyingPrice)) }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.sellingPrice)) }}</td>
-                    <td>&nbsp; {{ formatNumber(parseInt(record.quantity)) }}</td>
+                    <td>&nbsp; {{ parseInt(record.quantity) }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.tax)) }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.discount)) }}</td>
                     <td>
@@ -164,8 +163,7 @@ import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
 
 const loading = ref(false)
-const from = ref(null);
-const to = ref(null);
+const date = ref(null);
 const message = ref(null);
 const records = ref([]);
 const store = useStore();
@@ -177,8 +175,7 @@ const settings = computed(() => store.getters.setting)
 
 const search = async (e) => {
 
-  if (!from.value || !to.value) return ipcRenderer.send('errorMessage', 'Please Select Date');
-  if (from.value > to.value) return ipcRenderer.send('errorMessage', 'Sorry, (Date from) cannot be greater than (Date to)');
+  if (!date.value) return ipcRenderer.send('errorMessage', 'Please Select Date');
 
   records.value = [];
   message.value = null;
@@ -186,40 +183,23 @@ const search = async (e) => {
   try {
     e.target.submitBtn.disabled = true;
     loading.value = true;
-    await db('orderDetails')
+    records.value = await db('orderDetails')
         .leftJoin('orders', 'orders.id', '=', 'orderDetails.orderId')
         .leftJoin('users', 'users.id', '=', 'orders.userId')
         .select('orderDetails.id','orderDetails.productName', 'orderDetails.buyingPrice',
             'orderDetails.sellingPrice','orderDetails.tax','orderDetails.discount',
             'orderDetails.quantity', 'orderDetails.date', 'users.firstName as user')
-        .whereRaw('date >= ?', [from.value + ' 00:00:01'])
-        .andWhereRaw('date <= ?', [to.value + ' 23:59:59'])
-        .limit(510)
-        .stream((stream) => {
-
-          stream.on('data', (row) => {
-            records.value.push(row);
-            if (records.value.length > 500) { //If records are more than 500
-               stream.destroy()
-              records.value = [] //clear all record
-              return ipcRenderer.send(
-                  'errorMessage',
-                  `You tried to display more than 500 records on screen.\nFor performance sake, please load records in batches`
-              )
-            }
-          })
-
-        });
+        .whereRaw('date >= ?', [date.value + ' 00:00:01'])
+        .andWhereRaw('date <= ?', [date.value + ' 23:59:59'])
 
 
-    if (from.value === to.value) message.value = `Sales Report On ${new Date(from.value).toDateString()}`;
-    else message.value = `Sales Report From ${new Date(from.value).toLocaleDateString()} To ${new Date(to.value).toLocaleDateString()}`;
 
-    //If records from streaming
-    if (records.value.length){
-      from.value = null;
-      to.value = null;
-    }
+    if (records.value.length) {
+      message.value = `Sales Report On ${new Date(date.value).toDateString()}`;
+    }else message.value = "No Records Found";
+
+
+   date.value = null;
 
   }catch (e) { ipcRenderer.send('errorMessage', e.message) }
   finally {

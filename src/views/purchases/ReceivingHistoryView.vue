@@ -124,7 +124,8 @@
 <!--            <div class="d-flex mb-3">-->
 <!--              <label><b>Return Date</b> <input type="date" class="form-control-dark p-1" v-model="returnData.date"></label>-->
 <!--            </div>-->
-            <button name="submitBtn" type="submit" class="px-2 bg-dark text-white" style="outline: none !important;">Proceed</button>
+            <button name="submitBtn" type="submit" class="px-2 bg-dark text-white"
+                    style="outline: none !important;">Proceed</button>
             <button type="button" class="float-end px-2 btn-secondary" @click="closeReturnDialog">Cancel</button>
 
           </form>

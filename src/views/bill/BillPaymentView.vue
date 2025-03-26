@@ -55,6 +55,7 @@ import {useRoute, useRouter} from "vue-router";
 import {onMounted, reactive, ref} from "vue";
 import {formatNumber} from "@/functions";
 import db from "@/dbConfig/db";
+import moment from "moment/moment";
 
 const route = useRoute();
 const router = useRouter();
@@ -95,7 +96,7 @@ const pay = async (e) => {
 
        await trx('billPayments').insert({ // Save to billPayments table
         purchaseId: purchaseId.value,
-        date: formData.date,
+        date: moment(formData.date).format("YYYY-MM-DD hh:mm:ss"),
         amount: parseFloat(formData.amount),
         note: formData.note
       })

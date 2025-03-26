@@ -9,15 +9,16 @@ import customerRouter from "@/router/customers";
 import vendorsRouter from "@/router/vendors";
 import billsRouter from "@/router/bills";
 import userRouter from "@/router/users";
+import transfersRouter from "@/router/transfers";
 
 //Reports
 import indexReportRouter from "@/router/reports";
 import salesReportRouter from "@/router/reports/sales";
 import productsReportRouter from "@/router/reports/products";
 import purchasesReportRouter from "@/router/reports/purchases";
+import customersReportRouter from "@/router/reports/customers";
 
 import store from "@/store";
-
 
 const routes = [
   {
@@ -40,12 +41,14 @@ const routes = [
     ...vendorsRouter,
     ...purchasesRouter,
     ...billsRouter,
+    ...transfersRouter,
 
     //Report routes
     ...indexReportRouter,
     ...salesReportRouter,
     ...productsReportRouter,
     ...purchasesReportRouter,
+    ...customersReportRouter,
 ]
 
 

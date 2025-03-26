@@ -66,6 +66,7 @@
             </template>
           </Column>
 
+
           <Column field="total" header="Total" sortable class="data-table-font-size">
             <template #body="{data}">
               <td>{{ formatNumber(parseFloat(data.total)) }}</td>
@@ -93,6 +94,7 @@
               <th>Date</th>
               <th>Discount</th>
               <th>Tax</th>
+              <th>Type</th>
               <th>Total</th>
             </tr>
 
@@ -131,11 +133,11 @@ const from = ref(null);
 const to = ref(null);
 const message = ref(null);
 const records = ref([]);
-
+// const creditSales = ref(0);
+// const cashSales = ref(0);
 const store = useStore();
 
 const settings = computed(() => store.getters.setting);
-
 
 
         //....................Search.......................
@@ -153,7 +155,7 @@ const search = async (e) => {
     loading.value = true;
 
     await db('orders')
-        .select('orders.id', 'orders.orderDate')
+        .select('orders.id', 'orders.orderDate', 'orders.saleType')
         .sum('orders.total as total')
         .sum('orders.discount as discount')
         .sum('orders.tax as tax')
@@ -176,6 +178,16 @@ const search = async (e) => {
           })
 
         });
+
+    //Query to get cash and credit sales
+    // const typeofSAleQuery =   await db('orders')
+    //     .select('orders.saleType')
+    //     .sum('orders.total as total')
+    //     .whereRaw('orderDate >= ?', [from.value + ' 00:00:01'])
+    //     .andWhereRaw('orderDate <= ?', [to.value + ' 23:59:59'])
+    //     .groupBy('orders.saleType')
+    //     .limit(500)
+
 
 
     if (from.value === to.value) message.value = `Sales Report On ${new Date(from.value).toDateString()}`;

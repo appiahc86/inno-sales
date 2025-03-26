@@ -37,7 +37,9 @@ const adminMenu = [
             {label: 'Products', click(){sendRouteEvent('products')}},
             {label: 'Categories', click(){sendRouteEvent('categories')}},
             {label: 'Price Adjustment', click(){sendRouteEvent('price-adjustment')}},
-            {label: 'Qty Adjustment', click(){sendRouteEvent('qty-adjustment')}}
+            {label: 'Qty Adjustment', click(){sendRouteEvent('qty-adjustment')}},
+            {type: 'separator'},
+            {label: 'Stock Transfers', click(){sendRouteEvent('transfers')}}
         ]
     },
     //..........................Inventory.........................
@@ -74,9 +76,11 @@ const adminMenu = [
     {
         label: 'Customers',
         submenu: [
-            {label: 'Add or List Customers', click(){sendRouteEvent('customers')}},
+            {label: 'Manage Customers', click(){sendRouteEvent('customers')}},
+            {label: 'Outstanding Invoices', click(){sendRouteEvent('outstanding-customers')}},
         ]
     },
+
     //..........................Customers.........................
 
 
@@ -95,10 +99,6 @@ const adminMenu = [
                     {label: 'Sales Summary', click(){sendRouteEvent('report-sales-summary')}},
                     {label: 'Sales Details', click(){sendRouteEvent('report-sales-details')}},
                     {label: 'Sales Returns', click(){sendRouteEvent('report-sales-returns')}},
-                    {type: 'separator'},
-                    {label: 'Customer Sales', click(){sendRouteEvent('report-customer-sales')}},
-                    {label: 'Customer List', click(){sendRouteEvent('report-customer-list')}},
-
                 ]
             },// ./Sales
 
@@ -132,6 +132,20 @@ const adminMenu = [
                     {label: 'Bill Payment History', click(){sendRouteEvent('report-bill-payment-history')}},
                 ]
             }, // ./Purchasing
+
+
+            //Customers
+            {
+                label: 'Customers',
+                submenu: [
+                    {label: 'Outstanding Receivables', click(){sendRouteEvent('customer-outstanding-receivables')}},
+                    {label: 'Customer Credit History', click(){sendRouteEvent('customer-credit-history')}},
+                    {type: 'separator'},
+                    {label: 'Customer List', click(){sendRouteEvent('report-customer-list')}},
+                ]
+            },// ./Customers
+
+
         ]
     }
                     //  .........................../Reports.............................

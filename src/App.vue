@@ -54,17 +54,37 @@
                   <router-link :to="{name: 'price-adjustment'}" class="dropdown-item fw-bold">Price Adjustment</router-link>
                   <router-link :to="{name: 'qty-adjustment'}" class="dropdown-item fw-bold">Qty Adjustment</router-link>
                 </li>
+                <li class="dropdown-divider"></li>
+                <li>
+                  <router-link :to="{name: 'transfers'}" class="dropdown-item fw-bold"> Stock Transfers</router-link>
+                </li>
               </ul>
             </div>
           </li>
 
           <!-- Customers -->
-          <li class="nav-item">
-            <router-link :to="{name: 'customers'}" class="nav-link">
-              <span class="pi pi-users"> </span>
-              Customers
-            </router-link>
-          </li>
+            <li class="nav-item">
+              <div class="dropdown">
+                <a class="dropdown-toggle nav-link" id="app-settings" data-bs-toggle="dropdown" aria-expanded="false">
+                  <span class="pi pi-users"></span>
+                  Customers
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="app-settings" style="font-size: 0.9em !important;">
+                  <li>
+                    <router-link :to="{name: 'customers'}" class="dropdown-item fw-bold">
+                      Manage Customers
+                    </router-link>
+                  </li>
+                  <li>
+                    <router-link :to="{name: 'outstanding-customers'}" class="dropdown-item fw-bold">
+                      Outstanding Invoices
+                    </router-link>
+                  </li>
+                </ul>
+              </div>
+            </li>
+
+
 
           <!-- Vendors -->
           <li class="nav-item">
@@ -92,8 +112,10 @@
           </li>
         </template>
 
+
+
             <!-- Settings -->
-            <div class="align-items-center px-2 mt-4 mb-1 text-white-50" style="font-size: 1em;">
+            <div class="align-items-center px-2 mt-3 mb-1 text-white-50" style="font-size: 1em;">
               <span>Settings</span>
             </div>
             <li class="nav-item">

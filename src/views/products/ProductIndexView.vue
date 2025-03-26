@@ -76,6 +76,12 @@
                         </tr>
 
                         <tr>
+                          <th class="float-end text-primary"><span class="pi pi-home"></span> Warehouse Qty &nbsp;</th>
+                          <td><input type="number" step="1" min="0" class="form-control-dark"
+                                     v-model.number="productData.warehouseQty" oninput="validity.valid || (value = 0)"></td>
+                        </tr>
+
+                        <tr>
                           <th class="float-end"><span class="pi pi-clock"></span> Expiration Date &nbsp;</th>
                           <td>
                             <input type="date" class="form-control-dark"
@@ -177,7 +183,11 @@
                     <td><b>{{ formatNumber(parseFloat(data.sellingPrice)) }}</b></td>
                   </template>
                 </Column>
-                <Column field="quantity" header="Qty" sortable bodyStyle="width:90px !important;" class="data-table-font-size"></Column>
+                <Column field="quantity" header="Qty" sortable
+                        bodyStyle="width:90px !important;" class="data-table-font-size"></Column>
+
+                <Column field="warehouseQty" header="WH Qty" sortable
+                        bodyStyle="width:90px !important;" class="data-table-font-size text-primary"></Column>
 
               </DataTable>
               <ContextMenu :model="menuModel" ref="cm" class="context-menu" style="font-size: 0.9em;" />
@@ -219,6 +229,29 @@
                       <td><input type="text" class="form-control-dark" v-model.trim="editProductData.productName"></td>
                     </tr>
 
+                    <tr>
+                      <th class="float-end"><span class="pi pi-money-bill"></span> Buying Price &nbsp;</th>
+                      <td><input type="number" step="any" min="0" class="form-control-dark"
+                                 v-model.number="editProductData.buyingPrice"  oninput="validity.valid || (value = '')"></td>
+                    </tr>
+
+                    <tr>
+                      <th class="float-end"><span class="pi pi-money-bill"></span> Selling Price &nbsp;</th>
+                      <td><input type="number" step="any" min="0" class="form-control-dark"
+                                 v-model.number="editProductData.sellingPrice"  oninput="validity.valid || (value = '')"></td>
+                    </tr>
+
+                    <tr>
+                      <th class="float-end"><span class="pi pi-sort-numeric-up"></span> Quantity &nbsp;</th>
+                      <td><input type="number" step="1" min="0" class="form-control-dark"
+                                 v-model.number="editProductData.quantity" oninput="validity.valid || (value = 0)"></td>
+                    </tr>
+
+                    <tr>
+                      <th class="float-end text-primary"><span class="pi pi-sort-numeric-up"></span> Warehouse Qty &nbsp;</th>
+                      <td><input type="number" step="1" min="0" class="form-control-dark"
+                                 v-model.number="editProductData.warehouseQty" oninput="validity.valid || (value = 0)"></td>
+                    </tr>
 
                     <tr>
                       <th class="float-end"><span class="pi pi-money-bill"></span> Tax &nbsp;</th>
@@ -298,6 +331,10 @@
                       <td>{{ productDetails.quantity }}</td>
                     </tr>
                     <tr>
+                      <th class="text-primary">Warehouse Qty</th>
+                      <td>{{ productDetails.warehouseQty }}</td>
+                    </tr>
+                    <tr>
                       <th>Tax</th>
                       <td class="text-capitalize">{{ productDetails.tax }}</td>
                     </tr>
@@ -372,6 +409,7 @@ const secondActive = ref(false);
     const productData = reactive({
       productName: '',
       quantity: 0,
+      warehouseQty: 0,
       description: '',
       buyingPrice: '',
       sellingPrice: '',
@@ -383,12 +421,13 @@ const secondActive = ref(false);
     const editProductData = reactive({
       id: '',
       productName: '',
-      // quantity: '',
+      quantity: '',
       description: '',
       expiration: null,
-      // buyingPrice: '',
-      // sellingPrice: '',
+      buyingPrice: '',
+      sellingPrice: '',
       category: '',
+      warehouseQty: '',
       categoryName: '',
       tax: ''
     });
@@ -435,6 +474,7 @@ getCategories();
                   'products.buyingPrice',
                   'products.sellingPrice',
                   'products.quantity',
+                  'products.warehouseQty',
                   'products.expiration',
                   'categories.name as category',
                   'categories.id as categoryId'
@@ -465,6 +505,7 @@ getCategories();
                'products.buyingPrice',
                'products.sellingPrice',
                'products.quantity',
+               'products.warehouseQty',
                'products.tax',
                'products.description',
                'products.expiration',
@@ -486,12 +527,15 @@ getCategories();
     const resetProductData = () => {
       productData.productName = ''; productData.quantity = 0; productData.description = '';
       productData.buyingPrice = ''; productData.sellingPrice = ''; productData.category = null;
-      productData.tax = 'tax'; productData.expiration = null
+      productData.tax = 'tax'; productData.expiration = null; productData.warehouseQty = 0;
     }
 //Reset Product from data
 const resetEditProductData = () => {
-  editProductData.productName = ''; editProductData.id = ''; editProductData.description = '';
-  editProductData.expiration = null; editProductData.category = ''; editProductData.tax = 'tax'; editProductData.categoryName = ''
+  editProductData.productName = ""; editProductData.id = ""; editProductData.description = "";
+  editProductData.expiration = null; editProductData.category = "";
+  editProductData.tax = 'tax'; editProductData.categoryName = "";
+  editProductData.buyingPrice = ""; editProductData.sellingPrice = "";
+  editProductData.quantity = ""; editProductData.warehouseQty = "";
 }
 
       // Add product
@@ -506,6 +550,7 @@ const resetEditProductData = () => {
           buyingPrice: 'required|numeric',
           sellingPrice: 'required|numeric',
           quantity: 'required|integer|min:0',
+          warehouseQty: 'required|integer|min:0',
           tax: 'required',
           description: 'string|max:100'
         })
@@ -548,9 +593,10 @@ const resetEditProductData = () => {
         let validation = new Validator(editProductData,{
           category: 'required',
           productName: 'required|string|min:2|max:100',
-          // buyingPrice: 'required|numeric',
-          // sellingPrice: 'required|numeric',
-          // quantity: 'required|numeric',
+          buyingPrice: 'required|numeric',
+          sellingPrice: 'required|numeric',
+          quantity: 'required|numeric',
+          warehouseQty: 'required|numeric',
           tax: 'required',
           description: 'string|max:100'
         })
@@ -570,7 +616,7 @@ const resetEditProductData = () => {
           products.value.map(product => { //Update data in front end without reloading from database
             if (product.id === editProductData.id){
               const cat = categories.value.filter(c => c.id.toString() === editProductData.category.toString());
-              // product.buyingPrice = parseFloat(editProductData.buyingPrice);
+              product.buyingPrice = parseFloat(editProductData.buyingPrice);
               product.category = cat[0].name;
               product.categoryId = editProductData.category;
               product.description = editProductData.description;
@@ -578,8 +624,9 @@ const resetEditProductData = () => {
               product.id = editProductData.id;
               product.productName = editProductData.productName;
               product.expiration = editProductData.expiration ? editProductData.expiration : product.expiration;
-              // product.quantity = editProductData.quantity;
-              // product.sellingPrice = parseFloat(editProductData.sellingPrice);
+              product.quantity = editProductData.quantity;
+              product.warehouseQty = editProductData.warehouseQty;
+              product.sellingPrice = parseFloat(editProductData.sellingPrice);
             }
           })
 
@@ -590,6 +637,10 @@ const resetEditProductData = () => {
               date: editProductData.expiration
             })
           }
+
+          //Update Quantity in vuex store
+          store.dispatch("productsModule/modifyQty", {id: editProductData.id, qty: editProductData.quantity, type: 'set'})
+
 
         }else ipcRenderer.send('errorMessage', `${ Object.values(validation.errors.all())[0] }`)
       }catch (e) { ipcRenderer.send('errorMessage', e.message) }
@@ -645,6 +696,10 @@ const resetEditProductData = () => {
             .select(
                 'products.id',
                 'products.productName',
+                'products.buyingPrice',
+                'products.sellingPrice',
+                'products.quantity',
+                'products.warehouseQty',
                 'products.tax',
                 'products.description',
                 'products.expiration',
@@ -665,6 +720,10 @@ const resetEditProductData = () => {
         editProductData.id = id;
 
         editProductData.productName = query.productName;
+        editProductData.buyingPrice = query.buyingPrice;
+        editProductData.sellingPrice = query.sellingPrice;
+        editProductData.quantity = query.quantity;
+        editProductData.warehouseQty = query.warehouseQty;
         editProductData.description = query.description;
         editProductData.category = query.categoryId;
         editProductData.categoryName = query.category;

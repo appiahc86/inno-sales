@@ -32,6 +32,24 @@
                      v-model.number="settings.tax"  oninput="validity.valid || (value = 0)">
             </td>
           </tr>
+
+          <tr>
+            <th class="float-end">Paper Type</th>
+            <td>
+              <label>
+                <input type="radio" id="roll" value="roll" v-model="settings.paperType" class="p-radiobutton">
+                Paper Roll
+              </label>
+              &nbsp; &nbsp; &nbsp; &nbsp;
+              <label>
+                <input type="radio" id="a4" value="a4" v-model="settings.paperType" class="p-radiobutton">
+                A4
+              </label>
+
+
+            </td>
+          </tr>
+
           <tr>
             <th></th>
             <td>
@@ -40,6 +58,8 @@
           </tr>
         </table>
       </div>
+
+
 
     </div>
 
@@ -60,7 +80,8 @@ const settings = reactive({
   storeName: '',
   address: '',
   contact: '',
-  tax: 0
+  tax: 0,
+  paperType: ''
 })
 
 const getSettings = async () => {
@@ -72,6 +93,7 @@ const getSettings = async () => {
     settings.contact = data.contact;
     settings.tax = data.tax;
     settings.id = data.id;
+    settings.paperType = data.paperType
 
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);

@@ -9,6 +9,7 @@ const Product = async () => {
             table.string('productName', 100).notNullable();
             table.string('description', 100).nullable();
             table.integer('quantity').notNullable();
+            table.integer('warehouseQty').notNullable().defaultTo(0);
             table.float('buyingPrice');
             table.float('sellingPrice').notNullable();
             table.string('tax', 6).notNullable();

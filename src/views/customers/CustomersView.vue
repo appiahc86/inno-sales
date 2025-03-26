@@ -102,20 +102,25 @@
                         <h4 class="text-white"> Loading Customers data. Please wait.</h4>
                       </template>
 
-                      <Column selection-mode="multiple" class="data-table-font-size" style="width: 20px;"></Column>
+<!--                      <Column selection-mode="multiple" class="data-table-font-size" style="width: 20px;"></Column>-->
 
                       <Column field="name" header="Name" sortable  class="data-table-font-size"></Column>
                       <Column field="company" header="Company" sortable  class="data-table-font-size"></Column>
                       <Column field="phone" header="Contact" sortable  class="data-table-font-size"></Column>
+                      <Column field="account" header="Credit Balance" sortable  class="data-table-font-size">
+                        <template #body="{data}">
+                          <td>{{formatNumber(data.account) }}</td>
+                        </template>
+                      </Column>
                       <Column field="address" header="Address" sortable class="data-table-font-size"></Column>
                     </DataTable>
             <ContextMenu :model="menuModel" ref="cm" class="context-menu" style="font-size: 0.9em;" />
                   </div>
                   <br>
-                  <button class="btn-secondary"  @click="confirmDelete(selectedCustomers)" v-if="selectedCustomers.length">
-                    <span class="pi pi-trash"></span>
-                    Delete Selection
-                  </button>
+<!--                  <button class="btn-secondary"  @click="confirmDelete(selectedCustomers)" v-if="selectedCustomers.length">-->
+<!--                    <span class="pi pi-trash"></span>-->
+<!--                    Delete Selection-->
+<!--                  </button>-->
         </div>
 
 
@@ -141,6 +146,14 @@
                     <tr>
                       <th class="float-end">Phone &nbsp;</th>
                       <td class="w-50"><input type="text" maxlength="36" class="form-control-dark"  v-model.trim="editCustomerData.phone"></td>
+                    </tr>
+
+                    <tr>
+                      <th class="float-end">Credit Balance &nbsp;</th>
+                      <td class="w-50">
+                        <input type="number" class="form-control-dark" min="0" step="0.01" required
+                               v-model="editCustomerData.account" oninput="validity.valid || (value = '')">
+                      </td>
                     </tr>
 
                     <tr>
@@ -180,6 +193,7 @@ import {reactive, ref} from "vue";
 import * as Validator from "validatorjs";
 import db from "@/dbConfig/db";
 import {FilterMatchMode} from "primevue/api";
+import { formatNumber } from "@/functions/index.js";
 
 
 const loading = ref(false);
@@ -200,7 +214,8 @@ const editCustomerData = reactive({
   name: "",
   company: "",
   phone: "",
-  address: ""
+  address: "",
+  account: null,
 })
 
 const filters = ref({
@@ -230,7 +245,9 @@ const onRowContextMenu = (event) => {
 const getCustomers = async () => {
   try {
     loading.value = true;
-    customers.value = await db.select().from('customers');
+    customers.value = await db.select()
+        .from('customers')
+        .where('id', '!=', 1);
 
   }catch (e) {
     ipcRenderer.send("errorMessage", e.message)
@@ -260,7 +277,7 @@ const addCustomer = async (e) => {
     })
     if (validation.passes()){ //Save Data
       const customer = await db('customers').insert(customerData);
-      customers.value.push({...customerData, id: customer[0]})
+      customers.value.push({...customerData, id: customer[0], account: 0})
       clearFormData();
     }else ipcRenderer.send('errorMessage', `${Object.values(validation.errors.all())[0]}`)
 
@@ -275,13 +292,22 @@ const addCustomer = async (e) => {
 //.............Edit Customer .........................
 const editCustomer =async () => {
   try {
-      await db('customers').where('id', customerId.value).first().update(editCustomerData);
+      await db('customers').where('id', customerId.value)
+          .first()
+          .update({
+            name: editCustomerData.name,
+            company: editCustomerData.company,
+            phone: editCustomerData.phone,
+            address: editCustomerData.address,
+            account: editCustomerData.account || 0,
+          });
     for (let cust of customers.value) {
       if (cust.id === customerId.value){
         cust.name = editCustomerData.name;
         cust.company = editCustomerData.company;
         cust.phone = editCustomerData.phone;
         cust.address = editCustomerData.address;
+        cust.account = editCustomerData.account || 0;
       }
     }
     customerId.value = null;
@@ -297,6 +323,7 @@ const openDialog = (data) => {
   editCustomerData.company = data.company;
   editCustomerData.phone = data.phone;
   editCustomerData.address = data.address;
+  editCustomerData.account = data.account;
   customerId.value = data.id;
   editCustomerDialog.value.showModal()
 }
@@ -324,7 +351,21 @@ const confirmDelete = (id) => {
 
 ipcRenderer.on('deleteCustomer', async (event, args) => {
   try {
+
+   // return console.log(args)
+
+    const check = await db('orders')
+        .where('customerId', args[0]).limit(1);
+
+    //If customer has orders
+    if(check.length){
+     return ipcRenderer.send("errorMessage", 'Sorry, this record could not be deleted.');
+    }
+
+    //Delete Customer
     await db('customers').whereIn('id', args).del();
+
+
     selectedCustomers.value = []; //clear selected customers
     const newCustomers = [];
     for (const c of customers.value) {

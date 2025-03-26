@@ -1,3 +1,5 @@
+import {stat} from "fs-extra";
+
 const cartModule = {
 
     namespaced: true,
@@ -5,7 +7,7 @@ const cartModule = {
     state: () => ({
         cart: [],
         tax: 0,
-        cashTendered: 0
+        cashTendered: 0,
     }),
 
 
@@ -53,6 +55,8 @@ const cartModule = {
         },
 
         cashTendered: state => state.cashTendered, //Get cash tendered
+
+        barcode : state => state.barcode,
     },
 
 
@@ -133,7 +137,8 @@ const cartModule = {
         //Un-hold item
         unhold: (state, payload) => {
             state.cart = payload;
-        }
+        },
+
     },
 
 

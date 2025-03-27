@@ -55,7 +55,7 @@ defineProps({
       </div>
 
       <p style="font-size: 11px">
-        <b>Billed To</b><br>
+        <b>Invoice To</b><br>
         {{ name }}<br>
         {{ address }}<br>
         {{ phone }}

@@ -53,7 +53,7 @@ defineProps({
 
       <div style="line-height: 20px; font-size: 12px">
         <p>
-          <b>Bill From</b><br>
+          <b>Billed From</b><br>
           Name: <b>{{ companySettings.companyName }}</b><br>
           Address: {{ companySettings.address }}<br>
           Phone: {{ companySettings.contact }}<br>
@@ -63,7 +63,7 @@ defineProps({
 
       <div style="line-height: 20px; font-size: 12px">
         <p>
-          <b>Bill To</b><br>
+          <b>Billed To</b><br>
           Name: {{ name }}<br>
           Address: {{ address }}<br>
           Phone: {{ phone }}<br>
@@ -75,7 +75,6 @@ defineProps({
         <p>
           Invoice#: {{  "P-" + moment().format('YYYYMMDDHHssSSS') }}<br>
           InvoiceDate: {{ invoiceDate ? new Date(invoiceDate).toDateString(): '' }}<br>
-          Phone: {{ phone }}<br>
           DueDate: {{ dueDate ? new Date(dueDate).toDateString(): '' }}
         </p>
       </div>

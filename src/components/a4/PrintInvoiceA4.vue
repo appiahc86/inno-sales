@@ -42,137 +42,72 @@ defineProps({
 <template>
 
   <div id="invoice-a4">
-    <div class="invoice-container">
-      <div class="header">
-        <h1>INVOICE</h1>
-      </div>
-      <!-- Two Columns Section -->
-      <div class="two-columns">
-        <div>
-          <h3><strong>{{ companySettings.companyName }}</strong></h3>
-          <p>
-            {{ companySettings.address }}<br>
-            {{ companySettings.contact }}
-          </p>
-        </div>
-        <div>
-          <p><strong>Billed To</strong></p>
-          <p>
-            {{ name }}<br>
-            {{ address }}<br>
-            {{ phone }}
-          </p>
-
-        </div>
-      </div>
-      <!-- Three Columns Section -->
-      <div class="three-columns">
-        <div>
-          <p><strong>Invoice #:</strong></p>
-          <p>{{ invoiceNumber }}</p>
-        </div>
-        <div>
-          <p><strong>Date:</strong></p>
-          <p>{{ invoiceDate ? new Date(invoiceDate).toDateString(): '' }}</p>
-        </div>
-        <div>
-          <p><strong>Due Date:</strong></p>
-          <p>{{ dueDate ? new Date(dueDate).toDateString(): '' }}</p>
-        </div>
-      </div>
-      <!-- Table Section -->
-      <table>
-        <thead>
-        <tr>
-          <th>Item</th>
-          <th>Qty</th>
-          <th>Price</th>
-          <th>Ext Price</th>
-        </tr>
-        </thead>
-        <tbody>
-        <template v-for="item in cart">
-          <tr>
-            <td>{{ item.productName }}</td>
-            <td>{{ item.qty }}</td>
-            <td>{{ formatNumber(item.sellingPrice) }}</td>
-            <td>{{ formatNumber(item.sellingPrice * item.qty ) }}</td>
-          </tr>
-        </template>
-        </tbody>
-      </table>
-      <div class="totals">
-        <p><strong>Subtotal:</strong> GH¢ {{ formatNumber(subTotal) }}</p>
-        <template v-if="totalTax">
-          <p><strong>Tax:</strong> GH¢ {{ formatNumber(totalTax) }}</p>
-        </template>
-        <template v-if="totalDiscount">
-          <p><strong>Discount:</strong> GH¢ {{ formatNumber(totalDiscount) }}</p>
-        </template>
-        <p><strong>Total:</strong> GH¢ {{ formatNumber(total) }}</p>
-      </div>
-
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 20px;">
+      <h2 style="margin: 0;">{{ companySettings.companyName }}</h2>
+      <p style="margin: 0;">{{ companySettings.address }}</p>
+      <p style="margin: 0;">{{ companySettings.contact }}</p>
+      <h3 style="margin-top: 10px;">Credit Sales Invoice</h3>
     </div>
-  </div>
 
+    <!-- Customer Details -->
+    <div style="padding-bottom: 10px;">
+      <h4 style="margin: 0;">Invoice To:</h4>
+      <p style="margin: 5px 0;">Name: {{ name }}</p>
+      <p style="margin: 5px 0;">Address: {{ address }}</p>
+      <p style="margin: 5px 0;">Contact: {{ phone }}</p>
+    </div>
+
+    <div style="margin-bottom: 15px; float: right;">
+      <p style="margin: 5px 0;">Invoice #: <b>{{ invoiceNumber }}</b></p>
+      <p style="margin: 5px 0;">Invoice Date: {{ invoiceDate ? new Date(invoiceDate).toDateString(): '' }}</p>
+      <p style="margin: 5px 0;">Due Date: {{ invoiceDate ? new Date(dueDate).toDateString(): '' }}</p>
+    </div>
+
+    <!-- Item Table -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+      <thead>
+      <tr>
+        <th style="border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9;">Item</th>
+        <th style="border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9;">Qty</th>
+        <th style="border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9;">Price</th>
+        <th style="border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9;">Ext Price</th>
+      </tr>
+      </thead>
+      <tbody>
+      <template  v-for="item in cart">
+        <tr>
+          <td style="border: 1px solid #ccc; padding: 10px;">{{ item.productName }}</td>
+          <td style="border: 1px solid #ccc; padding: 10px; text-align: center;">{{ item.qty }}</td>
+          <td style="border: 1px solid #ccc; padding: 10px; text-align: right;">{{ formatNumber(item.sellingPrice) }}</td>
+          <td style="border: 1px solid #ccc; padding: 10px; text-align: right;">{{ formatNumber(item.sellingPrice * item.qty ) }}</td>
+        </tr>
+      </template>
+
+      </tbody>
+    </table>
+
+    <!-- Summary -->
+    <div style="text-align: right; margin-bottom: 20px;">
+      <p style="margin: 5px 0;">Subtotal: GH¢ {{ formatNumber(subTotal) }}</p>
+      <template v-if="totalTax">
+        <p style="margin: 5px 0;">Tax: GH¢ {{ formatNumber(totalTax) }}</p> <br>
+      </template>
+      <template v-if="totalDiscount">
+        <p style="margin: 5px 0;">Discount: GH¢ {{ formatNumber(totalDiscount) }}</p> <br>
+      </template>
+      <p style="margin: 5px 0; font-weight: bold;">Total: GH¢ {{ formatNumber(total) }}</p>
+    </div>
+
+    <!-- Footer -->
+<!--    <div style="text-align: center; border-top: 1px solid #ccc; padding-top: 10px;">-->
+<!--      <p style="margin: 0;">Thank you for your business!</p>-->
+<!--      <p style="margin: 0;">Please make payments to avoid penalties.</p>-->
+<!--    </div>-->
+
+  </div>
 </template>
 
 <style scoped>
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f4f4;
-}
-.invoice-container {
-  max-width: 900px;
-  margin: 20px auto;
-  padding: 20px;
-  background: #fff;
-}
-.header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-.header h1 {
-  margin: 0;
-}
-.two-columns,
-.three-columns {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-.two-columns div,
-.three-columns div {
-  padding: 10px;
-  border: 1px solid #ddd;
-  background-color: #f9f9f9;
-  flex: 1;
-}
-.two-columns div + div {
-  margin-left: 20px;
-}
-.three-columns div + div {
-  margin-left: 20px;
-}
-.three-columns div {
-  flex-basis: 30%;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-table th, table td {
-  padding: 10px;
-  border: 1px solid #ddd;
-}
-table th {
-  background: #f4f4f4;
-}
 
-.totals {
-  text-align: right;
-}
 </style>

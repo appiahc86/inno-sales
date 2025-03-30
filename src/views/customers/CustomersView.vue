@@ -34,17 +34,17 @@
 
                         <tr>
                           <th class="float-end"><span class="pi pi-user"></span> Customer Name &nbsp;</th>
-                          <td><input type="text" maxlength="40" class="form-control-dark" v-model.trim="customerData.name"></td>
+                          <td><input type="text" required maxlength="200" class="form-control-dark" v-model.trim="customerData.name"></td>
                         </tr>
 
                         <tr>
                           <th class="float-end"><span class="pi pi-home"></span> Company &nbsp;</th>
-                          <td><input type="text" maxlength="60" class="form-control-dark" v-model.trim="customerData.company"></td>
+                          <td><input type="text" maxlength="150" class="form-control-dark" v-model.trim="customerData.company"></td>
                         </tr>
 
                         <tr>
                           <th class="float-end"><span class="pi pi-phone"></span> Phone &nbsp;</th>
-                          <td><input type="text" maxlength="36" class="form-control-dark"  v-model.trim="customerData.phone"></td>
+                          <td><input type="text" required maxlength="50" class="form-control-dark"  v-model.trim="customerData.phone"></td>
                         </tr>
 
                         <tr>
@@ -135,7 +135,7 @@
 
                     <tr>
                       <th class="float-end">Customer Name &nbsp;</th>
-                      <td class="w-50"><input type="text" maxlength="40" class="form-control-dark w-100" v-model.trim="editCustomerData.name"></td>
+                      <td class="w-50"><input type="text" required maxlength="200" class="form-control-dark w-100" v-model.trim="editCustomerData.name"></td>
                     </tr>
 
                     <tr>
@@ -145,7 +145,7 @@
 
                     <tr>
                       <th class="float-end">Phone &nbsp;</th>
-                      <td class="w-50"><input type="text" maxlength="36" class="form-control-dark"  v-model.trim="editCustomerData.phone"></td>
+                      <td class="w-50"><input type="text" required maxlength="40" class="form-control-dark"  v-model.trim="editCustomerData.phone"></td>
                     </tr>
 
                     <tr>
@@ -158,7 +158,7 @@
 
                     <tr>
                       <th class="float-end">Address &nbsp;</th>
-                      <td><input type="text" maxlength="100" class="form-control-dark" v-model.trim="editCustomerData.address"></td>
+                      <td><input type="text" maxlength="200" class="form-control-dark" v-model.trim="editCustomerData.address"></td>
                     </tr>
 
                     <tr>

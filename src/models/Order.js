@@ -11,7 +11,7 @@ const Order = async () => {
             table.integer('numberOfItems');
             table.float('momo');
             table.string('momoType').defaultTo('');
-            table.decimal('total');
+            table.decimal('total').index();
             table.float('tendered');
             table.float('discount');
             table.float('tax');

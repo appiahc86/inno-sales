@@ -5,11 +5,11 @@ const Customer = async () => {
 
         await db.schema.createTable('customers', table => {
             table.increments('id').primary();
-            table.string('name', 40);
-            table.string('company', 60);
+            table.string('name');
+            table.string('company');
             table.double('account').defaultTo(0);
-            table.string('phone', 36);
-            table.string('address', 100);
+            table.string('phone');
+            table.string('address');
             table.boolean('isActive').defaultTo(true)
         })
 

@@ -34,11 +34,29 @@
 
           <button class="p-1 fw-bold bg-secondary text-white" @click="printReport">
             <span class="pi pi-print"></span> Print</button>
-          <h5 v-if="customerName">
-            Customer: <b> {{ customerName }}</b><br>
-            Contact: <b>{{ customerContact }}</b>
-          </h5>
-          <h6>{{ message }}</h6>
+          <div class="d-flex">
+            <div class="w-50">
+              <h6 v-if="customerName">
+                Customer: <b> {{ customerName }}</b><br>
+                Contact: <b>{{ customerContact }}</b>
+              </h6>
+              <h6>{{ message }}</h6>
+            </div>
+
+
+            <div class="w-50" style="font-size: 1.1em;">
+              <p class="float-end">
+                Total Purchases: <b>GH¢ {{ formatNumber(totalPurchases) }}</b> <br>
+                Payment Made: <b>GH¢ {{ formatNumber(totalPaid) }}</b> <br>
+                Debit: <b>GH¢ {{ formatNumber(totalPurchases - totalPaid) }}</b> <br>
+              </p>
+            </div>
+
+          </div>
+
+
+
+
           <div class="table-responsive">
 
             <template v-for="record in records" :key="record.id">
@@ -126,15 +144,31 @@
               </b>
             </div>
 
-          <h5 v-if="customerName">
-            Customer: <b> {{ customerName }}</b><br>
-            Contact: <b>{{ customerContact }}</b>
-          </h5>
-          <h6>{{ message }}</h6>
-          <div class="table-responsive">
+          <template v-if="customerName">
+            <div style="display: flex;">
+              <div style="width: 50%;">
+                <h5 v-if="customerName">
+                  Customer: <b> {{ customerName }}</b><br>
+                  Contact: <b>{{ customerContact }}</b>
+                </h5>
+                <h6>{{ message }}</h6>
+              </div>
 
+
+              <div style="width: 50%; font-size: 1em;">
+                <p style="float: right;">
+                  Total Purchases: <b>GH¢ {{ formatNumber(totalPurchases) }}</b> <br>
+                  Payment Made: <b>GH¢ {{ formatNumber(totalPaid) }}</b> <br>
+                  Debit: <b>GH¢ {{ formatNumber(totalPurchases - totalPaid) }}</b> <br>
+                </p>
+              </div>
+
+            </div>
+          </template>
+
+          <div>
             <template v-for="record in records" :key="record.id">
-              <div style="border: 1.5px solid darkslategrey; padding: 10px;">
+              <div style="border: 1.5px solid #2abdbd; padding: 10px;">
 
                 <div class="">
                   <p>
@@ -147,47 +181,47 @@
                   </p>
                 </div>
 
-                <table class="myTable">
+                <table style="font-size: 0.85em; width: 100%; border-collapse: collapse;">
                   <thead>
                   <tr>
-                    <th>Item</th>
-                    <th>Price</th>
-                    <th>Qty</th>
-                    <th>Discount</th>
-                    <th>Tax</th>
-                    <th>Total</th>
+                    <th style="padding: 5px; border: 0.8px solid grey">Item</th>
+                    <th style="padding: 5px; border: 0.8px solid grey">Price</th>
+                    <th style="padding: 5px; border: 0.8px solid grey">Qty</th>
+                    <th style="padding: 5px; border: 0.8px solid grey">Discount</th>
+                    <th style="padding: 5px; border: 0.8px solid grey">Tax</th>
+                    <th style="padding: 5px; border: 0.8px solid grey">Total</th>
                   </tr>
                   </thead>
                   <tbody>
                   <template v-for="data in record.details" :key="record.details.id">
                     <tr>
-                      <td>{{ data.productName }}</td>
-                      <td>{{ formatNumber(data.price) }}</td>
-                      <td>{{ data.quantity }}</td>
-                      <td>{{ formatNumber(data.discount) }}</td>
-                      <td>{{ formatNumber(data.tax) }}</td>
-                      <td>{{ formatNumber(data.total) }}</td>
+                      <td  style="padding: 5px; border: 0.8px solid grey">{{ data.productName }}</td>
+                      <td  style="padding: 5px; border: 0.8px solid grey">{{ formatNumber(data.price) }}</td>
+                      <td  style="padding: 5px; border: 0.8px solid grey">{{ data.quantity }}</td>
+                      <td  style="padding: 5px; border: 0.8px solid grey">{{ formatNumber(data.discount) }}</td>
+                      <td  style="padding: 5px; border: 0.8px solid grey">{{ formatNumber(data.tax) }}</td>
+                      <td  style="padding: 5px; border: 0.8px solid grey">{{ formatNumber(data.total) }}</td>
                     </tr>
                   </template>
                   </tbody>
                 </table>
 
                 <h5>Payments</h5>
-                <table class="myTable">
+                <table style="font-size: 0.85em; width: 100%; border-collapse: collapse;">
                   <thead>
                   <tr>
-                    <th>Receipt#</th>
-                    <th>Date</th>
-                    <th>Amount</th>
+                    <th style="padding: 5px; border: 0.8px solid #2b0101">Receipt#</th>
+                    <th style="padding: 5px; border: 0.8px solid #2b0101">Date</th>
+                    <th style="padding: 5px; border: 0.8px solid #2b0101">Amount</th>
                   </tr>
                   </thead>
                   <tbody>
 
                   <template v-for="p in record.payments?.payments" :key="p.id">
                     <tr>
-                      <td>{{ p.receiptNumber }}</td>
-                      <td>{{ new Date(p.date).toLocaleDateString() }}</td>
-                      <td>{{ formatNumber(p.amount) }}</td>
+                      <td style="padding: 5px; border: 0.8px solid #2b0101">{{ p.receiptNumber }}</td>
+                      <td style="padding: 5px; border: 0.8px solid #2b0101">{{ new Date(p.date).toLocaleDateString() }}</td>
+                      <td style="padding: 5px; border: 0.8px solid #2b0101">{{ formatNumber(p.amount) }}</td>
                     </tr>
                   </template>
 
@@ -278,7 +312,7 @@ const search = async (e) => {
         .where('orders.customerId', formData.selectedCustomer.id)
         .andWhereRaw('orders.orderDate >= ?', [formData.from + ' 00:00:01'])
         .andWhereRaw('orders.orderDate <= ?', [formData.to + ' 23:59:59'])
-        .andWhere('orders.isPaid', false)
+        // .andWhere('orders.isPaid', false)
         .select('orders.id', 'orders.orderDate', 'orders.total', 'orders.tendered',
             'orders.invoiceNumber', 'orders.payments',' orders.tax', 'orders.discount',
         'orderDetails.productName', 'orderDetails.quantity', 'orderDetails.sellingPrice',
@@ -327,8 +361,6 @@ const search = async (e) => {
     }
 
     records.value = filtered;
-    console.log(filtered)
-
 
     if (formData.from === formData.to) message.value = `Sales Report On ${new Date(formData.from).toDateString()}`;
     else message.value = `Credit Report From ${new Date(formData.from).toLocaleDateString()} To ${new Date(formData.to).toLocaleDateString()}`;
@@ -345,8 +377,8 @@ const search = async (e) => {
 
 }
 
-//Get records total
-const recordTotal = computed(() => {
+//Get purchases total
+const totalPurchases = computed(() => {
   let total = 0;
   if (records.value.length){
     for (const record of records.value) {
@@ -355,6 +387,18 @@ const recordTotal = computed(() => {
   }
   return total;
 })
+
+//Total Payment Made
+const totalPaid = computed(() => {
+  let total = 0;
+  if (records.value.length){
+    for (const record of records.value) {
+      total += parseFloat(record.tendered)
+    }
+  }
+  return total;
+})
+
 
 //Print Report
 const printReport = () => {
@@ -366,13 +410,5 @@ const printReport = () => {
 </script>
 
 <style scoped>
-.myTable{
-  font-size: 0.85em;
-  width: 100%;
-  border-collapse: collapse;
-}
-.myTable th, .myTable td {
-  padding: 5px;
-  border: 0.8px solid #978c8c;
-}
+
 </style>

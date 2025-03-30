@@ -37,7 +37,7 @@
       <div class="table-responsive">
 
         <DataTable
-            :value="records" :paginator="true"
+            :value="records" :paginator="true" dataKey="id"
             class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines"
             filterDisplay="menu" :rows="10"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -54,17 +54,9 @@
             </template>
           </Column>
 
-          <Column field="discount" header="Discount" sortable class="data-table-font-size">
-            <template #body="{data}">
-              <td>{{ formatNumber(parseFloat(data.discount)) }}</td>
-            </template>
-          </Column>
+          <Column field="name" header="Customer" sortable class="data-table-font-size"></Column>
 
-          <Column field="tax" header="Tax" sortable class="data-table-font-size">
-            <template #body="{data}">
-              <td>{{ formatNumber(parseFloat(data.tax)) }}</td>
-            </template>
-          </Column>
+          <Column field="phone" header="Contact" sortable class="data-table-font-size"></Column>
 
 
           <Column field="total" header="Total" sortable class="data-table-font-size">
@@ -89,21 +81,20 @@
               <span>{{ new Date().toDateString() }}</span><br>
               <span class="">{{ message }}</span>
             </p>
-          <table id="print-table">
+          <table id="print-table" style="font-size: 0.85em; width: 100%; border-collapse: collapse;">
             <tr>
-              <th>Date</th>
-              <th>Discount</th>
-              <th>Tax</th>
-              <th>Type</th>
-              <th>Total</th>
+              <th style="border: 1px solid black;">Date</th>
+              <th style="border: 1px solid black;">Customer</th>
+              <th style="border: 1px solid black;">Contact</th>
+              <th style="border: 1px solid black;">Total</th>
             </tr>
 
             <template v-for="record in records" :key="record.id">
               <tr>
-                <td>&nbsp; {{ new Date(record.orderDate).toLocaleDateString() }}</td>
-                <td>&nbsp; {{ formatNumber(parseFloat(record.discount)) }}</td>
-                <td>&nbsp; {{ formatNumber(parseFloat(record.tax)) }}</td>
-                <td>&nbsp; {{ formatNumber(parseFloat(record.total)) }}</td>
+                <td style="border: 1px solid black;">&nbsp; {{ new Date(record.orderDate).toLocaleDateString() }}</td>
+                <td style="border: 1px solid black;">&nbsp; {{ record.name }}</td>
+                <td style="border: 1px solid black;">&nbsp; {{ record.phone }}</td>
+                <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.total)) }}</td>
               </tr>
             </template>
 
@@ -133,8 +124,7 @@ const from = ref(null);
 const to = ref(null);
 const message = ref(null);
 const records = ref([]);
-// const creditSales = ref(0);
-// const cashSales = ref(0);
+
 const store = useStore();
 
 const settings = computed(() => store.getters.setting);
@@ -154,40 +144,15 @@ const search = async (e) => {
     e.target.submitBtn.disabled = true;
     loading.value = true;
 
-    await db('orders')
-        .select('orders.id', 'orders.orderDate', 'orders.saleType')
+    const query = await db('customers')
+        .join('orders', 'customers.id', '=', 'orders.customerId')
+        .select('customers.name', 'customers.phone','orders.orderDate', 'orders.id')
         .sum('orders.total as total')
-        .sum('orders.discount as discount')
-        .sum('orders.tax as tax')
         .whereRaw('orderDate >= ?', [from.value + ' 00:00:01'])
         .andWhereRaw('orderDate <= ?', [to.value + ' 23:59:59'])
-        .groupByRaw('DATE(orders.orderDate)')
-        .limit(510)
-        .stream((stream) => {
+        .groupByRaw('DATE(orders.orderDate), customers.id')
 
-          stream.on('data', (row) => {
-            records.value.push(row);
-            if (records.value.length > 500) { //If records are more than 500
-              stream.destroy();
-              records.value = [] //clear all record
-             return ipcRenderer.send(
-                  'errorMessage',
-                  `You tried to display more than 500 records on screen.\nFor performance sake, please load records in batches`
-              )
-            }
-          })
-
-        });
-
-    //Query to get cash and credit sales
-    // const typeofSAleQuery =   await db('orders')
-    //     .select('orders.saleType')
-    //     .sum('orders.total as total')
-    //     .whereRaw('orderDate >= ?', [from.value + ' 00:00:01'])
-    //     .andWhereRaw('orderDate <= ?', [to.value + ' 23:59:59'])
-    //     .groupBy('orders.saleType')
-    //     .limit(500)
-
+    if (query.length) records.value = query;
 
 
     if (from.value === to.value) message.value = `Sales Report On ${new Date(from.value).toDateString()}`;
@@ -228,12 +193,5 @@ const printReport = () => {
 </script>
 
 <style scoped>
-#print-table{
-  font-size: 0.85em;
-  width: 100%;
-  border-collapse: collapse;
-}
-#print-table th, #print-table td{
-  border: 1px solid black;
-}
+
 </style>

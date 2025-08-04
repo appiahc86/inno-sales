@@ -77,7 +77,7 @@ onMounted(() => {
   company.value = route.params.company;
   invoice.value = route.params.invoice;
   amountDue.value = parseFloat(route.params.amountDue);
-  invoiceDue.value = parseInt(route.params.invoiceDue);
+  invoiceDue.value = route.params.invoiceDue;
   formData.amount = parseFloat(route.params.amountDue);
 })
 

@@ -8,6 +8,7 @@ const cartModule = {
         cart: [],
         tax: 0,
         cashTendered: 0,
+        profit: 0
     }),
 
 
@@ -15,6 +16,14 @@ const cartModule = {
     getters: {
         cart: (state) => {
             return state.cart;
+        },
+
+        getProfit: (state) => {//Get profit
+            let profit = 0;
+            for (const item of state.cart) {
+                profit += ( (parseFloat(item.sellingPrice) - parseFloat(item.buyingPrice)) * parseInt(item.qty) ) - parseFloat(item.discount);
+            }
+            return profit;
         },
 
         getTax: state => state.tax, //get tax for checkout use

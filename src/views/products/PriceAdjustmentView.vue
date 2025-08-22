@@ -82,6 +82,7 @@ import {reactive, ref, watch, computed} from "vue";
 import { formatNumber } from "@/functions";
 import db from "@/dbConfig/db";
 import {useStore} from "vuex";
+import moment from "moment/moment";
 
 const loading = ref(false);
 const products = ref([]);
@@ -158,6 +159,7 @@ const updatePrice = async (e) => {
       await trx('priceAdjustments').insert({
         userId: user.value.id,
         productId: data.id,
+        date:  moment().format("YYYY-MM-DD HH:mm:ss"),
         oldCost: data.oldBuyingPrice,
         newCost: data.newBuyingPrice,
         oldPrice: data.oldSellingPrice,

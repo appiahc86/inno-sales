@@ -29,13 +29,13 @@ const cashierMenu = [
     //..........................Sales.........................
 
     //..........................Customers.........................
-    {
-        label: 'Customers',
-        submenu: [
-            {label: 'Manage Customers', click(){sendRouteEvent('customers')}},
-            {label: 'Outstanding Invoices', click(){sendRouteEvent('outstanding-customers')}},
-        ]
-    },
+    // {
+    //     label: 'Customers',
+    //     submenu: [
+    //         {label: 'Manage Customers', click(){sendRouteEvent('customers')}},
+    //         {label: 'Outstanding Invoices', click(){sendRouteEvent('outstanding-customers')}},
+    //     ]
+    // },
 
     //..........................Customers.........................
 
@@ -54,7 +54,7 @@ const cashierMenu = [
                     {label: 'Sales Details', click(){sendRouteEvent('report-sales-details')}},
                     {label: 'Sales Returns', click(){sendRouteEvent('report-sales-returns')}},
                     {type: 'separator'},
-                    {label: 'Customer Sales', click(){sendRouteEvent('report-customer-sales')}},
+                    // {label: 'Customer Sales', click(){sendRouteEvent('report-customer-sales')}},
                     {label: 'Customer List', click(){sendRouteEvent('report-customer-list')}},
 
                 ]

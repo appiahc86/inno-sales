@@ -79,7 +79,7 @@
         </div>
       </div>
 
-      <div class="text-center">
+      <div class="text-center" v-if="success">
         <h5 v-if="discount">Discount: <b>{{ formatNumber(discount) }}</b></h5>
         <h5 v-if="tax">Tax: <b>{{ formatNumber(tax) }}</b></h5>
       <h3 class="text-danger" v-if="change">
@@ -112,6 +112,7 @@ const returnBtn = ref(null);
 const momoType = ref('mtn');
 const paymentMethod = ref('cash');
 const store = useStore();
+const success = ref(false);
 
 const user = computed(() => store.getters.user);
 
@@ -124,6 +125,7 @@ const searchReceipt = async (e) => {
   tax.value = null;
   discount.value = null;
   paymentMethod.value = 'cash';
+  success.value = false;
 
   if (!search.value) return ipcRenderer.send('errorMessage', 'Please Enter Receipt number');
   try {
@@ -138,9 +140,9 @@ const searchReceipt = async (e) => {
         .join('orders', 'orderDetails.orderId', '=', 'orders.id')
         .where({ orderId: search.value })
         .andWhere('orders.type', 'sale')
-        .andWhere('saleType', 'cash')
-        .groupBy('orderDetails.id')
-        .limit(100);
+        .andWhere('orders.saleType', 'cash')
+        // .groupBy('orderDetails.id')
+
 
     if (records.length){
       items.value = records;
@@ -180,6 +182,7 @@ const markReturn = (e, id) => {
       break;
     }
   }
+
 }
 
 //Check if an item is checked to be returned
@@ -213,6 +216,18 @@ const calculateChange = async () => {
   tax.value = tx ? -tx : 0;
 }
 
+//Calculate profits of items to be returned
+const profitToReturn = computed(() => {
+  let profit = 0;
+  for (const i of items.value) {
+    if (i?.toBeReturned){ //If it is marked to be returned
+      profit += ( (parseFloat(i.sellingPrice) - parseFloat(i.buyingPrice)) * parseInt(i.returnQty) ) - parseFloat(i.discount);
+    }
+  }
+  return profit - (profit * 2)
+})
+
+
           //...................... Return Items ........................
 const returnItems = async () => {
   returningItems.value = items.value.filter(item => item.toBeReturned);
@@ -227,6 +242,7 @@ const returnItems = async () => {
       const data = {
         numberOfItems: -returningItems.value.length,
         type: 'return',
+        orderDate: moment().format("YYYY-MM-DD HH:mm:ss"),
         momo: paymentMethod.value === 'momo' ? -change.value : 0,
         total:  -change.value, //Get a negative value
         tendered: 0,
@@ -250,6 +266,7 @@ const returnItems = async () => {
           productId: ret.productId,
           productName: ret.productName,
           quantity: -ret.returnQty,
+          date: moment().format("YYYY-MM-DD HH:mm:ss"),
           buyingPrice: ret.buyingPrice,
           originalPrice: ret.originalPrice,
           sellingPrice: ret.sellingPrice,
@@ -268,6 +285,15 @@ const returnItems = async () => {
         await trx('products').where('id', ret.productId).increment('quantity', ret.returnQty);
       }
 
+
+      //insert Profit to profits table
+      await trx('profits').insert({
+        orderId: items.value[0].orderId,
+        date: moment().format("YYYY-MM-DD HH:mm:ss"),
+        profit: profitToReturn.value
+      })
+
+
       //Update quantity in vuex store
       for (const ret of returningItems.value) {
         store.dispatch("productsModule/modifyQty", {id: ret.productId, qty: ret.returnQty, type: 'increment'})
@@ -279,6 +305,7 @@ const returnItems = async () => {
       }
       returningItems.value = [];
       items.value = [];
+      success.value = true;
 
     })
 

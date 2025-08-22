@@ -12,9 +12,10 @@
   import BillPayment from "@/models/BillPayment";
   import QuantityAdjustment from "@/models/QuantityAdjustment";
   import PriceAdjustment from "@/models/PriceAdjustment";
+  import Profit from "@/models/Profit";
 
 const migrations =  [
-    Category, User, Product, Customer, Order, OrderDetails, Settings,
+    Category, User, Product, Customer, Order, OrderDetails, Profit, Settings,
     Vendor, Purchase, PurchaseDetails, BillPayment, QuantityAdjustment, PriceAdjustment
 ]
 

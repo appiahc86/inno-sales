@@ -144,6 +144,26 @@
         </ul>  <!-- ./ permissions -->
 
 
+        <!--        Cashier Customers Link-->
+        <template v-if="user && parseInt(user.role) === 3">
+          <li class="nav-item">
+            <div class="dropdown">
+              <a class="dropdown-toggle nav-link" id="app-settings" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="pi pi-users"></span>
+                Customers
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="app-settings" style="font-size: 0.9em !important;">
+                <li>
+                  <router-link :to="{name: 'outstanding-customers'}" class="dropdown-item fw-bold">
+                    Outstanding Invoices
+                  </router-link>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </template>
+
+
         <!-- User -->
         <br v-if="user && parseInt(user.role) === 3">
         <ul class="nav flex-column mb-2">
@@ -270,42 +290,10 @@
 
 <script setup>
 
-// import runMigrations from "@/models";
+import runMigrations from "@/models";
 import db from "./dbConfig/db";
-// runMigrations() //Run all Migrations
+runMigrations() //Run all Migrations
 db.raw('PRAGMA foreign_keys = ON').then(()=>{}); //set foreign key checks on
-
-// const boom = [];
-// let count = 1;
-// for (let i = 0; i < 200; i++) {
-
-  // boom.push({
-  //   name: 'Akwasi Mensah', company: 'Boom company limited', phone: '09897652334', address: 'gsdgmj sjkdgkkjs dkfkjhkjhs dsdfgjksd'
-  // })
-
-  // boom.push({
-  //   orderDate: '2022-03-14 07:55:00', type: 'sale', momo:0, total:55.00, tendered:6200.00, discount:0, tax:0, userId:1
-  // })
-  // boom.push({
-  //   productName: 'Pawpaw'+count, quantity: 20, buyingPrice: 80, sellingPrice: 100, category: 5, tax: 'tax', description: 'hello'
-  // })
-  // count++
-  // boom.push({
-  //   productId: 1, productName: 'Plantain', quantity: 3, buyingPrice: 900, originalPrice: 900, sellingPrice: 1000,
-  //   total: 3000, tax: 0, discount: 0, date: '2022-08-12 07:54:00', categoryId: 2, orderId: 2700005
-  // })
-//
-//
-// }
-
-// db.batchInsert('customers', boom, 30).then(()=> console.log('data in bulk'));
-// db('customers').del().then(() => console.log('deleted'));
-// db.batchInsert('orders', boom, 30).then(()=> console.log('orders created'));
-// db.batchInsert('products', boom, 30).then(()=> console.log('products created'));
-// db.batchInsert('orderDetails', boom, 30).then(()=> console.log('order details created'));
-
-
-
 
 import {computed, onMounted, ref} from "vue";
 import {useStore} from "vuex";

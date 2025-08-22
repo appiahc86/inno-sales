@@ -96,6 +96,7 @@
           </DataTable>
         </div>
         <h5 class="mt-2" v-if="records.length">Total: GH¢ {{ formatNumber(parseFloat(recordTotal)) }}</h5>
+        <h5 class="mt-2" v-if="records.length">Profit: GH¢ {{ formatNumber(parseFloat(totalProfit)) }}</h5>
 
 
 
@@ -142,6 +143,8 @@
 
               </table>
               <div style="margin-top: 0;"><h5>Total: GH¢ {{ formatNumber(parseFloat(recordTotal)) }}</h5></div>
+              <div style="margin-top: 0;"><h5>Profit: GH¢ {{ formatNumber(parseFloat(totalProfit)) }}</h5></div>
+
             </div>
 
           </div>
@@ -219,6 +222,18 @@ const recordTotal = computed(() => {
   }
   return total;
 })
+
+//Get total profit
+const totalProfit = computed(() => {
+  let profit = 0;
+  if (records.value.length){
+    for (const record of records.value) {
+      profit += ( (parseFloat(record.sellingPrice) - parseFloat(record.buyingPrice)) * parseInt(record.quantity) ) - parseFloat(record.discount);
+    }
+  }
+  return profit;
+})
+
 
 //Print Report
 const printReport = () => {

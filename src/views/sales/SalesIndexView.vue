@@ -81,6 +81,7 @@
        </div>
 
      </div>
+
    </div>
 
   <!--  checkout  -->
@@ -459,6 +460,7 @@ const subTotal = computed(() => store.getters["cartModule/subTotal"]); //get car
 const totalTax = computed(() => store.getters["cartModule/totalTax"]); //get total Tax
 const total = computed(() => store.getters["cartModule/total"]); //get cart total
 const totalDiscount = computed(() => store.getters["cartModule/totalDiscount"]); //get total discount
+const cartProfit = computed(() => store.getters["cartModule/getProfit"]); //get cart Profit
 
 const clearCart = () => {
   store.dispatch('cartModule/clearCart');
@@ -656,6 +658,7 @@ const checkout = async (e) => {
            order = await trx('orders').insert({ //Save to Orders table
              numberOfItems: cart.value.length,
              momo: momo.value || 0,
+             orderDate: moment().format("YYYY-MM-DD HH:mm:ss"),
              momoType: momo.value ? momoType.value : '',
              total: total.value,
              tendered: tendered.value,
@@ -707,7 +710,7 @@ const checkout = async (e) => {
              sellingPrice: item.sellingPrice,
              total: item.sellingPrice * item.qty,
              tax: item.salesTax,
-             date: typeOfSale.value === "credit" ? moment(invoiceDate.value).format("YYYY-MM-DD hh:mm:ss") : moment().format("YYYY-MM-DD hh:mm:ss"),
+             date: typeOfSale.value === "credit" ? moment(invoiceDate.value).format("YYYY-MM-DD hh:mm:ss") : moment().format("YYYY-MM-DD HH:mm:ss"),
              discount: item.discount,
              categoryId: item.categoryId,
              orderId: order
@@ -716,17 +719,24 @@ const checkout = async (e) => {
                 //Batch Insert into order details table
          await trx.batchInsert('orderDetails', orderDetailsArray, 30);
 
+
+
          //Deduct quantity from products table
          for (const item of cart.value) {
            await trx('products').where('id', '=', item.id ).first().decrement({quantity: parseInt(item.qty)})
          }
 
-
-
          //dispatch quantities to vuex store products
          for (const item of cart.value) {
            store.dispatch("productsModule/modifyQty", {id: item.id, qty: item.qty, type: 'decrement'})
          }
+
+         //insert Profit to profits table
+         await trx('profits').insert({
+           orderId: order,
+           date: typeOfSale.value === "credit" ? moment(invoiceDate.value).format("YYYY-MM-DD hh:mm:ss") : moment().format("YYYY-MM-DD HH:mm:ss"),
+           profit: cartProfit.value
+         })
 
          if (printReceipt.value){
 

@@ -66,7 +66,12 @@
           </Column>
         </DataTable>
       </div>
-      <h5 class="mt-2" v-if="records.length">Total: GH¢ {{ formatNumber(parseFloat(recordTotal)) }}</h5>
+
+      <template v-if="records.length">
+        <h5 class="mt-2">Total: GH¢ {{ formatNumber(parseFloat(recordTotal)) }}</h5>
+        <h5 class="mt-2 fw-bold">Profit: GH¢ {{ formatNumber(parseFloat(totalProfit)) }}</h5>
+      </template>
+
 
 
 
@@ -100,6 +105,7 @@
 
           </table>
           <div style="margin-top: 0;"><h5>Total: GH¢ {{ formatNumber(parseFloat(recordTotal)) }}</h5></div>
+          <div style="margin-top: 0;"><h5>Profit: GH¢ {{ formatNumber(parseFloat(totalProfit)) }}</h5></div>
           </div>
 
         </div>
@@ -124,6 +130,7 @@ const from = ref(null);
 const to = ref(null);
 const message = ref(null);
 const records = ref([]);
+const profits = ref([]);
 
 const store = useStore();
 
@@ -154,6 +161,11 @@ const search = async (e) => {
 
     if (query.length) records.value = query;
 
+    //Get profit from profits table
+    profits.value = await db('profits')
+        .whereRaw('date >= ?', [from.value + ' 00:00:01'])
+        .andWhereRaw('date <= ?', [to.value + ' 23:59:59'])
+        .select('profit')
 
     if (from.value === to.value) message.value = `Sales Report On ${new Date(from.value).toDateString()}`;
     else message.value = `Sales Report From ${new Date(from.value).toLocaleDateString()} To ${new Date(to.value).toLocaleDateString()}`;
@@ -181,6 +193,17 @@ const recordTotal = computed(() => {
     }
   }
     return total;
+})
+
+//Get total profit
+const totalProfit = computed(() => {
+  let total =0;
+  if (profits.value.length){
+    for (const p of profits.value) {
+      total += parseFloat(p.profit);
+    }
+  }
+  return total;
 })
 
 //Print Report

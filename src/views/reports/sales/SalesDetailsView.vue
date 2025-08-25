@@ -46,11 +46,11 @@
               No record found.
             </template>
 
-            <Column field="date" header="Date" sortable class="data-table-font-size">
-              <template #body="{data}">
-                <td>{{ new Date(data.date).toLocaleDateString() }}</td>
-              </template>
-            </Column>
+<!--            <Column field="date" header="Date" sortable class="data-table-font-size">-->
+<!--              <template #body="{data}">-->
+<!--                <td>{{ new Date(data.date).toLocaleDateString() }}</td>-->
+<!--              </template>-->
+<!--            </Column>-->
 
             <Column field="user" header="Cashier" sortable class="data-table-font-size">
               <template #body="{data}">
@@ -88,7 +88,7 @@
 
             <Column field="total" header="Total" sortable class="data-table-font-size">
               <template #body="{data}">
-  <td>
+  <td :style="data.quantity < 0 ? 'color: red' : ''">
     {{ formatNumber( ( (parseInt(data.quantity) * parseFloat(data.sellingPrice)) + parseFloat(data.tax) ) - parseFloat(data.discount) ) }}
   </td>
               </template>
@@ -97,8 +97,6 @@
         </div>
         <h5 class="mt-2" v-if="records.length">Total: GH¢ {{ formatNumber(parseFloat(recordTotal)) }}</h5>
         <h5 class="mt-2" v-if="records.length">Profit: GH¢ {{ formatNumber(parseFloat(totalProfit)) }}</h5>
-
-
 
 
         <!--  Print table -->
@@ -112,8 +110,9 @@
                 <span class="">{{ message }}</span>
               </p>
               <table id="print-table">
+                <thead>
                 <tr>
-                  <th>Date</th>
+                  <!--                  <th>Date</th>-->
                   <th>Cashier</th>
                   <th>Item</th>
                   <th>Cost</th>
@@ -123,10 +122,13 @@
                   <th>Discount</th>
                   <th>Total</th>
                 </tr>
+                </thead>
+
 
                 <template v-for="record in records" :key="record.id">
+                  <tbody>
                   <tr>
-                    <td>&nbsp; {{ new Date(record.date).toLocaleDateString() }}</td>
+                    <!--                    <td>&nbsp; {{ new Date(record.date).toLocaleDateString() }}</td>-->
                     <td>&nbsp; {{ record.user }}</td>
                     <td>&nbsp; {{ record.productName }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.buyingPrice)) }}</td>
@@ -139,6 +141,8 @@
                     </td>
 
                   </tr>
+                  </tbody>
+
                 </template>
 
               </table>
@@ -191,10 +195,9 @@ const search = async (e) => {
         .leftJoin('users', 'users.id', '=', 'orders.userId')
         .select('orderDetails.id','orderDetails.productName', 'orderDetails.buyingPrice',
             'orderDetails.sellingPrice','orderDetails.tax','orderDetails.discount',
-            'orderDetails.quantity', 'orderDetails.date', 'users.firstName as user')
+            'orderDetails.quantity',  'users.firstName as user')
         .whereRaw('date >= ?', [date.value + ' 00:00:01'])
         .andWhereRaw('date <= ?', [date.value + ' 23:59:59'])
-
 
 
     if (records.value.length) {

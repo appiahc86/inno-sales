@@ -87,20 +87,26 @@
               <span class="">{{ message }}</span>
             </p>
           <table id="print-table" style="font-size: 0.85em; width: 100%; border-collapse: collapse;">
+            <thead>
             <tr>
               <th style="border: 1px solid black;">Date</th>
               <th style="border: 1px solid black;">Customer</th>
               <th style="border: 1px solid black;">Contact</th>
               <th style="border: 1px solid black;">Total</th>
             </tr>
+            </thead>
+
 
             <template v-for="record in records" :key="record.id">
+              <tbody>
               <tr>
                 <td style="border: 1px solid black;">&nbsp; {{ new Date(record.orderDate).toLocaleDateString() }}</td>
                 <td style="border: 1px solid black;">&nbsp; {{ record.name }}</td>
                 <td style="border: 1px solid black;">&nbsp; {{ record.phone }}</td>
                 <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.total)) }}</td>
               </tr>
+              </tbody>
+
             </template>
 
           </table>

@@ -86,6 +86,7 @@
                 <span class="">{{ message }}</span>
               </p>
               <table id="print-table">
+                <thead>
                 <tr>
                   <th>Product</th>
                   <th>Date</th>
@@ -94,8 +95,11 @@
                   <th>New Qty</th>
                   <th>Reason</th>
                 </tr>
+                </thead>
+
 
                 <template v-for="record in records" :key="record.id">
+                  <tbody>
                   <tr>
                     <td>&nbsp; {{ record.productName }}</td>
                     <td>&nbsp; {{ new Date(record.date).toLocaleDateString() }}</td>
@@ -104,6 +108,8 @@
                     <td>&nbsp; {{ record.type === 'increment' ? record.oldQuantity + record.quantity : record.oldQuantity - record.quantity }}</td>
                     <td>&nbsp; {{ record.reason }}</td>
                   </tr>
+                  </tbody>
+
                 </template>
 
               </table>

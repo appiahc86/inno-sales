@@ -82,18 +82,24 @@
                 <span class="">{{ message }}</span>
               </p>
               <table id="print-table">
+                <thead>
                 <tr>
                   <th>#</th>
                   <th>Date</th>
                   <th>Total</th>
                 </tr>
+                </thead>
+
 
                 <template v-for="(record, index) in records" :key="record.id">
+                  <tbody>
                   <tr>
                     <td>&nbsp; {{ index + 1 }}</td>
                     <td>&nbsp; {{ new Date(record.orderDate).toLocaleDateString() }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.total)) }}</td>
                   </tr>
+                  </tbody>
+
                 </template>
 
               </table>

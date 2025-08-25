@@ -77,6 +77,7 @@
                 <span>Products List</span>
               </p>
               <table id="print-table">
+                <thead>
                 <tr>
                   <th>#</th>
                   <th>Product</th>
@@ -89,8 +90,11 @@
                   <th>Selling Price</th>
                   <th>Description</th>
                 </tr>
+                </thead>
+
 
                 <template v-for="(record, index) in records" :key="record.id">
+                  <tbody>
                   <tr>
                     <th>{{ index + 1 }}</th>
                     <td>&nbsp; {{ record.productName }}</td>
@@ -103,6 +107,8 @@
                     <td>&nbsp; {{ formatNumber(parseFloat(record.sellingPrice)) }}</td>
                     <td>&nbsp; {{ record.description }}</td>
                   </tr>
+                  </tbody>
+
                 </template>
 
               </table>

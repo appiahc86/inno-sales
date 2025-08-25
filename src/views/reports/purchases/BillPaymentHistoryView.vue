@@ -79,20 +79,26 @@
                 <span class="">{{ message }}</span>
               </p>
               <table id="print-table">
+                <thead>
                 <tr>
                   <th>Vendor</th>
                   <th>Invoice#</th>
                   <th>Date</th>
                   <th>Amount Paid</th>
                 </tr>
+                </thead>
+
 
                 <template v-for="record in records" :key="record.id">
+                  <tbody>
                   <tr>
                     <td>&nbsp; {{ record.company }}</td>
                     <td>&nbsp; {{ record.invoice }}</td>
                     <td>&nbsp; {{ new Date(record.date).toLocaleDateString() }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.amount)) }}</td>
                   </tr>
+                  </tbody>
+
                 </template>
 
               </table>

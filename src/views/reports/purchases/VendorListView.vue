@@ -47,6 +47,7 @@
                 <b>Vendor List</b>
               </p>
               <table id="print-table">
+                <thead>
                 <tr>
                   <th>#</th>
                   <th>Company</th>
@@ -55,8 +56,11 @@
                   <th>Phone</th>
                   <th>Account Number</th>
                 </tr>
+                </thead>
+
 
                 <template v-for="(record, index) in records" :key="record.id">
+                  <tbody>
                   <tr>
                     <th>{{ index + 1 }}</th>
                     <td>&nbsp; {{ record.company }}</td>
@@ -65,6 +69,8 @@
                     <td>&nbsp; {{ record.phone }}</td>
                     <td>&nbsp; {{ record.accountNumber }}</td>
                   </tr>
+                  </tbody>
+
                 </template>
 
               </table>

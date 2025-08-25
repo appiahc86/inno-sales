@@ -53,6 +53,7 @@
                 <b>Customer Outstanding Receivables</b>
               </p>
               <table id="print-table">
+                <thead>
                 <tr>
                   <th>#</th>
                   <th>Name</th>
@@ -60,8 +61,11 @@
                   <th>Phone</th>
                   <th>Outstanding</th>
                 </tr>
+                </thead>
+
 
                 <template v-for="(record, index) in records" :key="record.id">
+                  <tbody>
                   <tr>
                     <th>{{ index + 1 }}</th>
                     <td>&nbsp; {{ record.name }}</td>
@@ -69,6 +73,8 @@
                     <td>&nbsp; {{ record.phone }}</td>
                     <td>&nbsp; {{ formatNumber(record.outstanding) }}</td>
                   </tr>
+                  </tbody>
+
                 </template>
 
               </table>
@@ -86,7 +92,7 @@
 
 </template>
 <script setup>
-import {computed, reactive, ref} from "vue";
+import {computed, ref} from "vue";
 import db from "@/dbConfig/db";
 import {formatNumber} from "@/functions";
 import {useStore} from "vuex";

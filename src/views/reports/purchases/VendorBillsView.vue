@@ -91,6 +91,7 @@
                 <span class="">{{ message }} <b>{{ vendor }}</b></span>
               </p>
               <table id="print-table">
+                <thead>
                 <tr>
                   <th>Invoice#</th>
                   <th>Bill Date</th>
@@ -100,7 +101,10 @@
                   <th>Amount Due</th>
                 </tr>
 
+                </thead>
+
                 <template v-for="record in records" :key="record.id">
+                  <tbody>
                   <tr>
                     <td>&nbsp; {{ record.invoice }}</td>
                     <td>&nbsp; {{ new Date(record.billDate).toLocaleDateString() }}</td>
@@ -109,6 +113,8 @@
                     <td>&nbsp; {{ formatNumber(parseFloat(record.total)) }}</td>
                     <td>&nbsp; {{ formatNumber(record.total - (record.totalPaid || 0)) }}</td>
                   </tr>
+                  </tbody>
+
                 </template>
 
               </table>

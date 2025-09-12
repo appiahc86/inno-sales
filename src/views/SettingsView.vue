@@ -69,7 +69,7 @@
 </template>
 
 <script setup>
-import {reactive, ref} from "vue";
+import {reactive} from "vue";
 import db from "@/dbConfig/db";
 import {useStore} from "vuex";
 

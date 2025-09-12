@@ -300,7 +300,7 @@ import {useStore} from "vuex";
 import {useRouter} from "vue-router";
 
 
-const settings = async () => { // insert data into company settings table
+const settings = async () => { //Update company settings in vuex store
   try {
     let data = await db('settings').first();
     store.dispatch('cartModule/setTax', data.tax ? parseFloat(data.tax) : 0);

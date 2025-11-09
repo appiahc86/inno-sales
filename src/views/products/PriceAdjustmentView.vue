@@ -26,8 +26,8 @@
                     <h6 class="text-white bg-secondary fw-bold p-2">Current Price</h6>
                 </div>
                 <div class="d-flex">
-                  <h6>Buying Price</h6>
-                  <h6 class="mx-auto">Selling Price</h6>
+                  <h6>Cost Price</h6>
+                  <h6 class="mx-auto">Retail Price</h6>
                 </div>
 
                 <div class="d-flex">
@@ -39,8 +39,8 @@
                     <h6 class="bg-secondary text-white p-2 fw-bold">New Price</h6>
                 </div>
                 <div class="d-flex">
-                  <h6>Buying Price</h6>
-                  <h6 class="mx-auto">Selling Price</h6>
+                  <h6>Cost Price</h6>
+                  <h6 class="mx-auto">Retail Price</h6>
                 </div>
                 <div class="d-flex">
                   <input type="number" step="any" min="0" class="form-control"

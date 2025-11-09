@@ -31,7 +31,7 @@
                     </span>
                   </td>
                   <td>
-                    <span class="badge rounded-pill bg-success" style="cursor: pointer;" @click="unHold(item.id, item.cart)">
+                    <span class="badge rounded-pill bg-success" style="cursor: pointer;" @click="unHold(item)">
                       Unhold
                     </span>
                   </td>
@@ -120,11 +120,19 @@ const viewDetails = (total, lists) => {
 }
 
 //Unhold item
-const unHold = (id, lists) => {
-  store.dispatch('cartModule/clearCart');
-  store.dispatch('cartModule/unhold', lists);
-  removeFromHeldItems(id);
-  router.push({name: 'sales'})
+const unHold = (item) => {
+  if (item.type === 'retail'){
+    store.dispatch('cartModule/clearCart');
+    store.dispatch('cartModule/unhold', item.cart);
+    removeFromHeldItems(item.id);
+    router.push({name: 'sales'})
+  }else {
+    store.dispatch('wholesaleCartModule/clearCart');
+    store.dispatch('wholesaleCartModule/unhold', item.cart);
+    removeFromHeldItems(item.id);
+    router.push({name: 'wholesale'})
+  }
+
 }
 
 

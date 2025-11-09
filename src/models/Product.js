@@ -10,8 +10,9 @@ const Product = async () => {
             table.string('description', 100).nullable();
             table.integer('quantity').notNullable();
             table.integer('warehouseQty').notNullable().defaultTo(0);
-            table.float('buyingPrice');
+            table.float('buyingPrice').notNullable().defaultTo(0.00);
             table.float('sellingPrice').notNullable();
+            table.float('wholesalePrice').defaultTo(0.00);
             table.string('tax', 6).notNullable();
             table.date('dateAdded').defaultTo(db.fn.now());
             table.date('expiration');
@@ -19,6 +20,15 @@ const Product = async () => {
 
             table.foreign('category').references('id').inTable('categories');
         })
+    }else {
+        // Check if wholesalePrice column exists, if not add it
+        const hasColumn = await db.schema.hasColumn('products', 'wholesalePrice');
+
+        if (!hasColumn) {
+            await db.schema.alterTable('products', table => {
+                table.float('wholesalePrice').defaultTo(0.00);
+            });
+        }
     }
 }
 

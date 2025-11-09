@@ -18,7 +18,8 @@ const cashierMenu = [
     {
         label: 'Sales',
         submenu: [
-            {label: 'New Sales Receipt', click(){sendRouteEvent('sales')}},
+            {label: 'Retail', click(){sendRouteEvent('sales')}},
+            {label: 'Wholesale', click(){sendRouteEvent('wholesale')}},
             {label: 'Held Receipts', click(){sendRouteEvent('held-items')}},
             {label: 'Sales History', click(){sendRouteEvent('sales-history')}},
             {type: 'separator'},

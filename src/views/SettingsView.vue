@@ -107,6 +107,7 @@ const save = async () => {
     await db('settings').where('id', settings.id).update({...settings, id: undefined});
     store.dispatch('setSettings', {...settings, tax: undefined});
     store.dispatch('cartModule/setTax', settings.tax ? parseFloat(settings.tax) : 0);
+    store.dispatch('wholesaleCartModule/setTax', settings.tax ? parseFloat(settings.tax) : 0);
     ipcRenderer.send('successMessage', 'Settings updated.');
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);

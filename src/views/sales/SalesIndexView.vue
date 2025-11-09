@@ -3,7 +3,7 @@
  <div class="row">
 
    <h4 class="text-center mt-3 text-secondary mb-3 text-uppercase" style="letter-spacing: 14px; word-spacing: 10px">
-     <b>make a sale</b>
+     <b>Retail</b>
    </h4>
 
    <!--   CART -->

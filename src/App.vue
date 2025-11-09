@@ -21,7 +21,8 @@
                 Sales
               </a>
               <ul class="dropdown-menu" aria-labelledby="sales" style="font-size: 0.9em !important;">
-                <li><router-link :to="{name: 'sales'}" class="dropdown-item fw-bold">New Sales Receipt</router-link></li>
+                <li><router-link :to="{name: 'sales'}" class="dropdown-item fw-bold">Retail</router-link></li>
+                <li><router-link :to="{name: 'wholesale'}" class="dropdown-item fw-bold">Wholesale</router-link></li>
                 <li><router-link :to="{name: 'held-items'}" class="dropdown-item fw-bold">Held Receipts</router-link></li>
                 <li><router-link :to="{name: 'sales-history'}" class="dropdown-item fw-bold">Sales History</router-link></li>
                 <li class="dropdown-divider fw-bold"></li>
@@ -304,6 +305,7 @@ const settings = async () => { //Update company settings in vuex store
   try {
     let data = await db('settings').first();
     store.dispatch('cartModule/setTax', data.tax ? parseFloat(data.tax) : 0);
+    store.dispatch('wholesaleCartModule/setTax', data.tax ? parseFloat(data.tax) : 0);
     store.dispatch('setSettings', {...data, tax: undefined})
   }catch (e) {
     ipcRenderer.send('errorMessage', e.message);

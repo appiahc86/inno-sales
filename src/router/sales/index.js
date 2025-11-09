@@ -4,12 +4,18 @@ import HeldItemsView from "@/views/sales/HeldItemsView";
 import SalesHistoryView from "@/views/sales/SalesHistoryView";
 import ProductsListView from "@/views/sales/ProductsListView";
 import SalesReturnView from "@/views/sales/SalesReturnView";
+import WholesaleView from "@/views/sales/WholesaleView.vue";
 
 const salesRouter = [
     {
         path: '/sales',
         name: 'sales',
         component: SalesIndexView
+    },
+    {
+        path: '/sales/wholesale',
+        name: 'wholesale',
+        component: WholesaleView
     },
     {
         path: '/sales/held-items',

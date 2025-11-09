@@ -44,12 +44,17 @@
               </template>
             </Column>
             <Column field="tax" header="Tax" sortable class="data-table-font-size"></Column>
-            <Column field="buyingPrice" header="Cost" sortable class="data-table-font-size">
+            <Column field="buyingPrice" header="Cost Price" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td>{{ formatNumber(parseFloat(data.buyingPrice)) }}</td>
               </template>
             </Column>
-            <Column field="sellingPrice" header="Sel. Price" sortable class="data-table-font-size">
+            <Column field="wholesalePrice" header="Wholesale" sortable class="data-table-font-size">
+              <template #body="{data}">
+                <td>{{ formatNumber(parseFloat(data.wholesalePrice)) }}</td>
+              </template>
+            </Column>
+            <Column field="sellingPrice" header="Retail" sortable class="data-table-font-size">
               <template #body="{data}">
                 <td>{{ formatNumber(parseFloat(data.sellingPrice)) }}</td>
               </template>
@@ -83,12 +88,13 @@
                   <th>Product</th>
                   <th>Category</th>
                   <th>Exp</th>
-                  <th>Date Added</th>
-                  <th>Tax</th>
+<!--                  <th>Date Added</th>-->
+<!--                  <th>Tax</th>-->
                   <th>Qty</th>
-                  <th>Cost</th>
-                  <th>Selling Price</th>
-                  <th>Description</th>
+                  <th>Cost Price</th>
+                  <th>Wholesale</th>
+                  <th>Retail</th>
+<!--                  <th>Description</th>-->
                 </tr>
                 </thead>
 
@@ -100,12 +106,13 @@
                     <td>&nbsp; {{ record.productName }}</td>
                     <td style="text-transform: capitalize;">&nbsp; {{ record.category }}</td>
                     <td>&nbsp;{{ record.expiration ? new Date(record.expiration).toLocaleDateString() : '' }}</td>
-                    <td>&nbsp; {{ new Date(record.dateAdded).toLocaleDateString() }}</td>
-                    <td style="text-transform: capitalize;">&nbsp; {{ record.tax }}</td>
+<!--                    <td>&nbsp; {{ new Date(record.dateAdded).toLocaleDateString() }}</td>-->
+<!--                    <td style="text-transform: capitalize;">&nbsp; {{ record.tax }}</td>-->
                     <td>&nbsp; {{ record.quantity }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.buyingPrice)) }}</td>
+                    <td>&nbsp; {{ formatNumber(parseFloat(record.wholesalePrice)) }}</td>
                     <td>&nbsp; {{ formatNumber(parseFloat(record.sellingPrice)) }}</td>
-                    <td>&nbsp; {{ record.description }}</td>
+<!--                    <td>&nbsp; {{ record.description }}</td>-->
                   </tr>
                   </tbody>
 
@@ -149,6 +156,7 @@ const getAllProducts = async () => {
         .select(
             'products.productName',
             'products.buyingPrice',
+            'products.wholesalePrice',
             'products.sellingPrice',
             'products.quantity',
             'products.dateAdded',

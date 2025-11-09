@@ -1,6 +1,6 @@
 import {stat} from "fs-extra";
 
-const cartModule = {
+const wholesaleCartModule = {
 
     namespaced: true,
 
@@ -69,7 +69,7 @@ const cartModule = {
     },
 
 
-         //...........................................Mutations...............................
+    //...........................................Mutations...............................
     mutations: {
         //Add item to cart
         addToCart: (state, payload) => {
@@ -138,7 +138,7 @@ const cartModule = {
             if (!sessionStorage.heldItems) sessionStorage.heldItems = JSON.stringify([]);
             const id = new Date().getTime();
             const heldItems = JSON.parse(sessionStorage.heldItems)
-            heldItems.unshift({id, type:'retail', cart: state.cart, total: getters.total})
+            heldItems.unshift({id, type:'wholesale', cart: state.cart, total: getters.total})
             sessionStorage.heldItems = JSON.stringify(heldItems);
             state.cart = [];
         },
@@ -152,7 +152,7 @@ const cartModule = {
 
 
 
-              //...........................Actions....................................
+    //...........................Actions....................................
     actions: {
         addToCart: ({ commit }, payload) => { //Add to cart
             commit('addToCart', payload)
@@ -194,4 +194,4 @@ const cartModule = {
 }
 
 
-export default cartModule;
+export default wholesaleCartModule;

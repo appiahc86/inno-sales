@@ -44,7 +44,17 @@
                 <td >{{ data.expiration ? new Date(data.expiration).toLocaleDateString() : '' }}</td>
               </template>
             </Column>
-            <Column field="sellingPrice" header="Price" sortable class="data-table-font-size">
+            <Column field="sellingPrice" header="Wholesale Price" sortable class="data-table-font-size">
+              <template #body="{data}">
+                <td><b>{{ formatNumber(parseFloat(data.wholesalePrice))}}</b></td>
+              </template>
+            </Column>
+            <Column field="sellingPrice"
+                    header="Retail Price"
+                    sortable
+                    class="data-table-font-size"
+                    style="color: #9d02ef;"
+            >
               <template #body="{data}">
                 <td><b>{{ formatNumber(parseFloat(data.sellingPrice))}}</b></td>
               </template>
@@ -92,6 +102,7 @@ const getAllProducts = async () => {
           .leftJoin('categories', 'products.category', '=','categories.id')
           .select(
               'products.productName',
+              'products.wholesalePrice',
               'products.sellingPrice',
               'products.quantity',
               'products.description',

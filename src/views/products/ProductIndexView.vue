@@ -58,15 +58,21 @@
                         </tr>
 
                         <tr>
-                          <th class="float-end"><span class="pi pi-money-bill"></span> Buying Price &nbsp;</th>
-                          <td><input type="number" step="any" min="0" class="form-control-dark"
+                          <th class="float-end"><span class="pi pi-money-bill"></span> Cost Price &nbsp;</th>
+                          <td><input type="number" step="any" min="0" class="form-control-dark" required
                                v-model.number="productData.buyingPrice" oninput="validity.valid || (value = '')"></td>
                         </tr>
 
                         <tr>
-                          <th class="float-end"><span class="pi pi-money-bill"></span> Selling Price &nbsp;</th>
-                          <td><input type="number" step="any" min="0" class="form-control-dark"
-                               v-model.number="productData.sellingPrice"  oninput="validity.valid || (value = '')"></td>
+                          <th class="float-end"><span class="pi pi-money-bill"></span> Wholesale &nbsp;</th>
+                          <td><input type="number" step="any" min="0" class="form-control-dark" required
+                               v-model.number="productData.wholesalePrice"  oninput="validity.valid || (value = '')"></td>
+                        </tr>
+
+                        <tr style="color: #9d02ef;">
+                          <th class="float-end"><span class="pi pi-money-bill"></span> Retail &nbsp;</th>
+                          <td><input type="number" step="any" min="0" class="form-control-dark" required
+                                     v-model.number="productData.sellingPrice"  oninput="validity.valid || (value = '')"></td>
                         </tr>
 
                         <tr>
@@ -77,7 +83,7 @@
 
                         <tr>
                           <th class="float-end text-primary"><span class="pi pi-home"></span> Warehouse Qty &nbsp;</th>
-                          <td><input type="number" step="1" min="0" class="form-control-dark"
+                          <td><input type="number" step="1" class="form-control-dark" required
                                      v-model.number="productData.warehouseQty" oninput="validity.valid || (value = 0)"></td>
                         </tr>
 
@@ -173,12 +179,24 @@
                     <td >{{ data.expiration ? new Date(data.expiration).toLocaleDateString() : '' }}</td>
                   </template>
                 </Column>
-                <Column field="buyingPrice" header="Buying Price" sortable class="data-table-font-size">
+                <Column field="buyingPrice" header="Cost Price" sortable class="data-table-font-size">
                   <template #body="{data}">
                     <td>{{ formatNumber(parseFloat(data.buyingPrice)) }}</td>
                   </template>
                 </Column>
-                <Column field="sellingPrice" header="Selling Price" sortable class="data-table-font-size">
+                <Column field="wholesalePrice"
+                        header="Wholesale"
+                        sortable
+                        class="data-table-font-size">
+                  <template #body="{data}">
+                    <td><b>{{ formatNumber(parseFloat(data.wholesalePrice)) }}</b></td>
+                  </template>
+                </Column>
+                <Column field="sellingPrice"
+                        header="Retail"
+                        sortable
+                        class="data-table-font-size"
+                        style="color: #9d02ef;">
                   <template #body="{data}">
                     <td><b>{{ formatNumber(parseFloat(data.sellingPrice)) }}</b></td>
                   </template>
@@ -226,24 +244,32 @@
 
                     <tr>
                       <th class="float-end"><span class="pi pi-tag"></span> Product Name &nbsp;</th>
-                      <td><input type="text" class="form-control-dark" v-model.trim="editProductData.productName"></td>
+                      <td><input type="text" class="form-control-dark" required
+                                 v-model.trim="editProductData.productName"></td>
                     </tr>
 
+
                     <tr>
-                      <th class="float-end"><span class="pi pi-money-bill"></span> Buying Price &nbsp;</th>
-                      <td><input type="number" step="any" min="0" class="form-control-dark"
+                      <th class="float-end"><span class="pi pi-money-bill"></span> Cost Price &nbsp;</th>
+                      <td><input type="number" step="any" min="0" class="form-control-dark" required
                                  v-model.number="editProductData.buyingPrice"  oninput="validity.valid || (value = '')"></td>
                     </tr>
 
                     <tr>
-                      <th class="float-end"><span class="pi pi-money-bill"></span> Selling Price &nbsp;</th>
-                      <td><input type="number" step="any" min="0" class="form-control-dark"
+                      <th class="float-end"><span class="pi pi-money-bill"></span> Wholesale &nbsp;</th>
+                      <td><input type="number" step="any" min="0" class="form-control-dark" required
+                                 v-model.number="editProductData.wholesalePrice"  oninput="validity.valid || (value = '')"></td>
+                    </tr>
+
+                    <tr style="color: #9d02ef;">
+                      <th class="float-end"><span class="pi pi-money-bill"></span> Retail &nbsp;</th>
+                      <td><input type="number" step="any" min="0" class="form-control-dark" required
                                  v-model.number="editProductData.sellingPrice"  oninput="validity.valid || (value = '')"></td>
                     </tr>
 
                     <tr>
                       <th class="float-end"><span class="pi pi-sort-numeric-up"></span> Quantity &nbsp;</th>
-                      <td><input type="number" step="1" min="0" class="form-control-dark"
+                      <td><input type="number" step="1" class="form-control-dark"
                                  v-model.number="editProductData.quantity" oninput="validity.valid || (value = 0)"></td>
                     </tr>
 
@@ -319,11 +345,15 @@
                       <td>{{ productDetails.expiration ? new Date(productDetails.expiration).toLocaleDateString() : '' }}</td>
                     </tr>
                     <tr>
-                      <th>Buying Price</th>
+                      <th>Cost Price</th>
                       <td>{{ formatNumber(parseFloat(productDetails.buyingPrice)) }}</td>
                     </tr>
                     <tr>
-                      <th>Selling Price</th>
+                      <th>Wholesale</th>
+                      <td>{{ formatNumber(parseFloat(productDetails.wholesalePrice)) }}</td>
+                    </tr>
+                    <tr>
+                      <th>Retail</th>
                       <td>{{ formatNumber(parseFloat(productDetails.sellingPrice)) }}</td>
                     </tr>
                     <tr>
@@ -413,6 +443,7 @@ const secondActive = ref(false);
       description: '',
       buyingPrice: '',
       sellingPrice: '',
+      wholesalePrice: 0,
       category: null,
       tax: 'tax',
       expiration: null
@@ -425,6 +456,7 @@ const secondActive = ref(false);
       description: '',
       expiration: null,
       buyingPrice: '',
+      wholesalePrice: '',
       sellingPrice: '',
       category: '',
       warehouseQty: '',
@@ -472,6 +504,7 @@ getCategories();
               .select('products.id',
                   'products.productName',
                   'products.buyingPrice',
+                  'products.wholesalePrice',
                   'products.sellingPrice',
                   'products.quantity',
                   'products.warehouseQty',
@@ -503,6 +536,7 @@ getCategories();
            .select(
                'products.productName',
                'products.buyingPrice',
+               'products.wholesalePrice',
                'products.sellingPrice',
                'products.quantity',
                'products.warehouseQty',
@@ -523,20 +557,22 @@ getCategories();
     }
 
 
-    //Reset Product from data
+    //Reset Product form data
     const resetProductData = () => {
       productData.productName = ''; productData.quantity = 0; productData.description = '';
       productData.buyingPrice = ''; productData.sellingPrice = ''; productData.category = null;
       productData.tax = 'tax'; productData.expiration = null; productData.warehouseQty = 0;
+      productData.wholesalePrice = 0;
     }
-//Reset Product from data
+//Reset Edit Product form data
 const resetEditProductData = () => {
   editProductData.productName = ""; editProductData.id = ""; editProductData.description = "";
   editProductData.expiration = null; editProductData.category = "";
   editProductData.tax = 'tax'; editProductData.categoryName = "";
   editProductData.buyingPrice = ""; editProductData.sellingPrice = "";
   editProductData.quantity = ""; editProductData.warehouseQty = "";
-}
+  editProductData.wholesalePrice = 0;
+    }
 
       // Add product
     const addProduct = async (e) => {
@@ -548,6 +584,7 @@ const resetEditProductData = () => {
           category: 'required',
           productName: 'required|string|min:2|max:100',
           buyingPrice: 'required|numeric',
+          wholesalePrice: 'required|numeric',
           sellingPrice: 'required|numeric',
           quantity: 'required|integer|min:0',
           warehouseQty: 'required|integer|min:0',
@@ -594,6 +631,7 @@ const resetEditProductData = () => {
           category: 'required',
           productName: 'required|string|min:2|max:100',
           buyingPrice: 'required|numeric',
+          wholesalePrice: 'required|numeric',
           sellingPrice: 'required|numeric',
           quantity: 'required|numeric',
           warehouseQty: 'required|numeric',
@@ -627,6 +665,7 @@ const resetEditProductData = () => {
               product.quantity = editProductData.quantity;
               product.warehouseQty = editProductData.warehouseQty;
               product.sellingPrice = parseFloat(editProductData.sellingPrice);
+              product.wholesalePrice = parseFloat(editProductData.wholesalePrice);
             }
           })
 
@@ -697,6 +736,7 @@ const resetEditProductData = () => {
                 'products.id',
                 'products.productName',
                 'products.buyingPrice',
+                'products.wholesalePrice',
                 'products.sellingPrice',
                 'products.quantity',
                 'products.warehouseQty',
@@ -721,6 +761,7 @@ const resetEditProductData = () => {
 
         editProductData.productName = query.productName;
         editProductData.buyingPrice = query.buyingPrice;
+        editProductData.wholesalePrice = query.wholesalePrice;
         editProductData.sellingPrice = query.sellingPrice;
         editProductData.quantity = query.quantity;
         editProductData.warehouseQty = query.warehouseQty;

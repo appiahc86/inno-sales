@@ -4,18 +4,7 @@ import {formatNumber} from "@/functions";
 import {computed} from "vue";
 import {useStore} from "vuex";
 
-const store = useStore();
-const companySettings = computed(() => store.getters.setting); //get company settings
-const cart = computed(() => store.getters["cartModule/cart"]); //Cart array
-const subTotal = computed(() => store.getters["cartModule/subTotal"]); //get cart subTotal
-const totalTax = computed(() => store.getters["cartModule/totalTax"]); //get total Tax
-const total = computed(() => store.getters["cartModule/total"]); //get cart total
-const totalDiscount = computed(() => store.getters["cartModule/totalDiscount"]); //get total discount
-
-
-
-
-defineProps({
+const props = defineProps({
 
   tendered: {
     type: Number,
@@ -28,8 +17,30 @@ defineProps({
   barcode: {
     type: Number,
     required: true,
+  },
+  wholesale: {
+    type: Boolean,
+    required: false,
+    default: false,
   }
 });
+
+
+const store = useStore();
+const companySettings = computed(() => store.getters.setting); //get company settings
+let cart = computed(() => store.getters["cartModule/cart"]); //Cart array
+let subTotal = computed(() => store.getters["cartModule/subTotal"]); //get cart subTotal
+let totalTax = computed(() => store.getters["cartModule/totalTax"]); //get total Tax
+let total = computed(() => store.getters["cartModule/total"]); //get cart total
+let totalDiscount = computed(() => store.getters["cartModule/totalDiscount"]); //get total discount
+
+if (props.wholesale){
+  cart = computed(() => store.getters["wholesaleCartModule/cart"]); //Cart array
+  subTotal = computed(() => store.getters["wholesaleCartModule/subTotal"]); //get cart subTotal
+  totalTax = computed(() => store.getters["wholesaleCartModule/totalTax"]); //get total Tax
+  total = computed(() => store.getters["wholesaleCartModule/total"]); //get cart total
+  totalDiscount = computed(() => store.getters["wholesaleCartModule/totalDiscount"]); //get total discount
+}
 
 
 </script>
@@ -39,6 +50,7 @@ defineProps({
     <div id="receipt-roll">
       <div>
         <div class="mt-0" style="font-size: 11px;">
+          <b style="text-align: center;" v-if="wholesale === true">Wholesale <br></b>
           <span>{{ new Date().toLocaleString() }}</span>
           <b style="float: right;">Receipt #{{ barcode }}</b>
         </div>

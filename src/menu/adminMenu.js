@@ -112,6 +112,7 @@ const adminMenu = [
                     {label: 'Products List', click(){sendRouteEvent('report-products-list')}},
                     {label: 'Low Stock', click(){sendRouteEvent('report-products-low-stock')}},
                     {type: 'separator'},
+                    {label: 'Best Selling Products', click(){sendRouteEvent('report-best-selling-products')}},
                     {label: 'Quantity Adjustment History', click(){sendRouteEvent('report-quantity-adjustment')}},
                     {label: 'Price Adjustment History', click(){sendRouteEvent('report-price-adjustment')}},
                     {type: 'separator'},

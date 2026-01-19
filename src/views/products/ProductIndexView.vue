@@ -19,112 +19,97 @@
 
 
             <!-- Add Product -->
-            <div v-if="firstActive" style="margin-top: 10vh">
-              <div class="container">
-                <div class="row justify-content-center">
-                  <div class="col-md-10">
+            <div v-if="firstActive" class="add-product-container">
+              <form @submit.prevent="addProduct" class="product-form">
+                <h5 class="form-title"><span class="pi pi-box"></span> Add New Product</h5>
 
-                    <form @submit.prevent="addProduct">
-                      <table class="w-100 myTable">
-                        <tr>
-                          <th></th>
-                          <td>
-                            <h4>Add A New Product</h4>
-                          </td>
-                        </tr>
-                        <tr>
-                          <th class="float-end"><span class="pi pi-cog"></span> Category &nbsp;</th>
-                          <td>
-                            <div class="input-group">
+                <div class="form-grid">
+                  <!-- Category -->
+                  <div class="field">
+                    <label><span class="pi pi-cog"></span> Category</label>
+                    <div class="input-group">
+                      <v-select :options="categories" label="name"
+                                v-model="productData.category" class="form-control-dark select">
+                      </v-select>
+                      <div class="input-group-text text-success">
+                        <span class="pi pi-plus-circle" title="Add New Category"
+                              style="cursor: pointer; font-size: 1.3em;"
+                              @click="openCategoryDialog"></span>
+                      </div>
+                    </div>
+                  </div>
 
-                              <v-select :options="categories" label="name"
-                                        v-model="productData.category" class="form-control-dark select">
-                              </v-select>
+                  <!-- Product Name -->
+                  <div class="field span-2">
+                    <label><span class="pi pi-tag"></span> Product Name</label>
+                    <input type="text" class="form-control-dark" v-model.trim="productData.productName">
+                  </div>
 
+                  <!-- Cost Price -->
+                  <div class="field">
+                    <label><span class="pi pi-money-bill"></span> Cost Price</label>
+                    <input type="number" step="any" min="0" class="form-control-dark" required
+                           v-model.number="productData.buyingPrice" oninput="validity.valid || (value = '')">
+                  </div>
 
-                              <div class="input-group-text text-success">
-                          <span class="pi pi-plus-circle" title="Add New Category"
-                                style="cursor: pointer; font-size: 1.3em;"
-                                @click="openCategoryDialog"></span>
-                              </div>
-                            </div>
+                  <!-- Wholesale -->
+                  <div class="field">
+                    <label><span class="pi pi-money-bill"></span> Wholesale</label>
+                    <input type="number" step="any" min="0" class="form-control-dark" required
+                           v-model.number="productData.wholesalePrice" oninput="validity.valid || (value = '')">
+                  </div>
 
-                          </td>
-                        </tr>
+                  <!-- Retail -->
+                  <div class="field retail-field">
+                    <label><span class="pi pi-money-bill"></span> Retail</label>
+                    <input type="number" step="any" min="0" class="form-control-dark" required
+                           v-model.number="productData.sellingPrice" oninput="validity.valid || (value = '')">
+                  </div>
 
-                        <tr>
-                          <th class="float-end"><span class="pi pi-tag"></span> Product Name &nbsp;</th>
-                          <td><input type="text" class="form-control-dark" v-model.trim="productData.productName"></td>
-                        </tr>
+                  <!-- Quantity -->
+                  <div class="field">
+                    <label><span class="pi pi-sort-numeric-up"></span> Quantity</label>
+                    <input type="number" step="1" min="0" class="form-control-dark"
+                           v-model.number="productData.quantity" oninput="validity.valid || (value = 0)">
+                  </div>
 
-                        <tr>
-                          <th class="float-end"><span class="pi pi-money-bill"></span> Cost Price &nbsp;</th>
-                          <td><input type="number" step="any" min="0" class="form-control-dark" required
-                               v-model.number="productData.buyingPrice" oninput="validity.valid || (value = '')"></td>
-                        </tr>
+                  <!-- Warehouse Qty -->
+                  <div class="field">
+                    <label class="text-primary"><span class="pi pi-home"></span> Warehouse Qty</label>
+                    <input type="number" step="1" class="form-control-dark" required
+                           v-model.number="productData.warehouseQty" oninput="validity.valid || (value = 0)">
+                  </div>
 
-                        <tr>
-                          <th class="float-end"><span class="pi pi-money-bill"></span> Wholesale &nbsp;</th>
-                          <td><input type="number" step="any" min="0" class="form-control-dark" required
-                               v-model.number="productData.wholesalePrice"  oninput="validity.valid || (value = '')"></td>
-                        </tr>
+                  <!-- Expiration -->
+                  <div class="field">
+                    <label><span class="pi pi-clock"></span> Expiration</label>
+                    <input type="date" class="form-control-dark"
+                           v-model="productData.expiration" onkeydown="return false">
+                  </div>
 
-                        <tr style="color: #9d02ef;">
-                          <th class="float-end"><span class="pi pi-money-bill"></span> Retail &nbsp;</th>
-                          <td><input type="number" step="any" min="0" class="form-control-dark" required
-                                     v-model.number="productData.sellingPrice"  oninput="validity.valid || (value = '')"></td>
-                        </tr>
+                  <!-- Tax -->
+                  <div class="field">
+                    <label><span class="pi pi-money-bill"></span> Tax</label>
+                    <select class="form-control-dark select" v-model="productData.tax">
+                      <option value="tax">Tax</option>
+                      <option value="non">Non</option>
+                    </select>
+                  </div>
 
-                        <tr>
-                          <th class="float-end"><span class="pi pi-sort-numeric-up"></span> Quantity &nbsp;</th>
-                          <td><input type="number" step="1" min="0" class="form-control-dark"
-                                     v-model.number="productData.quantity" oninput="validity.valid || (value = 0)"></td>
-                        </tr>
+                  <!-- Description -->
+                  <div class="field span-2">
+                    <label><span class="pi pi-list"></span> Description</label>
+                    <textarea class="form-control-dark" rows="2" v-model.trim="productData.description"></textarea>
+                  </div>
 
-                        <tr>
-                          <th class="float-end text-primary"><span class="pi pi-home"></span> Warehouse Qty &nbsp;</th>
-                          <td><input type="number" step="1" class="form-control-dark" required
-                                     v-model.number="productData.warehouseQty" oninput="validity.valid || (value = 0)"></td>
-                        </tr>
-
-                        <tr>
-                          <th class="float-end"><span class="pi pi-clock"></span> Expiration Date &nbsp;</th>
-                          <td>
-                            <input type="date" class="form-control-dark"
-                                  v-model="productData.expiration" onkeydown="return false">
-                          </td>
-                        </tr>
-
-                        <tr>
-                          <th class="float-end"><span class="pi pi-money-bill"></span> Tax &nbsp;</th>
-                          <td>
-                            <select class="form-control-dark select" v-model="productData.tax">
-                              <option value="tax">Tax</option>
-                              <option value="non">Non</option>
-                            </select>
-                          </td>
-                        </tr>
-
-                        <tr>
-                          <th class="float-end"><span class="pi pi-list"></span> Description &nbsp;</th>
-                          <td><textarea class="form-control-dark" cols="10" rows="3" v-model.trim="productData.description"></textarea></td>
-                        </tr>
-
-                        <tr>
-                          <th class="float-end"></th>
-                          <td>
-                            <button class=" mt-1 btn-secondary" type="submit" style="width: 26em;" name="addProductBtn">
-                              <span class="pi pi-save"></span>
-                              <b style="font-size: 1.5em;"> Save</b>
-                            </button>
-                          </td>
-                        </tr>
-                      </table>
-
-                    </form>
+                  <!-- Save Button -->
+                  <div class="field span-3 text-end">
+                    <button class="btn-secondary save-btn" type="submit" name="addProductBtn">
+                      <span class="pi pi-save"></span> Save Product
+                    </button>
                   </div>
                 </div>
-              </div>
+              </form>
             </div>
 
 
@@ -220,102 +205,99 @@
 
 
         <!--  Edit Dialog-->
-        <dialog ref="editProductDialog" style="border: 2px solid #ccc;" name="dialog">
-          <h4>Edit product</h4>
-          <div class="container-fluid">
-            <div class="p-5" v-if="detailsLoading">
-              <h5 class="text-center">Loading... <span class="spinner-border spinner-border-sm"></span></h5>
-            </div>
-            <div class="row justify-content-center" v-else>
-              <div class="col-md-12">
-                <form @submit.prevent="editProduct">
-                  <table class="w-100 myTable">
+        <dialog ref="editProductDialog" class="edit-dialog" name="dialog">
+          <div class="p-5" v-if="detailsLoading">
+            <h5 class="text-center">Loading... <span class="spinner-border spinner-border-sm"></span></h5>
+          </div>
+          <div v-else>
+            <form @submit.prevent="editProduct" class="product-form">
+              <h5 class="form-title"><span class="pi pi-pencil"></span> Edit Product</h5>
 
-                    <tr>
-                      <th class="float-end"><span class="pi pi-cog"></span> Category &nbsp;</th>
-                      <td>
-                        <select class="form-control-dark select text-capitalize" v-model="editProductData.category">
-                          <option v-for="category in categories" :key="category.id" :value="category.id">
-                            {{ category.name }}
-                          </option>
-                        </select>
-                      </td>
-                    </tr>
+              <div class="form-grid">
+                <!-- Category -->
+                <div class="field">
+                  <label><span class="pi pi-cog"></span> Category</label>
+                  <select class="form-control-dark select text-capitalize" v-model="editProductData.category">
+                    <option v-for="category in categories" :key="category.id" :value="category.id">
+                      {{ category.name }}
+                    </option>
+                  </select>
+                </div>
 
-                    <tr>
-                      <th class="float-end"><span class="pi pi-tag"></span> Product Name &nbsp;</th>
-                      <td><input type="text" class="form-control-dark" required
-                                 v-model.trim="editProductData.productName"></td>
-                    </tr>
+                <!-- Product Name -->
+                <div class="field span-2">
+                  <label><span class="pi pi-tag"></span> Product Name</label>
+                  <input type="text" class="form-control-dark" required v-model.trim="editProductData.productName">
+                </div>
 
+                <!-- Cost Price -->
+                <div class="field">
+                  <label><span class="pi pi-money-bill"></span> Cost Price</label>
+                  <input type="number" step="any" min="0" class="form-control-dark" required
+                         v-model.number="editProductData.buyingPrice" oninput="validity.valid || (value = '')">
+                </div>
 
-                    <tr>
-                      <th class="float-end"><span class="pi pi-money-bill"></span> Cost Price &nbsp;</th>
-                      <td><input type="number" step="any" min="0" class="form-control-dark" required
-                                 v-model.number="editProductData.buyingPrice"  oninput="validity.valid || (value = '')"></td>
-                    </tr>
+                <!-- Wholesale -->
+                <div class="field">
+                  <label><span class="pi pi-money-bill"></span> Wholesale</label>
+                  <input type="number" step="any" min="0" class="form-control-dark" required
+                         v-model.number="editProductData.wholesalePrice" oninput="validity.valid || (value = '')">
+                </div>
 
-                    <tr>
-                      <th class="float-end"><span class="pi pi-money-bill"></span> Wholesale &nbsp;</th>
-                      <td><input type="number" step="any" min="0" class="form-control-dark" required
-                                 v-model.number="editProductData.wholesalePrice"  oninput="validity.valid || (value = '')"></td>
-                    </tr>
+                <!-- Retail -->
+                <div class="field retail-field">
+                  <label><span class="pi pi-money-bill"></span> Retail</label>
+                  <input type="number" step="any" min="0" class="form-control-dark" required
+                         v-model.number="editProductData.sellingPrice" oninput="validity.valid || (value = '')">
+                </div>
 
-                    <tr style="color: #9d02ef;">
-                      <th class="float-end"><span class="pi pi-money-bill"></span> Retail &nbsp;</th>
-                      <td><input type="number" step="any" min="0" class="form-control-dark" required
-                                 v-model.number="editProductData.sellingPrice"  oninput="validity.valid || (value = '')"></td>
-                    </tr>
+                <!-- Quantity -->
+                <div class="field">
+                  <label><span class="pi pi-sort-numeric-up"></span> Quantity</label>
+                  <input type="number" step="1" class="form-control-dark"
+                         v-model.number="editProductData.quantity" oninput="validity.valid || (value = 0)">
+                </div>
 
-                    <tr>
-                      <th class="float-end"><span class="pi pi-sort-numeric-up"></span> Quantity &nbsp;</th>
-                      <td><input type="number" step="1" class="form-control-dark"
-                                 v-model.number="editProductData.quantity" oninput="validity.valid || (value = 0)"></td>
-                    </tr>
+                <!-- Warehouse Qty -->
+                <div class="field">
+                  <label class="text-primary"><span class="pi pi-home"></span> Warehouse Qty</label>
+                  <input type="number" step="1" min="0" class="form-control-dark"
+                         v-model.number="editProductData.warehouseQty" oninput="validity.valid || (value = 0)">
+                </div>
 
-                    <tr>
-                      <th class="float-end text-primary"><span class="pi pi-sort-numeric-up"></span> Warehouse Qty &nbsp;</th>
-                      <td><input type="number" step="1" min="0" class="form-control-dark"
-                                 v-model.number="editProductData.warehouseQty" oninput="validity.valid || (value = 0)"></td>
-                    </tr>
+                <!-- Expiration -->
+                <div class="field">
+                  <label><span class="pi pi-clock"></span> Expiration</label>
+                  <input type="date" class="form-control-dark"
+                         v-model="editProductData.expiration" onkeydown="return false">
+                </div>
 
-                    <tr>
-                      <th class="float-end"><span class="pi pi-money-bill"></span> Tax &nbsp;</th>
-                      <td>
-                        <select class="form-control-dark select" v-model="editProductData.tax">
-                          <option value="tax">Tax</option>
-                          <option value="non">Non</option>
-                        </select>
-                      </td>
-                    </tr>
+                <!-- Tax -->
+                <div class="field">
+                  <label><span class="pi pi-money-bill"></span> Tax</label>
+                  <select class="form-control-dark select" v-model="editProductData.tax">
+                    <option value="tax">Tax</option>
+                    <option value="non">Non</option>
+                  </select>
+                </div>
 
-                    <tr>
-                      <th class="float-end"><span class="pi pi-clock"></span> Expiration Date &nbsp;</th>
-                      <td>
-                        <input type="date" class="form-control-dark"
-                               v-model="editProductData.expiration" onkeydown="return false">
-                      </td>
-                    </tr>
+                <!-- Description -->
+                <div class="field span-2">
+                  <label><span class="pi pi-list"></span> Description</label>
+                  <textarea class="form-control-dark" rows="2" v-model.trim="editProductData.description"></textarea>
+                </div>
 
-                    <tr>
-                      <th class="float-end"><span class="pi pi-list"></span> Description &nbsp;</th>
-                      <td><textarea class="form-control-dark" cols="10" rows="3"
-                                    v-model.trim="editProductData.description"></textarea></td>
-                    </tr>
-
-                    <tr>
-                      <td></td>
-                      <td colspan="2">
-                        <button name="addProductBtn" class="btn-secondary p-1 fw-bold" type="submit" style="width: 49%;">Save</button>
-                        <span style="width: 1%">&nbsp;</span>
-                        <button name="addProductBtn" class="p-1 fw-bold" type="button" @click="editProductDialog.close()" style="width: 49%;">Cancel</button>
-                      </td>
-                    </tr>
-
-                  </table>
-                </form>
+                <!-- Buttons -->
+                <div class="field span-3 dialog-buttons">
+                  <button class="btn-secondary" type="submit" name="addProductBtn">
+                    <span class="pi pi-save"></span> Save
+                  </button>
+                  <button type="button" @click="editProductDialog.close()">
+                    <span class="pi pi-times"></span> Cancel
+                  </button>
+                </div>
               </div>
-            </div>
+            </form>
           </div>
         </dialog>
 
@@ -395,7 +377,7 @@
           <div class="clearfix"></div>
 
           <form @submit.prevent="addCategory" class="my-3">
-            <label><b>Category Name</b> <input type="text" class="form-control-dark p-1" v-model.trim="categoryName" id="catInput"></label>
+            <label><b>Category Name</b> <input type="text" maxlength="100" class="form-control-dark p-1" v-model.trim="categoryName" id="catInput"></label>
             &nbsp;
             <button type="submit" name="submitBtn"><span class="pi pi-save px-2 py-1"></span><b>Save</b></button>
           </form>
@@ -823,6 +805,106 @@ const openCategoryDialog = (e) => {
 .myTable input, .myTable textarea, .myTable .select{
   width: 26em;
   padding: 5px;
+}
+
+/* Add Product Layout */
+.add-product-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.form-title {
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.field label {
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.field .form-control-dark,
+.field .select,
+.field textarea {
+  width: 100%;
+  padding: 8px;
+}
+
+.field .input-group {
+  display: flex;
+  width: 100%;
+}
+
+.field .input-group .select {
+  flex: 1;
+}
+
+.span-2 {
+  grid-column: span 2;
+}
+
+.span-3 {
+  grid-column: span 3;
+}
+
+.retail-field label,
+.retail-field input {
+  color: #9d02ef;
+}
+
+.save-btn {
+  padding: 10px 28px;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .span-2, .span-3 {
+    grid-column: span 1;
+  }
+}
+
+/* Edit Dialog */
+.edit-dialog {
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 1.5rem;
+  min-width: 650px;
+}
+
+.edit-dialog .form-grid {
+  gap: 0.85rem;
+}
+
+.dialog-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.dialog-buttons button {
+  padding: 8px 20px;
+  font-weight: 500;
 }
 
 </style>

@@ -63,6 +63,15 @@ const wholesaleCartModule = {
             return (getters.subTotal + getters.totalTax) - getters.totalDiscount
         },
 
+        //Get Items count
+        getItemsCount: (state) => {//Get profit
+            let count = 0;
+            for (const item of state.cart) {
+                count += item.qty;
+            }
+            return count;
+        },
+
         cashTendered: state => state.cashTendered, //Get cash tendered
 
         barcode : state => state.barcode,

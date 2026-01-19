@@ -27,11 +27,13 @@
                 </div>
                 <div class="d-flex">
                   <h6>Cost Price</h6>
+                  <h6 class="mx-auto">Wholesale Price</h6>
                   <h6 class="mx-auto">Retail Price</h6>
                 </div>
 
                 <div class="d-flex">
                   <input type="text"  v-model="data.oldBuyingPrice" class="form-control" disabled>&nbsp;
+                  <input type="text"  v-model="data.oldWholesalePrice" class="form-control" disabled>&nbsp;
                   <input type="text"  v-model="data.oldSellingPrice" class="form-control" disabled>
                 </div>
 
@@ -40,11 +42,14 @@
                 </div>
                 <div class="d-flex">
                   <h6>Cost Price</h6>
+                  <h6 class="mx-auto">Wholesale Price</h6>
                   <h6 class="mx-auto">Retail Price</h6>
                 </div>
                 <div class="d-flex">
                   <input type="number" step="any" min="0" class="form-control"
                          v-model.number="data.newBuyingPrice" oninput="validity.valid || (value = 0)">&nbsp;
+                  <input type="number" step="any" class="form-control" min="0"
+                         v-model.number="data.newWholesalePrice" oninput="validity.valid || (value = 0)">
                   <input type="number" step="any" class="form-control" min="0"
                          v-model.number="data.newSellingPrice" oninput="validity.valid || (value = 0)">
                 </div>
@@ -52,7 +57,7 @@
                 <textarea cols="30" rows="4" class="form-control mt-2" placeholder="Reason"
                           v-model.trim="data.reason" maxlength="254"></textarea>
 
-                <div class="text-center mt-2" v-if="data.newBuyingPrice && data.newSellingPrice && data.reason">
+                <div class="text-center mt-2" v-if="data.newBuyingPrice && data.newSellingPrice && data.newWholesalePrice">
                   <button class="p-button p-button-rounded p-button-vertical" name="submitBtn">
                     <span class="pi pi-save"></span>
                     Save
@@ -96,6 +101,7 @@ const data = reactive({
   oldBuyingPrice: null,
   oldSellingPrice: null,
   newBuyingPrice: null,
+  newWholesalePrice: null,
   newSellingPrice: null,
   productName: null,
   reason: null
@@ -110,6 +116,7 @@ const getAllProducts = async () => {
         .select('products.id',
             'products.productName',
             'products.sellingPrice',
+            'products.wholesalePrice',
             'products.buyingPrice',
         );
 
@@ -127,8 +134,12 @@ watch(selectedProduct, (value, oldValue) => {
     resetData();
     data.id = value.id;
     data.oldBuyingPrice = parseFloat(value.buyingPrice);
+    data.oldWholesalePrice = parseFloat(value.wholesalePrice);
     data.oldSellingPrice = parseFloat(value.sellingPrice);
+
     data.newBuyingPrice = parseFloat(value.buyingPrice);
+    data.newWholesalePrice = parseFloat(value.wholesalePrice);
+    data.newSellingPrice = parseFloat(value.sellingPrice);
     data.productName = value.productName;
   }
 })
@@ -138,8 +149,11 @@ watch(selectedProduct, (value, oldValue) => {
 const resetData = () => {
       data.id = null;
       data.oldBuyingPrice = null;
+      data.oldWholesalePrice = null;
       data.oldSellingPrice = null;
+
       data.newBuyingPrice = null;
+      data.newWholesalePrice = null;
       data.newSellingPrice = null;
       data.productName = null;
       data.reason = null;
@@ -171,6 +185,7 @@ const updatePrice = async (e) => {
       //Modify Price in products table
       await trx('products').where('id', data.id).update({
         buyingPrice: data.newBuyingPrice,
+        wholesalePrice: data.newWholesalePrice,
         sellingPrice: data.newSellingPrice
       })
 
@@ -183,6 +198,7 @@ const updatePrice = async (e) => {
     for (const product of products.value) {
       if (product.id.toString() === data.id.toString()){
         product.buyingPrice = data.newBuyingPrice;
+        product.wholesalePrice = data.newWholesalePrice;
         product.sellingPrice = data.newSellingPrice;
         break;
       }

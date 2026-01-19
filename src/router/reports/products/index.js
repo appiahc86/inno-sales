@@ -5,6 +5,7 @@ import ExpiringProductsView from "@/views/reports/products/ExpiringProductsView"
 import ExpiredProductsView from "@/views/reports/products/ExpiredProductsView";
 import QuantityAdjustmentView from "@/views/reports/products/QuantityAdjustmentView";
 import PriceAdjustmentView from "@/views/reports/products/PriceAdjustmentView";
+import BestSellingProducts from "@/views/reports/products/BestSellingProducts.vue";
 
 const productsReportRouter = [
     {
@@ -37,6 +38,12 @@ const productsReportRouter = [
         path: '/report/products/price-adjustment',
         name: 'report-price-adjustment',
         component: PriceAdjustmentView
+    },
+
+    {
+        path: '/report/products/best-selling-products',
+        name: 'report-best-selling-products',
+        component: BestSellingProducts
     },
 ]
 

@@ -151,7 +151,10 @@
             <b>Cost Price</b>
           </div>
           <div class="col">
-            <b>Selling Price</b>
+            <b>Wholesale Price</b>
+          </div>
+          <div class="col">
+            <b>Retail Price</b>
           </div>
         </div>
 
@@ -161,6 +164,9 @@
           </div>
           <div class="col">
             <input type="number" class="form-control-dark" min="0" step="any" v-model="editData.buyingPrice">
+          </div>
+          <div class="col">
+            <input type="number" class="form-control-dark" min="0" step="any" v-model="editData.wholesalePrice">
           </div>
           <div class="col">
             <input type="number" class="form-control-dark" min="0" step="any" v-model="editData.sellingPrice">
@@ -263,6 +269,7 @@ const editData = reactive({
   id: '',
   qty: 0,
   buyingPrice: 0,
+  wholesalePrice: 0,
   sellingPrice: 0,
 })
 
@@ -290,6 +297,7 @@ const getAllProducts = async () => {
         .select('products.id',
             'products.productName',
             'products.buyingPrice',
+            'products.wholesalePrice',
             'products.sellingPrice',
         );
     products.value.map(p => {
@@ -352,6 +360,7 @@ const openDialog = (item) => {
   editData.id = item.id;
   editData.qty = item.qty;
   editData.buyingPrice = item.buyingPrice;
+  editData.wholesalePrice = item.wholesalePrice;
   editData.sellingPrice = item.sellingPrice;
   dialog.value.showModal();
 }
@@ -421,6 +430,7 @@ const savePurchase = async (e) => {
             .first()
             .update({
               buyingPrice: parseFloat(item.buyingPrice),
+              wholesalePrice: parseFloat(item.wholesalePrice),
               sellingPrice: item.sellingPrice
             }).increment({quantity: parseInt(item.qty)})
       }

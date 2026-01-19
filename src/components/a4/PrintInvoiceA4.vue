@@ -45,6 +45,8 @@ let subTotal = computed(() => store.getters["cartModule/subTotal"]); //get cart 
 let totalTax = computed(() => store.getters["cartModule/totalTax"]); //get total Tax
 let total = computed(() => store.getters["cartModule/total"]); //get cart total
 let totalDiscount = computed(() => store.getters["cartModule/totalDiscount"]); //get total discount
+let itemsCount = computed(() => store.getters["cartModule/getItemsCount"]); //get items count
+
 
 if (props.wholesale){
   cart = computed(() => store.getters["wholesaleCartModule/cart"]); //Cart array
@@ -52,6 +54,7 @@ if (props.wholesale){
   totalTax = computed(() => store.getters["wholesaleCartModule/totalTax"]); //get total Tax
   total = computed(() => store.getters["wholesaleCartModule/total"]); //get cart total
   totalDiscount = computed(() => store.getters["wholesaleCartModule/totalDiscount"]); //get total discount
+  itemsCount = computed(() => store.getters["wholesaleCartModule/getItemsCount"]); //get items count
 }
 
 </script>
@@ -103,6 +106,8 @@ if (props.wholesale){
 
       </tbody>
     </table>
+
+    <p style="margin: 5px 0;">Items Count: {{ itemsCount.toLocaleString() }}</p>
 
     <!-- Summary -->
     <div style="text-align: right; margin-bottom: 20px;">

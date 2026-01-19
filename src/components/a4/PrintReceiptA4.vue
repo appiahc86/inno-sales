@@ -34,6 +34,7 @@ let subTotal = computed(() => store.getters["cartModule/subTotal"]); //get cart 
 let totalTax = computed(() => store.getters["cartModule/totalTax"]); //get total Tax
 let total = computed(() => store.getters["cartModule/total"]); //get cart total
 let totalDiscount = computed(() => store.getters["cartModule/totalDiscount"]); //get total discount
+let itemsCount = computed(() => store.getters["cartModule/getItemsCount"]); //get items count
 
 
 if (props.wholesale){
@@ -42,6 +43,8 @@ if (props.wholesale){
   totalTax = computed(() => store.getters["wholesaleCartModule/totalTax"]); //get total Tax
   total = computed(() => store.getters["wholesaleCartModule/total"]); //get cart total
   totalDiscount = computed(() => store.getters["wholesaleCartModule/totalDiscount"]); //get total discount
+  itemsCount = computed(() => store.getters["wholesaleCartModule/getItemsCount"]); //get items count
+
 }
 
 
@@ -57,6 +60,7 @@ if (props.wholesale){
         <b style="float: right;">Receipt #{{ barcode }}</b>
       </div>
       <div  style="font-size: 12px;">Store: {{ companySettings.storeName }}</div>
+      <div  style="font-size: 12px;">Items Count: {{ itemsCount.toLocaleString() }}</div>
 
       <div style="text-align: center;">
         <div style="font-size: 13px"><b>{{ companySettings.companyName }}</b></div>

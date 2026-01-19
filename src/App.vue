@@ -27,7 +27,7 @@
                 <li><router-link :to="{name: 'sales-history'}" class="dropdown-item fw-bold">Sales History</router-link></li>
                 <li class="dropdown-divider fw-bold"></li>
                 <li><router-link :to="{name: 'sales-products-list'}" class="dropdown-item fw-bold">Products List</router-link></li>
-                <li><router-link :to="{name: 'sales-return'}" class="dropdown-item fw-bold">Accept Return</router-link></li>
+                <li><router-link :to="{name: 'sales-return', params: {receipt: ' '}}" class="dropdown-item fw-bold">Accept Return</router-link></li>
               </ul>
             </div>
           </li>
@@ -360,6 +360,11 @@ ipcRenderer.on('routing', (event, args) => {
   if (!!freezeRouting.value){
     return ipcRenderer.send("errorMessage", "There is a query in progress. Please wait for it to finish")
   }
+
+  if (args === "sales-return"){ //For sales return use empty params
+    return router.push({name: args, params: {receipt: ' '}});
+  }
+
   router.push({name: args});
 
 })

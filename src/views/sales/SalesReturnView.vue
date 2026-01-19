@@ -9,7 +9,7 @@
         <div class="input-group">
           <input type="search" v-model.trim.number="search" ref="searchInput" class="form-control-dark px-3" placeholder="Enter Receipt#">
           <div class="input-group-append">
-            <button type="submit" class="py-2 px-3 text-white bg-primary" name="submitBtn" style="border: none;">
+            <button type="submit" ref="searchButton" class="py-2 px-3 text-white bg-primary" name="submitBtn" style="border: none;">
               <span class="pi pi-search"></span>
             </button>
           </div>
@@ -99,7 +99,11 @@ import db from "@/dbConfig/db";
 import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
 import moment from "moment/moment";
+import {useRoute} from "vue-router";
 
+const route = useRoute();
+
+const searchButton = ref();
 const loading = ref(false);
 const searchInput = ref();
 const search = ref(null);
@@ -116,7 +120,16 @@ const success = ref(false);
 
 const user = computed(() => store.getters.user);
 
-onMounted(() => searchInput.value.focus() )
+onMounted(() =>
+{
+  searchInput.value.focus();
+  if (!!route.params.receipt.trim()){
+    search.value = route.params.receipt;
+    searchButton.value.click();
+  }
+
+}
+)
 
 //Search for receipt number
 const searchReceipt = async (e) => {

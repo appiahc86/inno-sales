@@ -33,7 +33,7 @@ const salesRouter = [
         component: ProductsListView
     },
     {
-        path: '/sales/sales-return',
+        path: '/sales/sales-return/:receipt',
         name: 'sales-return',
         component: SalesReturnView
     }

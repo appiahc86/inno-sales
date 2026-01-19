@@ -66,6 +66,10 @@
                 <div class="col justify-content-end"> <h6><span class="text-warning">Total: </span>{{ formatNumber(total) }}</h6></div>
               </div>
             </div>
+
+            <h6 class="float-end">
+              <span class="fw-bold">Items Count: </span> {{ itemsCount.toLocaleString() }}
+            </h6>
             <h5><span class="text-danger fw-bold">Amount Due: </span>GH¢ {{ formatNumber(total) }}</h5>
           </div>
 
@@ -468,6 +472,8 @@ const totalTax = computed(() => store.getters["wholesaleCartModule/totalTax"]); 
 const total = computed(() => store.getters["wholesaleCartModule/total"]); //get cart total
 const totalDiscount = computed(() => store.getters["wholesaleCartModule/totalDiscount"]); //get total discount
 const cartProfit = computed(() => store.getters["wholesaleCartModule/getProfit"]); //get cart Profit
+const itemsCount = computed(() => store.getters["wholesaleCartModule/getItemsCount"]); //get Items count
+
 
 const clearCart = () => {
   store.dispatch('wholesaleCartModule/clearCart');

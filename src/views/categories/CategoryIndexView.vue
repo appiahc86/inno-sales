@@ -61,7 +61,7 @@
 <dialog ref="editDialog" style="border: 1px solid #ccc; padding: 20px;" class="shadow shadow-lg">
   <form @submit.prevent="editCategory">
     <h5>Edit this record?</h5>
-    <label><b>Name</b> <input type="text" maxlength="20" class="form-control-dark p-1" v-model.trim="editName"></label>&nbsp;
+    <label><b>Name</b> <input type="text" maxlength="100" class="form-control-dark p-1" v-model.trim="editName"></label>&nbsp;
     <button type="submit" class="p-1 px-3 fw-bold bg-dark text-white">Save</button>&nbsp;
     <button type="button" @click="editDialog.close()" class="p-1 px-2 fw-bold">Cancel</button>
   </form>

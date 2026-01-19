@@ -29,21 +29,34 @@
 
           <Column field="orderDate" header="Date" sortable class="data-table-font-size">
            <template #body="{data}">
-             <td>{{ new Date(data.orderDate).toLocaleString() }}</td>
+             <td :class="{'text-danger fw-bold': data.numberOfItems < 0}">{{ new Date(data.orderDate).toLocaleString() }}</td>
            </template>
           </Column>
-          <Column field="id" header="Receipt#" sortable  class="data-table-font-size"></Column>
-          <Column field="firstName" header="Cashier" sortable class="data-table-font-size"></Column>
-          <Column field="numberOfItems" header="No. Of Items" sortable class="data-table-font-size"></Column>
+          <Column field="id" header="Receipt#" sortable  class="data-table-font-size">
+            <template #body="{data}">
+              <td :class="{'text-danger fw-bold': data.numberOfItems < 0}">{{ data.id }}</td>
+            </template>
+          </Column>
+          <Column field="firstName" header="Cashier" sortable class="data-table-font-size">
+            <template #body="{data}">
+              <td :class="{'text-danger fw-bold': data.numberOfItems < 0}">{{ data.firstName }}</td>
+            </template>
+          </Column>
+          <Column field="numberOfItems" header="No. Of Items" sortable class="data-table-font-size">
+            <template #body="{data}">
+              <td :class="{'text-danger fw-bold': data.numberOfItems < 0}">{{ data.numberOfItems }}</td>
+            </template>
+          </Column>
           <Column field="total" header="Total" sortable class="data-table-font-size">
             <template #body="{data}">
-              <td>{{ formatNumber(data.total) }}</td>
+              <td :class="{'text-danger fw-bold': data.numberOfItems < 0}">{{ formatNumber(data.total) }}</td>
             </template>
           </Column>
 
           <Column header="View Details" headerStyle="text-align: center" bodyStyle="text-align: center; overflow: visible" class="data-table-font-size">
             <template #body="{data}">
-              <span type="button" title="View Details" @click="showDetails(data.id)" class="pi pi-eye-slash"></span>
+              <span :class="{'d-none': data.numberOfItems < 0}" type="button" title="View Details"
+                    @click="showDetails(data.id)" class="pi pi-eye-slash"></span>
             </template>
           </Column>
         </DataTable>
@@ -98,9 +111,13 @@
           <div class="" v-if="details.length">
             <h5>Total : <span class="text-danger">{{ details.length ? formatNumber(details[0].total) : 0 }}</span></h5>
             <div class="text-center py-1">
-              <button class="fw-bold btn-secondary" @click="reprint(details.length ? details[0].id : '')">
+              <button class="fw-bold btn-secondary me-3" @click="reprint(details.length ? details[0].id : '')">
                 <span class="pi pi-print"></span>
                 Reprint</button>
+              <button class="fw-bold btn-danger"
+              @click="router.push({name: 'sales-return', params: {receipt: details.length ? details[0].id : ' '}})">
+                <span class="pi pi-undo"></span>
+                Return Items</button>
             </div>
           </div>
           <div v-else><h5 class="text-center">No Match Found</h5></div>
@@ -265,7 +282,9 @@ import {FilterMatchMode} from "primevue/api";
 import db from "@/dbConfig/db";
 import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 
+const router = useRouter();
 const loading = ref(false);
 const detailsLoading = ref(false);
 const orders = ref([]);
@@ -290,9 +309,9 @@ const getOrders = async () => {
         .leftJoin('users', 'orders.userId', '=', 'users.id')
         .select('orders.id', 'orders.orderDate', 'users.firstName',
             'orders.numberOfItems', 'orders.total', 'orders.saleType')
-        .where('type', 'sale')
+        // .where('type', 'sale')
         .orderBy('orders.id', 'DESC')
-        .limit(150)
+        .limit(200)
 
     //filter only cash sales
     if (orders.value.length){

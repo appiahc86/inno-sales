@@ -30,7 +30,7 @@
             <th>Discount</th>
             <th>Ext Price</th>
             <th>Return Qty</th>
-            <th>Return</th>
+            <th><input type="checkbox" :checked="allItemsChecked" @click="toggleSelectAll" class="p-checkbox" title="Select All"> Select All</th>
           </tr>
           </thead>
 
@@ -48,7 +48,7 @@
                      style="max-width: 60px; outline: none; border: 1px solid white; background: #ccc;"
                      :min="1" :max="item.quantity" oninput="validity.valid||(value = max);">
               </td>
-              <td><input type="checkbox" @click="markReturn($event, item.id)" class="p-checkbox"></td>
+              <td><input type="checkbox" :checked="item.toBeReturned" @click="markReturn($event, item.id)" class="p-checkbox"></td>
             </tr>
           </template>
           </tbody>
@@ -207,6 +207,20 @@ const anItemIsChecked = computed(() => {
   }
   return false;
 })
+
+//Check if all items are checked
+const allItemsChecked = computed(() => {
+  if (items.value.length === 0) return false;
+  return items.value.every(item => item.toBeReturned);
+})
+
+//Toggle select all items
+const toggleSelectAll = (e) => {
+  const checked = e.target.checked;
+  for (const item of items.value) {
+    item.toBeReturned = checked;
+  }
+}
 
             //Calculate Change
 const calculateChange = async () => {

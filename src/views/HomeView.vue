@@ -3,7 +3,16 @@
 
     <div class="row mb-3">
 
-      <h4 class="text-black-50 my-3"><b>HOME</b></h4>
+      <h4 class="text-black-50 my-3">
+        <b>HOME</b>
+        <span
+          class="ms-3"
+          style="cursor: pointer; font-size: 0.8em;"
+          @click="showSalesValues = !showSalesValues"
+          :title="showSalesValues ? 'Hide sales values' : 'Show sales values'">
+          {{ showSalesValues ? '&#128065;' : '&#128064;' }}
+        </span>
+      </h4>
 
 
       <div class="col-3">
@@ -15,7 +24,7 @@
                 <div class="h6 mb-0 fw-bold" v-if="loading">
                   <span class="spinner-border spinner-border-sm"></span> loading...
                 </div>
-                <div class="h6 mb-0 fw-bold" v-else>GH¢ {{ formatNumber(momo) }}</div>
+                <div class="h6 mb-0 fw-bold" v-else>{{ showSalesValues ? 'GH¢ ' + formatNumber(momo) : '****' }}</div>
               </div>
               <div class="col-auto">
                 <span title="View Details" style="font-size: 250%; cursor: pointer;" @click="showMomoDetails">&#128241;</span>
@@ -35,7 +44,7 @@
                 <div class="h6 mb-0 fw-bold" v-if="loading">
                   <span class="spinner-border spinner-border-sm"></span> loading...
                 </div>
-                <div class="h6 mb-0 fw-bold" v-else>&nbsp; {{ formatNumber(creditSales) }}</div>
+                <div class="h6 mb-0 fw-bold" v-else>{{ showSalesValues ? formatNumber(creditSales) : '****' }}</div>
               </div>
               <div class="col-auto">
                 <span class="text-black-50" style="font-size: 250%">&#128683;</span>
@@ -55,7 +64,7 @@
                 <div class="h6 mb-0 fw-bold" v-if="loading">
                   <span class="spinner-border spinner-border-sm"></span> loading...
                 </div>
-                <div class="h6 mb-0 fw-bold" v-else>GH¢ {{ formatNumber(cashSales) }}</div>
+                <div class="h6 mb-0 fw-bold" v-else>{{ showSalesValues ? 'GH¢ ' + formatNumber(cashSales) : '****' }}</div>
               </div>
               <div class="col-auto">
                 <span style="font-size: 250%">&#128176;</span>
@@ -75,7 +84,7 @@
                 <div class="h6 mb-0 fw-bold" v-if="loading">
                   <span class="spinner-border spinner-border-sm"></span> loading...
                 </div>
-                <div class="h6 mb-0 fw-bold" v-else>GH¢ {{ formatNumber(totalSales) }}</div>
+                <div class="h6 mb-0 fw-bold" v-else>{{ showSalesValues ? 'GH¢ ' + formatNumber(totalSales) : '****' }}</div>
               </div>
               <div class="col-auto">
                 <span style="font-size: 250%">
@@ -160,6 +169,7 @@ const cashSales = ref(0);
 const momo = ref(0);
 const creditSales = ref(0);
 const store = useStore();
+const showSalesValues = ref(false);
 
 const barChartRecords = ref([]);
 

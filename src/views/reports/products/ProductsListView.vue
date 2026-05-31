@@ -81,19 +81,19 @@
                 <span>{{ new Date().toDateString() }}</span><br>
                 <span>Products List</span>
               </p>
-              <table id="print-table">
+              <table id="print-table" style="font-size: 0.85em; width: 100%; border-collapse: collapse;">
                 <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Product</th>
-                  <th>Category</th>
-                  <th>Exp</th>
+                  <th style="border: 1px solid black;">#</th>
+                  <th style="border: 1px solid black;">Product</th>
+                  <th style="border: 1px solid black;">Category</th>
+                  <th style="border: 1px solid black;">Exp</th>
 <!--                  <th>Date Added</th>-->
 <!--                  <th>Tax</th>-->
-                  <th>Qty</th>
-                  <th>Cost Price</th>
-                  <th>Wholesale</th>
-                  <th>Retail</th>
+                  <th style="border: 1px solid black;">Qty</th>
+                  <th style="border: 1px solid black;">Cost Price</th>
+                  <th style="border: 1px solid black;">Wholesale</th>
+                  <th style="border: 1px solid black;">Retail</th>
 <!--                  <th>Description</th>-->
                 </tr>
                 </thead>
@@ -102,16 +102,16 @@
                 <template v-for="(record, index) in records" :key="record.id">
                   <tbody>
                   <tr>
-                    <th>{{ index + 1 }}</th>
-                    <td>&nbsp; {{ record.productName }}</td>
-                    <td style="text-transform: capitalize;">&nbsp; {{ record.category }}</td>
-                    <td>&nbsp;{{ record.expiration ? new Date(record.expiration).toLocaleDateString() : '' }}</td>
+                    <th style="border: 1px solid black;">{{ index + 1 }}</th>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.productName }}</td>
+                    <td style="text-transform: capitalize; border: 1px solid black;">&nbsp; {{ record.category }}</td>
+                    <td style="border: 1px solid black;">&nbsp;{{ record.expiration ? new Date(record.expiration).toLocaleDateString() : '' }}</td>
 <!--                    <td>&nbsp; {{ new Date(record.dateAdded).toLocaleDateString() }}</td>-->
 <!--                    <td style="text-transform: capitalize;">&nbsp; {{ record.tax }}</td>-->
-                    <td>&nbsp; {{ record.quantity }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.buyingPrice)) }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.wholesalePrice)) }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.sellingPrice)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.quantity }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.buyingPrice)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.wholesalePrice)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.sellingPrice)) }}</td>
 <!--                    <td>&nbsp; {{ record.description }}</td>-->
                   </tr>
                   </tbody>

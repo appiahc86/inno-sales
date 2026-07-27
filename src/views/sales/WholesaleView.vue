@@ -2,7 +2,7 @@
   <div class="container-fluid mt-4">
     <div class="row">
 
-      <h4 class="text-center mt-3 text-secondary mb-3 text-uppercase" style="letter-spacing: 14px; word-spacing: 10px">
+      <h4 class="text-center mt-3 text-info mb-3 text-uppercase" style="letter-spacing: 14px; word-spacing: 10px">
         <b>Wholesale</b>
       </h4>
 
@@ -77,10 +77,12 @@
           <div class="container" v-if="cart.length">
             <div class="row">
               <div class="col">
-                <button class="btn-info text-white" @click="putOnHold"><b>Put On Hold</b></button>
+                <button class="btn-info text-dark fw-bold" @click="putOnHold"><b>Put On Hold</b></button>
               </div>
               <div class="col">
-                <button class="btn-warning float-end" @click="clearCart"><b>Clear Cart</b></button>
+                <button class="btn-danger float-end fw-bold" @click="clearCart">
+                  <b>Clear </b> <span class="pi pi-shopping-cart"></span>
+                </button>
               </div>
             </div>
           </div>
@@ -127,9 +129,9 @@
                   <h6 class="w-50">MoMo</h6>
                 </div>
                 <div class="d-flex">
-                  <input type="number" class="form-control-dark w-50" oninput="validity.valid||(value = 0);"
+                  <input type="number" class="form-control-dark bg-light w-50" oninput="validity.valid||(value = 0);"
                          step="any" v-model="cash" min="0" ref="cashRef"> &nbsp;
-                  <input type="number" class="form-control-dark w-50" oninput="validity.valid||(value = 0);"
+                  <input type="number" class="form-control-dark bg-light w-50" oninput="validity.valid||(value = 0);"
                          step="any" v-model="momo" min="0" ref="momoRef">
                 </div>
 
@@ -148,7 +150,7 @@
                   <input type="checkbox" class="p-checkbox" v-model="printReceipt">
                   &nbsp; <b>Print Receipt</b>
                 </label>
-                <button class="float-end" name="submitBtn" style="width: 80px;" type="submit" :disabled="tendered < total || total === 0">
+                <button class="float-end btn py-1 btn-dark" name="submitBtn" style="width: 80px;" type="submit" :disabled="tendered < total || total === 0">
                   <span class="pi pi-print"></span> Save</button>
               </form>
 
@@ -161,19 +163,20 @@
               <form @submit.prevent="checkout">
 
                 <v-select :options="customers" label="display" v-model="selectedCustomer"
-                          placeholder="Select Customer" class="v-select mb-3" v-if="typeOfSale === 'credit'">
+                          placeholder="Select Customer" class="v-select mb-3 bg-light" v-if="typeOfSale === 'credit'">
                 </v-select>
                 <div class="d-flex">
                   <h6 class="w-50">Invoice Date<span class="text-danger">*</span></h6>
                   <h6 class="w-50">Due Date<span class="text-danger">*</span></h6>
                 </div>
                 <div class="d-flex mb-4">
-                  <input type="date" class="form-control-dark w-50" v-model="invoiceDate" required> &nbsp;
-                  <input type="date" class="form-control-dark w-50" v-model="dueDate" required>
+                  <input type="date" class="form-control-dark bg-light w-50" v-model="invoiceDate" required> &nbsp;
+                  <input type="date" class="form-control-dark bg-light w-50" v-model="dueDate" required>
                 </div>
                 <div class="">
                   <label class="fw-bold">Invoice Number</label> <br>
-                  <input type="text" v-model.trim="invoiceNumber" class="form-control-dark w-50" required>
+                  <input type="text" v-model.trim="invoiceNumber"
+                         class="form-control-dark bg-light w-50" required>
                 </div>
                 <br>
 
@@ -181,7 +184,7 @@
                   <input type="checkbox" class="p-checkbox" v-model="printReceipt">
                   &nbsp; <b>Print Invoice</b>
                 </label>
-                <button class="float-end" name="submitBtn" style="width: 80px;" type="submit"
+                <button class="float-end btn py-1 btn-dark" name="submitBtn" style="width: 80px;" type="submit"
                         :disabled="!selectedCustomer || !total">
                   <span class="pi pi-print"></span> Save</button>
               </form>
@@ -194,35 +197,39 @@
               <form @submit.prevent="checkout">
 
                 <v-select :options="customers" label="display" v-model="selectedCustomer"
-                          placeholder="Select Customer" class="v-select mb-3" v-if="typeOfSale === 'credit'">
+                          placeholder="Select Customer" class="v-select mb-3 bg-light" v-if="typeOfSale === 'credit'">
                 </v-select>
                 <div class="d-flex">
                   <h6 class="w-50">Invoice Date<span class="text-danger">*</span></h6>
                   <h6 class="w-50">Due Date<span class="text-danger">*</span></h6>
                 </div>
                 <div class="d-flex mb-4">
-                  <input type="date" class="form-control-dark w-50" v-model="proformaData.invoiceDate" required> &nbsp;
-                  <input type="date" class="form-control-dark w-50" v-model="proformaData.dueDate" required>
+                  <input type="date" class="form-control-dark bg-light w-50" v-model="proformaData.invoiceDate" required> &nbsp;
+                  <input type="date" class="form-control-dark bg-light w-50" v-model="proformaData.dueDate" required>
                 </div>
 
                 <h6 class="text-center fw-bold">BILL TO</h6>
 
                 <div class="">
                   <label class="fw-bold">Name</label> <br>
-                  <input type="text" v-model.trim="proformaData.name" class="form-control-dark w-100" required>
+                  <input type="text" v-model.trim="proformaData.name"
+                         class="form-control-dark bg-light w-100" required>
                   <br><br>
 
                   <label class="fw-bold">Address</label> <br>
-                  <input type="text" v-model.trim="proformaData.address" class="form-control-dark w-100">
+                  <input type="text" v-model.trim="proformaData.address"
+                         class="form-control-dark bg-light w-100">
                   <br><br>
 
                   <label class="fw-bold">Phone</label> <br>
-                  <input type="text" v-model.trim="proformaData.phone" class="form-control-dark w-50">
+                  <input type="text" v-model.trim="proformaData.phone"
+                         class="form-control-dark bg-light w-50">
 
                 </div>
                 <br>
 
-                <button class="float-end" name="submitBtn" style="width: 80px;" type="submit"
+                <button class="float-end btn py-1 btn-dark" name="submitBtn"
+                        style="width: 80px;" type="submit"
                         :disabled="!total">
                   <span class="pi pi-print"></span> Print</button>
               </form>
@@ -841,6 +848,10 @@ const checkout = async (e) => {
 <style scoped>
 .v-select{
   background: #e7e6e6;
+}
+
+.btn-dark:hover {
+  background: rgb(6 22 30 / 0.66);
 }
 
 </style>

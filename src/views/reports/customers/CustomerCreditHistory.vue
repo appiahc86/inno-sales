@@ -362,7 +362,7 @@ const search = async (e) => {
 
     records.value = filtered;
 
-    if (formData.from === formData.to) message.value = `Sales Report On ${new Date(formData.from).toDateString()}`;
+    if (formData.from === formData.to) message.value = `Credit Report On ${new Date(formData.from).toDateString()}`;
     else message.value = `Credit Report From ${new Date(formData.from).toLocaleDateString()} To ${new Date(formData.to).toLocaleDateString()}`;
 
     customerName.value = formData.selectedCustomer.name;

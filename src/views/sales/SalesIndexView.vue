@@ -77,10 +77,12 @@
        <div class="container" v-if="cart.length">
          <div class="row">
            <div class="col">
-             <button class="btn-info text-white" @click="putOnHold"><b>Put On Hold</b></button>
+             <button class="btn-info fw-bold" @click="putOnHold"><b>Put On Hold</b></button>
            </div>
            <div class="col">
-             <button class="btn-warning float-end" @click="clearCart"><b>Clear Cart</b></button>
+             <button class="btn-danger float-end fw-bold" @click="clearCart">
+               <b>Clear</b> <span class="pi pi-shopping-cart"></span>
+             </button>
            </div>
          </div>
        </div>
@@ -148,7 +150,8 @@
              <input type="checkbox" class="p-checkbox" v-model="printReceipt">
              &nbsp; <b>Print Receipt</b>
            </label>
-           <button class="float-end" name="submitBtn" style="width: 80px;" type="submit" :disabled="tendered < total || total === 0">
+           <button class="float-end btn py-1 btn-dark" name="submitBtn"
+                   style="width: 80px;" type="submit" :disabled="tendered < total || total === 0">
              <span class="pi pi-print"></span> Save</button>
          </form>
 
@@ -181,7 +184,7 @@
                <input type="checkbox" class="p-checkbox" v-model="printReceipt">
                &nbsp; <b>Print Invoice</b>
              </label>
-             <button class="float-end" name="submitBtn" style="width: 80px;" type="submit"
+             <button class="float-end btn py-1 btn-dark" name="submitBtn" style="width: 80px;" type="submit"
                      :disabled="!selectedCustomer || !total">
                <span class="pi pi-print"></span> Save</button>
            </form>
@@ -222,7 +225,7 @@
              </div>
              <br>
 
-             <button class="float-end" name="submitBtn" style="width: 80px;" type="submit"
+             <button class="float-end btn py-1 btn-dark" name="submitBtn" style="width: 80px;" type="submit"
                      :disabled="!total">
                <span class="pi pi-print"></span> Print</button>
            </form>
@@ -835,4 +838,7 @@ const checkout = async (e) => {
   background: #e7e6e6;
 }
 
+.btn-dark:hover {
+  background: rgb(6 22 30 / 0.66);
+}
 </style>

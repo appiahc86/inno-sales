@@ -11,7 +11,8 @@
         </template>
         <template v-else>
           <v-select :options="products" label="productName" v-model="selectedProduct"
-                    placeholder="select product" class="v-select form-control-dark">
+                    placeholder="select product" class="v-select form-control-dark"
+                    :filterable="false" @search="onProductSearch">
           </v-select>
         </template>
 
@@ -97,22 +98,39 @@ const data = reactive({
 })
 
 
-//get all products
+// Product picker is a searchable combobox against the full catalog, not a paged table,
+// so "server-side pagination" here means capping + remote-searching results instead of
+// loading every product into the dropdown up front (matters once the catalog gets large).
+const PRODUCT_RESULT_LIMIT = 50;
+
+const productQuery = () => db('products').select('products.id', 'products.productName', 'products.quantity');
+
+//get initial products shown before the user types anything
 const getAllProducts = async () => {
   try {
     loading.value = true;
-    products.value = await db('products')
-        .select('products.id',
-            'products.productName',
-            'products.quantity',
-        );
-
-    loading.value = false;
-
+    products.value = await productQuery().orderBy('products.productName', 'asc').limit(PRODUCT_RESULT_LIMIT);
   }
   catch (e){ ipcRenderer.send('errorMessage', e.message) }
+  finally { loading.value = false; }
 }
 getAllProducts();
+
+//Remote, debounced search for the product picker (v-select :filterable="false")
+let productSearchDebounce;
+const onProductSearch = (search, setSearchLoading) => {
+  clearTimeout(productSearchDebounce);
+  setSearchLoading(true);
+  productSearchDebounce = setTimeout(async () => {
+    try {
+      let query = productQuery();
+      if (search.trim()) query = query.where('products.productName', 'like', `%${search}%`);
+      products.value = await query.orderBy('products.productName', 'asc').limit(PRODUCT_RESULT_LIMIT);
+    }
+    catch (e){ ipcRenderer.send('errorMessage', e.message) }
+    finally { setSearchLoading(false); }
+  }, 300);
+}
 
 
 

@@ -189,7 +189,7 @@
       </div>
 
       <div class="d-flex" style="position: absolute; bottom: 0">
-        <b class="text-light">&nbsp;Inno Sales 1.0.0</b>
+        <b class="text-light">&nbsp;Inno Sales 2.0.0</b>
         <b><span class="pi pi-arrow-circle-left text-white" style="margin-left: 3.5em; font-size: 1.5em; cursor: pointer;"
                  @click="collapseSidebar" title="Collapse Sidebar"></span></b>
       </div>

@@ -2,7 +2,7 @@
   "name": "inno-sales",
   "author": "Appiah Collins",
   "description": "sales app",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",

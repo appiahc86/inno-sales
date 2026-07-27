@@ -10,7 +10,7 @@ const endingMenu = [
                     dialog.showMessageBox(
                         BrowserWindow.getAllWindows()[0],
                         {type: 'info',
-                            message: `Inno Sales 1.0.0`
+                            message: `Inno Sales 2.0.0`
                         }
                     )
                 }

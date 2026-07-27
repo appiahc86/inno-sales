@@ -81,12 +81,12 @@
                 <span>{{ new Date().toDateString() }}</span><br>
                 <span class="">{{ message }}</span>
               </p>
-              <table id="print-table">
+              <table id="print-table" style="font-size: 0.85em; width: 100%; border-collapse: collapse;">
                 <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Date</th>
-                  <th>Total</th>
+                  <th style="border: 1px solid black;">#</th>
+                  <th style="border: 1px solid black;">Date</th>
+                  <th style="border: 1px solid black;">Total</th>
                 </tr>
                 </thead>
 
@@ -94,9 +94,9 @@
                 <template v-for="(record, index) in records" :key="record.id">
                   <tbody>
                   <tr>
-                    <td>&nbsp; {{ index + 1 }}</td>
-                    <td>&nbsp; {{ new Date(record.orderDate).toLocaleDateString() }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.total)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ index + 1 }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ new Date(record.orderDate).toLocaleDateString() }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.total)) }}</td>
                   </tr>
                   </tbody>
 

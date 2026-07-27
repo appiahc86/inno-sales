@@ -5,6 +5,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const path = require('path');
+const fs = require('fs');
 
 
 //Import menus
@@ -205,5 +206,30 @@ ipcMain.on('confirm', async (event, {id, type, message}) => {
     }
   }
   else console.clear();
+
+})
+
+
+//Export report HTML (produced by the renderer's #printOut element) to a PDF file on disk
+ipcMain.handle('exportToPDF', async (event, {html, defaultFileName}) => {
+
+  const {canceled, filePath} = await dialog.showSaveDialog(win, {
+    title: 'Export to PDF',
+    defaultPath: defaultFileName || 'report.pdf',
+    filters: [{name: 'PDF', extensions: ['pdf']}]
+  });
+
+  if (canceled || !filePath) return {success: false, canceled: true};
+
+  const pdfWindow = new BrowserWindow({show: false});
+
+  try {
+    await pdfWindow.loadURL('data:text/html;charset=UTF-8,' + encodeURIComponent(html));
+    const pdfBuffer = await pdfWindow.webContents.printToPDF({printBackground: true, pageSize: 'A4', landscape: true});
+    await fs.promises.writeFile(filePath, pdfBuffer);
+    return {success: true, filePath};
+  } finally {
+    pdfWindow.destroy();
+  }
 
 })

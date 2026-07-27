@@ -109,18 +109,18 @@
                 <span>{{ new Date().toDateString() }}</span><br>
                 <span class="">{{ message }}</span>
               </p>
-              <table id="print-table">
+              <table id="print-table" style="font-size: 0.85em; width: 100%; border-collapse: collapse;">
                 <thead>
                 <tr>
                   <!--                  <th>Date</th>-->
-                  <th>Cashier</th>
-                  <th>Item</th>
-                  <th>Cost</th>
-                  <th>Selling Price</th>
-                  <th>Qty</th>
-                  <th>Tax</th>
-                  <th>Discount</th>
-                  <th>Total</th>
+                  <th style="border: 1px solid black;">Cashier</th>
+                  <th style="border: 1px solid black;">Item</th>
+                  <th style="border: 1px solid black;">Cost</th>
+                  <th style="border: 1px solid black;">Selling Price</th>
+                  <th style="border: 1px solid black;">Qty</th>
+                  <th style="border: 1px solid black;">Tax</th>
+                  <th style="border: 1px solid black;">Discount</th>
+                  <th style="border: 1px solid black;">Total</th>
                 </tr>
                 </thead>
 
@@ -129,14 +129,14 @@
                   <tbody>
                   <tr>
                     <!--                    <td>&nbsp; {{ new Date(record.date).toLocaleDateString() }}</td>-->
-                    <td>&nbsp; {{ record.user }}</td>
-                    <td>&nbsp; {{ record.productName }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.buyingPrice)) }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.sellingPrice)) }}</td>
-                    <td>&nbsp; {{ parseInt(record.quantity) }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.tax)) }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.discount)) }}</td>
-                    <td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.user }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.productName }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.buyingPrice)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.sellingPrice)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ parseInt(record.quantity) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.tax)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.discount)) }}</td>
+                    <td style="border: 1px solid black;">
                       &nbsp; {{formatNumber( ( (parseInt(record.quantity)*parseFloat(record.sellingPrice)) + parseFloat(record.tax) ) - parseFloat(record.discount) ) }}
                     </td>
 

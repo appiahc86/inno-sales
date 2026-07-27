@@ -165,9 +165,10 @@ import db from "@/dbConfig/db";
 import {formatNumber} from "@/functions";
 import {reactive} from "vue";
 import {useStore} from "vuex";
+import moment from "moment";
 
 const orders = ref([]);
-const outstandingBills = ref([]);
+const outstandingBillsTotal = ref(0);
 const loading = ref(false);
 const dialog = ref();
 const totalPurchases = ref(0);
@@ -204,7 +205,6 @@ const lineChartSeries = reactive([
   {
     name: 'Sale',
     data: [0,0,0,0,0,0,0,0,0,0,0,0]
-
   }
 ])
 
@@ -231,32 +231,21 @@ const totalSales = computed(() => { //Get Annual Sales
   return total;
 })
 
-//Get total bills
-const outstandingBillsTotal = computed(() => {
-  let total = 0;
-  if (outstandingBills.value.length){
-    for (const record of outstandingBills.value) {
-      total += parseFloat(record.total) - (parseFloat(record.totalPaid) || 0);
-    }
-  }
-
-  return total;
-})
-
-
 const startDate = () => { //This will set date to January 1 of the current year
-  let yyyy = new Date().getFullYear();
-  let mm = '01';
-  let dd = '01';
-  return `${yyyy}-${mm}-${dd} 00:00:01`;
+  // let yyyy = new Date().getFullYear();
+  // let mm = '01';
+  // let dd = '01';
+  // return `${yyyy}-${mm}-${dd} 00:00:01`;
+  return moment().startOf('year').format('YYYY-MM-DD HH:mm:ss');
 }
 
 
 const endDate = () => { //This will set date to December 31 of the current year
-  let yyyy = new Date().getFullYear();
-  let mm = '12';
-  let dd = '31';
-  return `${yyyy}-${mm}-${dd} 23:59:59`;
+  // let yyyy = new Date().getFullYear();
+  // let mm = '12';
+  // let dd = '31';
+  // return `${yyyy}-${mm}-${dd} 23:59:59`;
+  return moment().endOf('year').format('YYYY-MM-DD HH:mm:ss');
 }
 
 onMounted(() => {
@@ -299,15 +288,20 @@ const getData = async () => {
       //Get  Number of products
       totalProducts.value = productsLength.value || 0;
 
-      //Outstanding Bills
-      outstandingBills.value = await trx('purchases')
+      //Outstanding Bills - single aggregate instead of fetching every unpaid bill row and summing in JS
+      const paymentsByPurchase = trx('billPayments')
+          .select('purchaseId')
+          .sum('amount as totalPaid')
+          .groupBy('purchaseId');
+
+      const outstanding = await trx('purchases')
           .innerJoin('vendors', 'purchases.vendorId', '=', 'vendors.id')
-          .leftJoin('billPayments', 'purchases.id', 'billPayments.purchaseId')
-          .select('purchases.total', )
-          .sum('billPayments.amount as totalPaid')
-          .groupBy('purchases.id')
-          .havingRaw('?? > ?', ['purchases.total',  db.raw('coalesce(sum(billPayments.amount), 0)'  )] )
-          .orderBy('purchases.id', 'DESC');
+          .leftJoin(paymentsByPurchase.as('payments'), 'payments.purchaseId', 'purchases.id')
+          .whereRaw('purchases.total > coalesce(payments.totalPaid, 0)')
+          .select(db.raw('coalesce(sum(purchases.total - coalesce(payments.totalPaid, 0)), 0) as outstandingTotal'))
+          .first();
+
+      outstandingBillsTotal.value = parseFloat(outstanding?.outstandingTotal) || 0;
 
       // Best-selling products
       bestSellingProducts.value = await trx('products')

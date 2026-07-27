@@ -61,15 +61,15 @@
                 <span>{{ new Date().toDateString() }}</span><br>
                 <span>Outstanding Bills</span>
               </p>
-              <table id="print-table">
+              <table id="print-table" style="font-size: 0.85em; width: 100%; border-collapse: collapse;">
                 <thead>
                 <tr>
-                  <th>Vendor</th>
-                  <th>Invoice#</th>
-                  <th>Bill Date</th>
-                  <th>Due Date</th>
-                  <th>Total</th>
-                  <th>Amount Due</th>
+                  <th style="border: 1px solid black;">Vendor</th>
+                  <th style="border: 1px solid black;">Invoice#</th>
+                  <th style="border: 1px solid black;">Bill Date</th>
+                  <th style="border: 1px solid black;">Due Date</th>
+                  <th style="border: 1px solid black;">Total</th>
+                  <th style="border: 1px solid black;">Amount Due</th>
                 </tr>
                 </thead>
 
@@ -77,12 +77,12 @@
                 <template v-for="record in records" :key="record.id">
                   <tbody>
                   <tr>
-                    <td>&nbsp; {{ record.company }}</td>
-                    <td>&nbsp; {{ record.invoice }}</td>
-                    <td>&nbsp; {{ new Date(record.billDate).toLocaleDateString() }}</td>
-                    <td>&nbsp; {{ new Date(record.invoiceDue).toLocaleDateString() }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.total)) }}</td>
-                    <td>&nbsp; {{ formatNumber(record.total - (record.totalPaid || 0)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.company }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.invoice }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ new Date(record.billDate).toLocaleDateString() }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ new Date(record.invoiceDue).toLocaleDateString() }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.total)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(record.total - (record.totalPaid || 0)) }}</td>
                   </tr>
                   </tbody>
 

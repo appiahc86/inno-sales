@@ -326,10 +326,6 @@ const returnItems = async () => {
         store.dispatch("productsModule/modifyQty", {id: ret.productId, qty: ret.returnQty, type: 'increment'})
       }
 
-      //dispatch qty to vuex store products
-      for (const ret of returningItems.value) {
-        store.dispatch("productsModule/modifyQty", {id: ret.productId, qty: ret.returnQty, type: 'increment'});
-      }
       returningItems.value = [];
       items.value = [];
       success.value = true;

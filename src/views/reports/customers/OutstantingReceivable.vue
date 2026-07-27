@@ -52,14 +52,14 @@
                 <span>{{ new Date().toDateString() }}</span><br>
                 <b>Customer Outstanding Receivables</b>
               </p>
-              <table id="print-table">
+              <table id="print-table" style="font-size: 0.85em; width: 100%; border-collapse: collapse;">
                 <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Name</th>
-                  <th>Company</th>
-                  <th>Phone</th>
-                  <th>Outstanding</th>
+                  <th style="border: 1px solid black;">#</th>
+                  <th style="border: 1px solid black;">Name</th>
+                  <th style="border: 1px solid black;">Company</th>
+                  <th style="border: 1px solid black;">Phone</th>
+                  <th style="border: 1px solid black;">Outstanding</th>
                 </tr>
                 </thead>
 
@@ -67,11 +67,11 @@
                 <template v-for="(record, index) in records" :key="record.id">
                   <tbody>
                   <tr>
-                    <th>{{ index + 1 }}</th>
-                    <td>&nbsp; {{ record.name }}</td>
-                    <td>&nbsp; {{ record.company }}</td>
-                    <td>&nbsp; {{ record.phone }}</td>
-                    <td>&nbsp; {{ formatNumber(record.outstanding) }}</td>
+                    <td style="border: 1px solid black;">{{ index + 1 }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.name }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.company }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.phone }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(record.outstanding) }}</td>
                   </tr>
                   </tbody>
 

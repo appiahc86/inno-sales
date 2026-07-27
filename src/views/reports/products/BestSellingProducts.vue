@@ -30,8 +30,11 @@
     <div class="row">
       <div class="col-12">
 
-        <button class="p-1 fw-bold bg-secondary text-white" v-if="records.length" @click="printReport">
+        <button class="p-1 fw-bold bg-secondary text-white" v-if="totalRecords" @click="printReport">
           <span class="pi pi-print"></span> Print</button>
+        <button class="p-1 fw-bold bg-secondary text-white ms-2" v-if="totalRecords"
+                @click="exportToPDF" :disabled="exportingPDF">
+          <span class="pi pi-file-pdf"></span> {{ exportingPDF ? 'Exporting...' : 'Export to PDF' }}</button>
         <div class="d-flex">
           <h6 class="">{{ message }}</h6>
           <h6 style="margin-left: auto">{{ new Date().toDateString() }}</h6>
@@ -42,11 +45,11 @@
           <DataTable
               :value="records" :paginator="true" dataKey="id"
               class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines"
-              filterDisplay="menu" :rows="10"
+              :lazy="true" :totalRecords="totalRecords" :rows="lazyParams.rows" :loading="loading"
               paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
               :rowsPerPageOptions="[10,25,50]"
               currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-              :globalFilterFields="['productName','category']" responsiveLayout="scroll"
+              responsiveLayout="scroll" @page="onPage" @sort="onSort"
           >
             <template #empty>
               No Record Found.
@@ -78,7 +81,7 @@
                 <td>{{ formatNumber(parseFloat(data.sellingPrice)) }}</td>
               </template>
             </Column>
-            <Column field="quantity" header="Qty Sold" sortable bodyStyle="width:90px !important;" class="data-table-font-size">
+            <Column field="totalSold" header="Qty Sold" sortable bodyStyle="width:90px !important;" class="data-table-font-size">
               <template #body="{data}">
                 <td class="fw-bold">
                   {{ data.totalSold.toLocaleString() }}
@@ -93,7 +96,7 @@
 
         <!--  Print table -->
         <template>
-          <div class="" v-if="records.length">
+          <div class="" v-if="printRecords.length">
 
             <div id="printOut">
               <h4 style="text-align: center;" v-if="settings.companyName">{{ settings.companyName }}</h4>
@@ -102,32 +105,32 @@
                 <span>{{ new Date().toDateString() }}</span><br>
                 <span class="">{{ message }}</span>
               </p>
-              <table id="print-table">
+              <table id="print-table" style="font-size: 0.85em; width: 100%; border-collapse: collapse;">
                 <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Product</th>
-                  <th>Category</th>
-                  <th>Date Added</th>
-                  <th>Cost Price</th>
-                  <th>Wholesale</th>
-                  <th>Retail</th>
-                  <th>Qty Sold</th>
+                  <th style="border: 1px solid black;">#</th>
+                  <th style="border: 1px solid black;">Product</th>
+                  <th style="border: 1px solid black;">Category</th>
+                  <th style="border: 1px solid black;">Date Added</th>
+                  <th style="border: 1px solid black;">Cost Price</th>
+                  <th style="border: 1px solid black;">Wholesale</th>
+                  <th style="border: 1px solid black;">Retail</th>
+                  <th style="border: 1px solid black;">Qty Sold</th>
                 </tr>
                 </thead>
 
 
-                <template v-for="(record, index) in records" :key="record.id">
+                <template v-for="(record, index) in printRecords" :key="record.id">
                   <tbody>
                   <tr>
-                    <th>{{ index + 1 }}</th>
-                    <td>&nbsp; {{ record.productName }}</td>
-                    <td style="text-transform: capitalize;">&nbsp; {{ record.category }}</td>
-                    <td>&nbsp; {{ new Date(record.dateAdded).toLocaleDateString() }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.buyingPrice)) }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.wholesalePrice)) }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.sellingPrice)) }}</td>
-                    <td>&nbsp; {{ record.totalSold.toLocaleString() }}</td>
+                    <td style="border: 1px solid black;">{{ index + 1 }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.productName }}</td>
+                    <td style="text-transform: capitalize; border: 1px solid black;">&nbsp; {{ record.category }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ new Date(record.dateAdded).toLocaleDateString() }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.buyingPrice)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.wholesalePrice)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.sellingPrice)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.totalSold.toLocaleString() }}</td>
                   </tr>
                   </tbody>
 
@@ -147,7 +150,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, nextTick, onMounted, reactive, ref, shallowRef} from "vue";
 import db from "@/dbConfig/db";
 import {formatNumber} from "@/functions";
 import {useStore} from "vuex";
@@ -156,11 +159,31 @@ import {useStore} from "vuex";
 const submitButton = ref();
 const loading = ref(false);
 const records = ref([]);
+// shallowRef: avoids deep-proxying every field of every row for a full-report print list
+const printRecords = shallowRef([]);
 const message = ref(null);
 const quantity = ref(5);
 const store = useStore();
+const totalRecords = ref(0);
+const lazyParams = reactive({ first: 0, rows: 10, sortField: null, sortOrder: null });
 
 const settings = computed(() => store.getters.setting)
+
+const SORT_FIELD_MAP = {
+  productName: 'products.productName',
+  category: 'categories.name',
+  dateAdded: 'products.dateAdded',
+  buyingPrice: 'products.buyingPrice',
+  wholesalePrice: 'products.wholesalePrice',
+  sellingPrice: 'products.sellingPrice',
+  totalSold: 'totalSold'
+};
+
+const productColumns = [
+  'products.id', 'products.productName', 'products.buyingPrice',
+  'products.wholesalePrice', 'products.sellingPrice',
+  'products.dateAdded', 'categories.name as category'
+];
 
 const startDate = () => { //This will set date to January 1 of the current year
   let yyyy = new Date().getFullYear();
@@ -182,30 +205,60 @@ onMounted(() => {
   submitButton.value.click();
 })
 
+const baseQuery = () => db('products')
+    .innerJoin('orderDetails', 'products.id', '=', 'orderDetails.productId')
+    .innerJoin('categories', 'categories.id', 'orderDetails.categoryId')
+    .whereRaw('orderDetails.date >= ?', [startDate()])
+    .andWhereRaw('orderDetails.date <= ?', [endDate()]);
+
+//get products for the current page (server-side pagination)
+const fetchRecords = async () => {
+  try {
+    loading.value = true;
+
+    const countResult = await baseQuery().countDistinct('products.id as count').first();
+    totalRecords.value = parseInt(countResult?.count, 10) || 0;
+
+    // default ranking is by qty sold (desc) until the user explicitly sorts a column
+    const sortColumn = SORT_FIELD_MAP[lazyParams.sortField] || 'totalSold';
+    const sortDir = lazyParams.sortField ? (lazyParams.sortOrder === -1 ? 'desc' : 'asc') : 'desc';
+
+    records.value = await baseQuery()
+        .sum('orderDetails.quantity as totalSold')
+        .select(...productColumns)
+        .groupBy('products.id')
+        .orderBy(sortColumn, sortDir)
+        .limit(lazyParams.rows)
+        .offset(lazyParams.first);
+
+    message.value = `Best Selling Products (${new Date().getFullYear()})`;
+
+  }
+  catch (e){ ipcRenderer.send('errorMessage', e.message) }
+  finally { loading.value = false; }
+}
+
+//Handle paginator page/rows change
+const onPage = (event) => {
+  lazyParams.first = event.first;
+  lazyParams.rows = event.rows;
+  fetchRecords();
+}
+
+//Handle column sort change
+const onSort = (event) => {
+  lazyParams.sortField = event.sortField;
+  lazyParams.sortOrder = event.sortOrder;
+  fetchRecords();
+}
 
 //Search
 const search = async (e) => {
   e.target.submitBtn.disabled = false;
   loading.value = true;
   try {
-
-    records.value = await db('products')
-        .innerJoin('orderDetails', 'products.id', '=','orderDetails.productId')
-        .innerJoin('categories', 'categories.id', 'orderDetails.categoryId')
-        .sum('orderDetails.quantity as totalSold')
-        .whereRaw('orderDetails.date >= ?', [startDate()])
-        .andWhereRaw('orderDetails.date <= ?', [endDate()])
-        .select('products.id','products.productName','products.buyingPrice',
-            'products.wholesalePrice', 'products.sellingPrice',
-            'products.dateAdded','categories.name as category'
-        )
-        .groupBy('products.id')
-        .orderBy('totalSold', 'desc')
-        // .limit(10)
-
-    message.value = `Best Selling Products (${new Date().getFullYear()})`;
-
-
+    lazyParams.first = 0;
+    await fetchRecords();
   }
   catch (e){ ipcRenderer.send('errorMessage', e.message) }
   finally {
@@ -217,11 +270,43 @@ const search = async (e) => {
 
 
 
+//Fetch the full, unpaginated list into #printOut - shared by Print and Export to PDF
+const loadPrintOut = async () => {
+  printRecords.value = await baseQuery()
+      .sum('orderDetails.quantity as totalSold')
+      .select(...productColumns)
+      .groupBy('products.id')
+      .orderBy('totalSold', 'desc');
+  await nextTick();
+}
+
 //Print Report
-const printReport = () => {
-  const printOut = document.querySelector('#printOut');
-  printTiny(printOut, {scanStyles: false, scanHTML: true});
-  console.clear();
+const printReport = async () => {
+  try {
+    await loadPrintOut();
+    const printOut = document.querySelector('#printOut');
+    printTiny(printOut, {scanStyles: false, scanHTML: true});
+    console.clear();
+  } catch (e) { ipcRenderer.send('errorMessage', e.message) }
+}
+
+//Export Report to PDF - renders #printOut in a hidden window in the main process and saves it
+const exportingPDF = ref(false);
+const exportToPDF = async () => {
+  try {
+    exportingPDF.value = true;
+    await loadPrintOut();
+    const printOut = document.querySelector('#printOut');
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Best Selling Products</title></head><body>${printOut.outerHTML}</body></html>`;
+
+    const result = await ipcRenderer.invoke('exportToPDF', {
+      html,
+      defaultFileName: `Best Selling Products ${new Date().toISOString().slice(0, 10)}.pdf`
+    });
+
+    if (result?.success) ipcRenderer.send('successMessage', `Saved to ${result.filePath}`);
+  } catch (e) { ipcRenderer.send('errorMessage', e.message) }
+  finally { exportingPDF.value = false; }
 }
 
 </script>

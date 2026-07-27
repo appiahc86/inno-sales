@@ -309,14 +309,9 @@ const getOrders = async () => {
         .leftJoin('users', 'orders.userId', '=', 'users.id')
         .select('orders.id', 'orders.orderDate', 'users.firstName',
             'orders.numberOfItems', 'orders.total', 'orders.saleType')
-        // .where('type', 'sale')
+        .where('orders.saleType', 'cash')
         .orderBy('orders.id', 'DESC')
         .limit(200)
-
-    //filter only cash sales
-    if (orders.value.length){
-      orders.value = orders.value.filter((item) => { return item.saleType === "cash"})
-    }
 
 
   }catch (e) { ipcRenderer.send('errorMessage', e.message); }

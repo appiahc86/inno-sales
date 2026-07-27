@@ -123,12 +123,14 @@
               <DataTable
                   :value="products" :paginator="true" dataKey="id"
                   class="p-datatable-sm p-datatable-striped p-datatable-hoverable-rows p-datatable-gridlines"
-                  filterDisplay="menu" :rows="10" v-model:filters="filters" :loading="loading"
+                  :lazy="true" :totalRecords="totalRecords" :rows="lazyParams.rows"
+                  v-model:filters="filters" :loading="loading"
                   paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                   :rowsPerPageOptions="[10,25,50]" v-model:selection="selectedProducts"
                   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                  :globalFilterFields="['productName','category', 'description']" responsiveLayout="scroll"
+                  responsiveLayout="scroll"
                   contextMenu v-model:contextMenuSelection="selectedRow" @row-contextmenu="onRowContextMenu"
+                  @page="onPage" @sort="onSort"
               >
                 <template #header>
                   <div class="d-flex justify-content-center align-items-center" style="height: 15px">
@@ -159,7 +161,7 @@
                     <td class="text-capitalize">{{ data.category }}</td>
                   </template>
                 </Column>
-                <Column header="Expiration" sortable class="data-table-font-size" style="width: 20px;">
+                <Column field="expiration" header="Expiration" sortable class="data-table-font-size" style="width: 20px;">
                   <template #body="{data}">
                     <td >{{ data.expiration ? new Date(data.expiration).toLocaleDateString() : '' }}</td>
                   </template>
@@ -392,7 +394,7 @@
 </template>
 
 <script setup>
-import {reactive, ref} from "vue";
+import {reactive, ref, watch} from "vue";
 import * as Validator from "validatorjs";
 import db from "@/dbConfig/db";
 import { FilterMatchMode } from "primevue/api";
@@ -412,6 +414,8 @@ const secondActive = ref(false);
     const detailsLoading = ref(false);
     const categories = ref([]);
     const products = ref([]);
+    const totalRecords = ref(0);
+    const lazyParams = reactive({ first: 0, rows: 10, sortField: null, sortOrder: null });
     const productDetails = ref();
     const detailsDialog = ref();
     const categoryDialog = ref(null);
@@ -474,26 +478,60 @@ const getCategories = async () => {
 }
 getCategories();
 
-    //get all products
+    // maps DataTable sort field -> actual SQL column for server-side sorting
+    const SORT_FIELD_MAP = {
+      productName: 'products.productName',
+      category: 'categories.name',
+      expiration: 'products.expiration',
+      buyingPrice: 'products.buyingPrice',
+      wholesalePrice: 'products.wholesalePrice',
+      sellingPrice: 'products.sellingPrice',
+      quantity: 'products.quantity',
+      warehouseQty: 'products.warehouseQty'
+    };
+
+    //get products for the current page (server-side pagination)
     const getAllProducts = async () => {
 
       try {
 
         loading.value = true;
 
-          products.value = await db('products')
-              .leftJoin('categories', 'products.category', '=','categories.id')
-              .select('products.id',
-                  'products.productName',
-                  'products.buyingPrice',
-                  'products.wholesalePrice',
-                  'products.sellingPrice',
-                  'products.quantity',
-                  'products.warehouseQty',
-                  'products.expiration',
-                  'categories.name as category',
-                  'categories.id as categoryId'
-              )
+        const search = filters.value.global.value?.trim();
+
+        const baseQuery = () => {
+          const query = db('products')
+              .leftJoin('categories', 'products.category', '=', 'categories.id');
+          if (search) {
+            query.where(builder => {
+              builder.where('products.productName', 'like', `%${search}%`)
+                  .orWhere('categories.name', 'like', `%${search}%`)
+                  .orWhere('products.description', 'like', `%${search}%`);
+            });
+          }
+          return query;
+        }
+
+        const countResult = await baseQuery().count('products.id as count').first();
+        totalRecords.value = parseInt(countResult?.count, 10) || 0;
+
+        const sortColumn = SORT_FIELD_MAP[lazyParams.sortField] || 'products.productName';
+
+        products.value = await baseQuery()
+            .select('products.id',
+                'products.productName',
+                'products.buyingPrice',
+                'products.wholesalePrice',
+                'products.sellingPrice',
+                'products.quantity',
+                'products.warehouseQty',
+                'products.expiration',
+                'categories.name as category',
+                'categories.id as categoryId'
+            )
+            .orderBy(sortColumn, lazyParams.sortOrder === -1 ? 'desc' : 'asc')
+            .limit(lazyParams.rows)
+            .offset(lazyParams.first);
 
       }
       catch (e){ ipcRenderer.send('errorMessage', e.message) }
@@ -504,6 +542,30 @@ getCategories();
 
     }
     getAllProducts();
+
+    //Handle paginator page/rows change
+    const onPage = (event) => {
+      lazyParams.first = event.first;
+      lazyParams.rows = event.rows;
+      getAllProducts();
+    }
+
+    //Handle column sort change
+    const onSort = (event) => {
+      lazyParams.sortField = event.sortField;
+      lazyParams.sortOrder = event.sortOrder;
+      getAllProducts();
+    }
+
+    //Debounced re-fetch on global search
+    let searchDebounce;
+    watch(() => filters.value.global.value, () => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => {
+        lazyParams.first = 0;
+        getAllProducts();
+      }, 300);
+    });
 
 
     //View product details
@@ -584,9 +646,8 @@ const resetEditProductData = () => {
                 expiration:   productData.expiration ? productData.expiration : ''
               });
 
-          //Update on front-end
-          const cat = categories.value.filter(c => c.id.toString() === productData.category.toString());
-          products.value.push({ ...productData, id: product[0], categoryId: productData.category, category: cat[0].name })
+          //Refresh current page from the database (row may land on a different page)
+          await getAllProducts();
 
           //push to vuex store products
           store.dispatch("productsModule/addProduct", {
@@ -633,23 +694,7 @@ const resetEditProductData = () => {
               });
           editProductDialog.value.close(); // Close edit dialog
 
-          products.value.map(product => { //Update data in front end without reloading from database
-            if (product.id === editProductData.id){
-              const cat = categories.value.filter(c => c.id.toString() === editProductData.category.toString());
-              product.buyingPrice = parseFloat(editProductData.buyingPrice);
-              product.category = cat[0].name;
-              product.categoryId = editProductData.category;
-              product.description = editProductData.description;
-              product.tax = editProductData.tax;
-              product.id = editProductData.id;
-              product.productName = editProductData.productName;
-              product.expiration = editProductData.expiration ? editProductData.expiration : product.expiration;
-              product.quantity = editProductData.quantity;
-              product.warehouseQty = editProductData.warehouseQty;
-              product.sellingPrice = parseFloat(editProductData.sellingPrice);
-              product.wholesalePrice = parseFloat(editProductData.wholesalePrice);
-            }
-          })
+          await getAllProducts(); //Refresh current page from the database
 
           //Update product expiration date in vuex store
           if (editProductData.expiration){
@@ -689,12 +734,12 @@ const resetEditProductData = () => {
       try {
         await db('products').whereIn('id', args).del();
         selectedProducts.value = []; //clear selected products
-        const newPros = [];
-        for (const p of products.value) {
-          if (!args.includes(p.id)) newPros.push(p)
-        }
 
-        products.value = newPros;
+        //If the deleted rows emptied the current page, step back a page
+        if (products.value.length <= args.length && lazyParams.first > 0) {
+          lazyParams.first = Math.max(0, lazyParams.first - lazyParams.rows);
+        }
+        await getAllProducts(); //Refresh current page from the database
 
         //Update in vuex store
         store.dispatch("productsModule/deleteProduct", args);

@@ -159,6 +159,7 @@ import {formatNumber} from "@/functions";
 import db from "@/dbConfig/db";
 import {onMounted, watch} from "vue";
 import {useStore} from "vuex";
+import moment from "moment";
 
 const loading = ref(false);
 const loadingDialog = ref();
@@ -221,10 +222,10 @@ const pieChartSeries = ref( []);
 
 //Today's date
 const today = () => {
-  let yyyy = new Date().getFullYear();
-  let mm = ( new Date().getMonth() + 1) < 10 ? '0' + ( new Date().getMonth() + 1) : new Date().getMonth() + 1;
-  let dd = (new Date().getDate()) < 10 ? '0' + (new Date().getDate()) : (new Date().getDate());
-  return {start: `${yyyy}-${mm}-${dd} 00:00:01`, end: `${yyyy}-${mm}-${dd} 23:59:59`};
+  return {
+    start: moment().startOf('day').format('YYYY-MM-DD HH:mm:ss'),
+    end: moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
+  };
 }
 const interval = today();
 
@@ -248,22 +249,23 @@ const getData = async () => {
     await db.transaction( async tx => {
 
     //...............................Today's sales................................
-    const query = await tx('orders')
+    const salesBySaleType = await tx('orders')
         .whereRaw('orderDate >= ?', [interval.start])
         .andWhereRaw('orderDate <= ?', [interval.end])
-        .select('orders.saleType', 'total', 'momo')
+        .select('saleType')
+        .sum('total as total')
+        .sum('momo as momoTotal')
+        .groupBy('saleType')
 
 
-
-
-    for (const record of query) {
+    for (const record of salesBySaleType) {
       if (record.saleType === 'credit') {
-        creditSales.value += parseFloat(record.total);
-        momo.value += parseFloat(record.momo);
+        creditSales.value += parseFloat(record.total) || 0;
+        momo.value += parseFloat(record.momoTotal) || 0;
       }
       else if (record.saleType === 'cash') {
-        cashSales.value += record.total;
-        momo.value += parseFloat(record.momo);
+        cashSales.value += parseFloat(record.total) || 0;
+        momo.value += parseFloat(record.momoTotal) || 0;
       }
     }
 

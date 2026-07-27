@@ -16,7 +16,8 @@
        </template>
        <template v-else>
          <v-select :options="products" label="display" v-model="selectedProduct"
-           placeholder="select product" class="v-select">
+           placeholder="select product" class="v-select"
+           :filterable="false" @search="onProductSearch">
          </v-select>
        </template>
 
@@ -384,36 +385,69 @@ const editData = reactive({
   discountInPercentage: 0
 })
 
-//get all products
+// Product picker is a searchable combobox against the full catalog, not a paged table,
+// so "server-side pagination" here means capping + remote-searching results instead of
+// loading every product into the dropdown up front (matters once the catalog gets large).
+const PRODUCT_RESULT_LIMIT = 50;
+
+const productQuery = () => db('products')
+    .leftJoin('categories', 'products.category', '=','categories.id')
+    .select('products.id',
+        'products.productName',
+        'products.sellingPrice',
+        'products.buyingPrice',
+        'products.quantity',
+        'products.tax',
+        'categories.id as categoryId'
+    );
+
+const mapProducts = (rows) => {
+  rows.map(p => {
+    p.qty = 1;
+    p.discount = 0;
+    p.display = p.productName + " " + " ---->"  + " price = " + formatNumber(p.sellingPrice);
+    p.originalPrice = p.sellingPrice;
+    p.salesTax = 0;
+    p.total = 0;
+  })
+  return rows;
+}
+
+//get initial products shown before the cashier types anything
 const getAllProducts = async () => {
   try {
-        loading.value = true;
-    products.value = await db('products')
-        .leftJoin('categories', 'products.category', '=','categories.id')
-        .select('products.id',
-            'products.productName',
-            'products.sellingPrice',
-            'products.buyingPrice',
-            'products.quantity',
-            'products.tax',
-            'categories.id as categoryId'
-        );
-    products.value.map(p => {
-      p.qty = 1;
-      p.discount = 0;
-      p.display = p.productName + " " + " ---->"  + " price = " + formatNumber(p.sellingPrice);
-      p.originalPrice = p.sellingPrice;
-      p.salesTax = 0;
-      p.total = 0;
-
-    })
-
-    loading.value = false;
-
+    loading.value = true;
+    const rows = await productQuery()
+        .orderBy('products.productName', 'asc')
+        .limit(PRODUCT_RESULT_LIMIT);
+    products.value = mapProducts(rows);
   }
   catch (e){ ipcRenderer.send('errorMessage', e.message) }
+  finally { loading.value = false; }
 }
 getAllProducts();
+
+//Remote, debounced search for the product picker (v-select :filterable="false")
+let productSearchDebounce;
+const onProductSearch = (search, setSearchLoading) => {
+  clearTimeout(productSearchDebounce);
+  setSearchLoading(true);
+  productSearchDebounce = setTimeout(async () => {
+    try {
+      let query = productQuery();
+      if (search.trim()) {
+        query = query.where(builder => {
+          builder.where('products.productName', 'like', `%${search}%`)
+              .orWhere('categories.name', 'like', `%${search}%`);
+        });
+      }
+      const rows = await query.orderBy('products.productName', 'asc').limit(PRODUCT_RESULT_LIMIT);
+      products.value = mapProducts(rows);
+    }
+    catch (e){ ipcRenderer.send('errorMessage', e.message) }
+    finally { setSearchLoading(false); }
+  }, 300);
+}
 
 
 //.............Get all Customers .........................

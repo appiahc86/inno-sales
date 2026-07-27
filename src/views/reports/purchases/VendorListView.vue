@@ -46,15 +46,15 @@
                 <span>{{ new Date().toDateString() }}</span><br>
                 <b>Vendor List</b>
               </p>
-              <table id="print-table">
+              <table id="print-table" style="font-size: 0.85em; width: 100%; border-collapse: collapse;">
                 <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Company</th>
-                  <th>Address</th>
-                  <th>Contact Person</th>
-                  <th>Phone</th>
-                  <th>Account Number</th>
+                  <th style="border: 1px solid black;">#</th>
+                  <th style="border: 1px solid black;">Company</th>
+                  <th style="border: 1px solid black;">Address</th>
+                  <th style="border: 1px solid black;">Contact Person</th>
+                  <th style="border: 1px solid black;">Phone</th>
+                  <th style="border: 1px solid black;">Account Number</th>
                 </tr>
                 </thead>
 
@@ -62,12 +62,12 @@
                 <template v-for="(record, index) in records" :key="record.id">
                   <tbody>
                   <tr>
-                    <th>{{ index + 1 }}</th>
-                    <td>&nbsp; {{ record.company }}</td>
-                    <td>&nbsp; {{ record.address }}</td>
-                    <td>&nbsp; {{ record.contactPerson }}</td>
-                    <td>&nbsp; {{ record.phone }}</td>
-                    <td>&nbsp; {{ record.accountNumber }}</td>
+                    <td style="border: 1px solid black;">{{ index + 1 }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.company }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.address }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.contactPerson }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.phone }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.accountNumber }}</td>
                   </tr>
                   </tbody>
 

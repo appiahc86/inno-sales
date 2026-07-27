@@ -13,6 +13,7 @@
   import QuantityAdjustment from "@/models/QuantityAdjustment";
   import PriceAdjustment from "@/models/PriceAdjustment";
   import Profit from "@/models/Profit";
+  import ensureIndices from "@/models/indices";
 
 const migrations =  [
     Category, User, Product, Customer, Order, OrderDetails, Profit, Settings,
@@ -24,6 +25,8 @@ const migrations =  [
     for (const migration of migrations) {
         await migration();
     }
+
+    await ensureIndices(); // backfill indices on existing databases (safe, idempotent)
 
       console.log('Database Connected')
   }

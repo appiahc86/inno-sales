@@ -78,13 +78,13 @@
                 <span>{{ new Date().toDateString() }}</span><br>
                 <span class="">{{ message }}</span>
               </p>
-              <table id="print-table">
+              <table id="print-table" style="font-size: 0.85em; width: 100%; border-collapse: collapse;">
                 <thead>
                 <tr>
-                  <th>Vendor</th>
-                  <th>Invoice#</th>
-                  <th>Date</th>
-                  <th>Amount Paid</th>
+                  <th style="border: 1px solid black;">Vendor</th>
+                  <th style="border: 1px solid black;">Invoice#</th>
+                  <th style="border: 1px solid black;">Date</th>
+                  <th style="border: 1px solid black;">Amount Paid</th>
                 </tr>
                 </thead>
 
@@ -92,10 +92,10 @@
                 <template v-for="record in records" :key="record.id">
                   <tbody>
                   <tr>
-                    <td>&nbsp; {{ record.company }}</td>
-                    <td>&nbsp; {{ record.invoice }}</td>
-                    <td>&nbsp; {{ new Date(record.date).toLocaleDateString() }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.amount)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.company }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.invoice }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ new Date(record.date).toLocaleDateString() }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.amount)) }}</td>
                   </tr>
                   </tbody>
 

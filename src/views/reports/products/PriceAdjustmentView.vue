@@ -89,15 +89,15 @@
                 <span>{{ new Date().toDateString() }}</span><br>
                 <span class="">{{ message }}</span>
               </p>
-              <table id="print-table">
+              <table id="print-table" style="font-size: 0.85em; width: 100%; border-collapse: collapse;">
                 <thead>
                 <tr>
-                  <th>Product</th>
-                  <th>Date</th>
-                  <th>User</th>
-                  <th>Old Price</th>
-                  <th>New Price</th>
-                  <th>Reason</th>
+                  <th style="border: 1px solid black;">Product</th>
+                  <th style="border: 1px solid black;">Date</th>
+                  <th style="border: 1px solid black;">User</th>
+                  <th style="border: 1px solid black;">Old Price</th>
+                  <th style="border: 1px solid black;">New Price</th>
+                  <th style="border: 1px solid black;">Reason</th>
                 </tr>
                 </thead>
 
@@ -105,12 +105,12 @@
                 <template v-for="record in records" :key="record.id">
                   <tbody>
                   <tr>
-                    <td>&nbsp; {{ record.productName }}</td>
-                    <td>&nbsp; {{ new Date(record.date).toLocaleDateString() }}</td>
-                    <td>&nbsp; {{ record.user }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.oldPrice)) }}</td>
-                    <td>&nbsp; {{ formatNumber(parseFloat(record.newPrice)) }}</td>
-                    <td>&nbsp; {{ record.reason }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.productName }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ new Date(record.date).toLocaleDateString() }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.user }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.oldPrice)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ formatNumber(parseFloat(record.newPrice)) }}</td>
+                    <td style="border: 1px solid black;">&nbsp; {{ record.reason }}</td>
                   </tr>
                   </tbody>
 
